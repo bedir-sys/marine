@@ -3024,13 +3024,13 @@ const MSAL_CLIENT_ID = 'fd5e2c28-7c0d-4770-8a6d-01af9236faa4';
 const MSAL_TENANT_ID = 'd153c3ba-e435-41de-a598-fb76ad7bf301';
 const MSAL_SCOPES    = ['https://yasaholding.sharepoint.com/AllSites.Write'];
 
-let _cloudReady  = false;
-let _currentUser = null;
-let _saveTimer   = null;
-let _msalApp     = null;
-let _msalAccount = null;
-let _requestDigest = null;
-let _digestExpiry  = 0;
+var _cloudReady  = false;
+var _currentUser = null;
+var _saveTimer   = null;
+var _msalApp     = null;
+var _msalAccount = null;
+var _requestDigest = null;
+var _digestExpiry  = 0;
 
 // ── SharePoint base URL ───────────────────────────────────────
 function _spBase() { return 'https://yasaholding.sharepoint.com/sites/Marinesuperintendent'; }
