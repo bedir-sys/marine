@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <style>
 :root {
   --navy: #f8fafc;
@@ -1476,7 +1477,7 @@ function saveAssignments(a) {
 function init() {
   updateDate();
   loadSavedData();          // load from localStorage immediately (offline fallback)
-  rebuildDropdowns();
+  // NOTE: rebuildDropdowns() is now always called inside loadSavedData() — no need here
   cloudInit();              // then try to connect to SharePoint
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeModal();
@@ -1635,11 +1636,15 @@ function loadSavedData() {
       reportFileName = s.reportFileName || '';
       reportDate = s.reportDate || '';
       if (allVessels.length > 0) {
-        renderAll();
+        renderAll();        // renderAll already calls rebuildDropdowns()
         showReportBar();
+      } else {
+        rebuildDropdowns(); // no vessels yet — still need dropdowns for filters
       }
     }
   } catch(e) { console.log('No saved state'); }
+  // Guard: if somehow no state was found at all, ensure dropdowns are populated
+  if (!document.querySelector('#marineFilter option[value!=""]')) rebuildDropdowns();
 }
 
 function saveState() {
@@ -2292,18 +2297,28 @@ function onCertChange(el, key, vesselName) {
       if (lbl) lbl.style.color = st === 'overdue' ? '#991b1b' : st === 'warn' ? '#92400e' : '';
     }
   }
-  // Auto-save
+  // Auto-save with per-field timestamp for fine-grained cloud merge
   const data = loadCerts(vesselName);
   data[key] = raw;
+  if (!data._ts) data._ts = {};
+  data._ts[key] = new Date().toISOString();
   saveCertsLocal(vesselName, data);
   renderVessels();
 }
 
 function saveCertsFromModal(vesselName) {
-  const data = {};
+  const existing = loadCerts(vesselName);
+  const data = { _ts: existing._ts || {} };
+  const now = new Date().toISOString();
   CERT_FIELDS.forEach(f => {
     const el = document.getElementById('cert_' + f.key);
-    if (el) data[f.key] = el.value.trim();
+    if (el) {
+      data[f.key] = el.value.trim();
+      // Only update timestamp if the value actually changed
+      if (data[f.key] !== existing[f.key]) {
+        data._ts[f.key] = now;
+      }
+    }
   });
   saveCertsLocal(vesselName, data);
   renderVessels(); // Refresh cards immediately
@@ -2994,39 +3009,84 @@ window.lsaHandleFile = function(e) {
 };
 
 // ══════════════════════════════════════════════════════════════════
-//  SHAREPOINT REST API INTEGRATION (no MSAL — uses SharePoint session)
+//  SHAREPOINT REST API INTEGRATION — MSAL (Azure AD token auth)
+//  Works from any domain (GitHub Pages, local, etc.)
 // ══════════════════════════════════════════════════════════════════
 
-const CLOUD_SITE_PATH  = '/sites/Marinesuperintendent';
+const CLOUD_SP_HOST     = 'https://yasaholding.sharepoint.com';
+const CLOUD_SITE_PATH   = '/sites/Marinesuperintendent';
 const CLOUD_FILE_FOLDER = 'Shared Documents/YASA Marine Dashboard';
 const CLOUD_FILE_NAME   = 'dashboard-data.json';
-const CLOUD_API_BASE    = `/_api/web/GetFolderByServerRelativeUrl('${CLOUD_FILE_FOLDER}')`;
+
+// Azure App Registration
+const MSAL_CLIENT_ID = 'fd5e2c28-7c0d-4770-8a6d-01af9236faa4';
+const MSAL_TENANT_ID = 'd153c3ba-e435-41de-a598-fb76ad7bf301';
+const MSAL_SCOPES    = ['https://yasaholding.sharepoint.com/AllSites.Write'];
 
 let _cloudReady  = false;
 let _currentUser = null;
 let _saveTimer   = null;
+let _msalApp     = null;
+let _msalAccount = null;
 let _requestDigest = null;
 let _digestExpiry  = 0;
 
-// ── Get SharePoint base URL ───────────────────────────────────
-function _spBase() {
-  // Extract https://tenant.sharepoint.com/sites/SiteName
-  const url = window.location.href;
-  const m = url.match(/(https:\/\/[^\/]+\/sites\/[^\/]+)/i);
-  if (m) return m[1];
-  // fallback: origin + hardcoded path
-  return window.location.origin + '/sites/Marinesuperintendent';
+// ── SharePoint base URL ───────────────────────────────────────
+function _spBase() { return CLOUD_SP_HOST + CLOUD_SITE_PATH; }
+
+// ── Initialize MSAL ───────────────────────────────────────────
+function _initMsal() {
+  if (_msalApp) return _msalApp;
+  const config = {
+    auth: {
+      clientId:    MSAL_CLIENT_ID,
+      authority:   `https://login.microsoftonline.com/${MSAL_TENANT_ID}`,
+      redirectUri: window.location.href.split('?')[0].split('#')[0]
+    },
+    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
+  };
+  _msalApp = new msal.PublicClientApplication(config);
+  return _msalApp;
 }
 
-// ── Get request digest (CSRF token for writes) ────────────────
+// ── Acquire token (silent → popup fallback) ───────────────────
+async function _getToken() {
+  const app = _initMsal();
+  // Handle redirect response if any
+  try { await app.handleRedirectPromise(); } catch(e) {}
+
+  const accounts = app.getAllAccounts();
+  if (accounts.length > 0) _msalAccount = accounts[0];
+
+  const req = { scopes: MSAL_SCOPES, account: _msalAccount || undefined };
+  try {
+    const res = await app.acquireTokenSilent(req);
+    _msalAccount = res.account;
+    return res.accessToken;
+  } catch(e) {
+    // Silent failed → popup
+    try {
+      const res = await app.acquireTokenPopup(req);
+      _msalAccount = res.account;
+      return res.accessToken;
+    } catch(e2) {
+      throw new Error('MSAL token acquisition failed: ' + e2.message);
+    }
+  }
+}
+
+// ── Auth headers helper ───────────────────────────────────────
+async function _authHeaders(extra) {
+  const token = await _getToken();
+  return Object.assign({ Authorization: 'Bearer ' + token, Accept: 'application/json;odata=verbose' }, extra || {});
+}
+
+// ── Get request digest (needed for SharePoint write ops) ──────
 async function _getDigest() {
   const now = Date.now();
   if (_requestDigest && now < _digestExpiry) return _requestDigest;
-  const res = await fetch(_spBase() + '/_api/contextinfo', {
-    method: 'POST',
-    headers: { Accept: 'application/json;odata=verbose', 'Content-Type': 'application/json' },
-    credentials: 'include'
-  });
+  const headers = await _authHeaders({ 'Content-Type': 'application/json' });
+  const res = await fetch(_spBase() + '/_api/contextinfo', { method: 'POST', headers });
   if (!res.ok) throw new Error('Digest fetch failed: ' + res.status);
   const data = await res.json();
   _requestDigest = data.d.GetContextWebInformation.FormDigestValue;
@@ -3037,45 +3097,47 @@ async function _getDigest() {
 // ── Get current user info ─────────────────────────────────────
 async function _getUser() {
   try {
-    const res = await fetch(_spBase() + '/_api/web/currentuser?$select=Title,Email', {
-      headers: { Accept: 'application/json;odata=verbose' },
-      credentials: 'include'
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return { name: data.d.Title, email: data.d.Email };
+    const app = _initMsal();
+    try { await app.handleRedirectPromise(); } catch(e) {}
+    const accounts = app.getAllAccounts();
+    if (accounts.length > 0) {
+      _msalAccount = accounts[0];
+      return { name: _msalAccount.name || _msalAccount.username, email: _msalAccount.username };
+    }
+    // No cached account — trigger login
+    const token = await _getToken();
+    if (!token) return null;
+    return { name: _msalAccount.name || _msalAccount.username, email: _msalAccount.username };
   } catch(e) { return null; }
 }
 
 // ── Ensure folder exists ──────────────────────────────────────
 async function _ensureFolder(digest, folderServerRelUrl) {
-  const base = _spBase();
+  const headers = await _authHeaders();
   const check = await fetch(
-    base + `/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderServerRelUrl)}')`,
-    { headers: { Accept: 'application/json;odata=verbose' }, credentials: 'include' }
+    _spBase() + `/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderServerRelUrl)}')`,
+    { headers }
   );
   if (check.ok) return;
-  await fetch(base + `/_api/web/folders`, {
+  const writeHeaders = await _authHeaders({
+    'Content-Type': 'application/json;odata=verbose',
+    'X-RequestDigest': digest
+  });
+  await fetch(_spBase() + '/_api/web/folders', {
     method: 'POST',
-    headers: {
-      Accept: 'application/json;odata=verbose',
-      'Content-Type': 'application/json;odata=verbose',
-      'X-RequestDigest': digest
-    },
-    credentials: 'include',
+    headers: writeHeaders,
     body: JSON.stringify({ '__metadata': { 'type': 'SP.Folder' }, 'ServerRelativeUrl': folderServerRelUrl })
   });
 }
 
 // ── Fetch cloud data ──────────────────────────────────────────
 async function _fetchCloud() {
-  // Build server-relative URL: /sites/SiteName/Belgeler/YASA Marine Dashboard/dashboard-data.json
-  const base = _spBase(); // https://tenant.sharepoint.com/sites/SiteName
-  const sitePath = base.replace(/^https?:\/\/[^\/]+/, ''); // /sites/SiteName
+  const sitePath = CLOUD_SITE_PATH;
   const serverRelUrl = `${sitePath}/${CLOUD_FILE_FOLDER}/${CLOUD_FILE_NAME}`;
+  const headers = await _authHeaders();
   const res = await fetch(
-    base + `/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(serverRelUrl)}')/$value`,
-    { headers: { Accept: 'application/json;odata=verbose' }, credentials: 'include' }
+    _spBase() + `/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(serverRelUrl)}')/$value`,
+    { headers }
   );
   if (res.status === 404 || res.status === 500) return null;
   if (!res.ok) throw new Error('Fetch failed: ' + res.status);
@@ -3084,24 +3146,18 @@ async function _fetchCloud() {
 
 // ── Write data to SharePoint ──────────────────────────────────
 async function _writeCloud(data) {
-  const digest  = await _getDigest();
-  const base    = _spBase();
-  const sitePath = base.replace(/^https?:\/\/[^\/]+/, '');
+  const digest = await _getDigest();
+  const sitePath = CLOUD_SITE_PATH;
   const folderServerRelUrl = `${sitePath}/${CLOUD_FILE_FOLDER}`;
   await _ensureFolder(digest, folderServerRelUrl);
 
+  const headers = await _authHeaders({
+    'X-RequestDigest': digest,
+    'Content-Type': 'application/octet-stream'
+  });
   const res = await fetch(
-    base + `/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderServerRelUrl)}')/Files/add(url='${CLOUD_FILE_NAME}',overwrite=true)`,
-    {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json;odata=verbose',
-        'X-RequestDigest': digest,
-        'Content-Type': 'application/octet-stream'
-      },
-      credentials: 'include',
-      body: JSON.stringify(data, null, 2)
-    }
+    _spBase() + `/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderServerRelUrl)}')/Files/add(url='${CLOUD_FILE_NAME}',overwrite=true)`,
+    { method: 'POST', headers, body: JSON.stringify(data, null, 2) }
   );
   if (!res.ok) {
     const err = await res.text();
@@ -3202,23 +3258,44 @@ function _mergeSnapshots(cloud, local) {
     merged.lsa[v] = new Date(ll.loaded||0) >= new Date(cl.loaded||0) ? ll : cl;
   });
 
-  // Merge certs: last-write-wins per vessel (use lastModified from snapshot)
+  // Merge certs: field-level last-write-wins using per-field _ts timestamps.
+  // Falls back to snapshot-level timestamp for fields that have no _ts entry
+  // (e.g. data saved by an older version of the dashboard).
   const cloudCerts = cloud.certs || {};
   const localCerts = local.certs || {};
   const allCertKeys = new Set([...Object.keys(cloudCerts), ...Object.keys(localCerts)]);
   merged.certs = {};
   const snapshotTs = t => new Date(t || 0).getTime();
-  const localTs  = snapshotTs(local.lastModified);
-  const cloudTs  = snapshotTs(cloud.lastModified);
+  const localSnapshotTs  = snapshotTs(local.lastModified);
+  const cloudSnapshotTs  = snapshotTs(cloud.lastModified);
   allCertKeys.forEach(v => {
     const cc = cloudCerts[v];
     const lc = localCerts[v];
     if (!cc) { merged.certs[v] = lc; return; }
     if (!lc) { merged.certs[v] = cc; return; }
-    // Merge field by field — local wins if local snapshot is newer
-    merged.certs[v] = localTs >= cloudTs
-      ? Object.assign({}, cc, lc)
-      : Object.assign({}, lc, cc);
+    // Merge field by field, picking the version with the newer per-field _ts.
+    // If a field has no _ts entry, fall back to the snapshot-level timestamp.
+    const cTs = cc._ts || {};
+    const lTs = lc._ts || {};
+    const mergedCert = { _ts: {} };
+    CERT_FIELDS.forEach(f => {
+      const cloudFieldTs = snapshotTs(cTs[f.key] || cloud.lastModified);
+      const localFieldTs = snapshotTs(lTs[f.key] || local.lastModified);
+      if (localFieldTs >= cloudFieldTs) {
+        mergedCert[f.key]       = lc[f.key] || '';
+        mergedCert._ts[f.key]   = lTs[f.key] || local.lastModified || '';
+      } else {
+        mergedCert[f.key]       = cc[f.key] || '';
+        mergedCert._ts[f.key]   = cTs[f.key] || cloud.lastModified || '';
+      }
+    });
+    // Carry forward any extra fields (future-proofing) from the newer snapshot
+    if (localSnapshotTs >= cloudSnapshotTs) {
+      Object.keys(lc).forEach(k => { if (!(k in mergedCert) && k !== '_ts') mergedCert[k] = lc[k]; });
+    } else {
+      Object.keys(cc).forEach(k => { if (!(k in mergedCert) && k !== '_ts') mergedCert[k] = cc[k]; });
+    }
+    merged.certs[v] = mergedCert;
   });
 
   merged.lastModifiedBy = _currentUser ? _currentUser.name : 'unknown';
@@ -3303,6 +3380,20 @@ async function cloudSave() {
 }
 
 // ── cloudLoad: fetch → merge → apply ─────────────────────────
+// Deep-sort JSON stringify — ensures nested object key order is consistent
+// so the diff check is reliable regardless of insertion order.
+function _deepSortStringify(obj) {
+  return JSON.stringify(obj, function(key, value) {
+    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+      return Object.keys(value).sort().reduce(function(sorted, k) {
+        sorted[k] = value[k];
+        return sorted;
+      }, {});
+    }
+    return value;
+  });
+}
+
 async function cloudLoad() {
   if (!_cloudReady) return;
   try {
@@ -3311,9 +3402,10 @@ async function cloudLoad() {
     const local  = _buildSnapshot();
     const merged = _mergeSnapshots(cloudData, local);
     _applySnapshot(merged);
-    // Only write back if the merged result actually differs from what's on SharePoint
-    const cloudStr  = JSON.stringify(cloudData,  Object.keys(cloudData).sort());
-    const mergedStr = JSON.stringify(merged, Object.keys(merged).sort());
+    // Only write back if the merged result actually differs from what's on SharePoint.
+    // Uses deep-sort stringify so nested key ordering differences don't cause false positives.
+    const cloudStr  = _deepSortStringify(cloudData);
+    const mergedStr = _deepSortStringify(merged);
     if (cloudStr !== mergedStr) {
       await _writeCloud(merged);
     }
@@ -3322,9 +3414,18 @@ async function cloudLoad() {
   }
 }
 
-// ── Stubs for removed MSAL functions ─────────────────────────
-window.cloudLogin  = function() { showToast('Already signed in via SharePoint', 'success'); };
-window.cloudLogout = function() { showToast('Use SharePoint to sign out', 'success'); };
+// ── cloudLogin / cloudLogout exposed for UI ──────────────────
+window.cloudLogin  = async function() {
+  try { await _getToken(); showToast('Signed in successfully', 'success'); }
+  catch(e) { showToast('Sign-in failed: ' + e.message, 'error'); }
+};
+window.cloudLogout = function() {
+  if (_msalApp && _msalAccount) {
+    _msalApp.logoutPopup({ account: _msalAccount })
+      .then(() => showToast('Signed out', 'success'))
+      .catch(() => {});
+  }
+};
 </script>
 
 <div id="page-settings" class="page">
