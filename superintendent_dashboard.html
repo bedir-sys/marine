@@ -1482,9 +1482,6 @@ function init() {
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeModal();
   });
-
-  // Auto-refresh every 5 minutes
-  setInterval(() => { if(typeof _cloudReady!=='undefined' && _cloudReady) cloudLoad().catch(e=>console.warn('Auto-refresh:',e)); }, 300000);
 }
 
 function updateDate() {
@@ -1578,7 +1575,7 @@ function migrateNote(n) {
   // Already new format (has items arrays)
   if (n.operational?.items !== undefined || n.procurement?.items !== undefined) {
     const fixCat = c => ({ items: (c?.items || []).map((it, i) => ({
-      id: it.id || (i + 1), text: it.text || '', time: it.time || '', priority: it.priority || '', author: it.author || ''
+      id: it.id || (i + 1), text: it.text || '', time: it.time || '', priority: it.priority || ''
     })) });
     return {
       operational: fixCat(n.operational),
@@ -1591,7 +1588,7 @@ function migrateNote(n) {
   if (n.operational !== undefined || n.procurement !== undefined || n.personnel !== undefined || n.other !== undefined) {
     const migrateOldCat = c => {
       if (!c?.text) return EMPTY_CAT();
-      return { items: [{ id: 1, text: c.text, time: c.time || '', priority: c.priority || '', author: c.author || '' }] };
+      return { items: [{ id: 1, text: c.text, time: c.time || '', priority: c.priority || '' }] };
     };
     return {
       operational: migrateOldCat(n.operational),
@@ -1603,7 +1600,7 @@ function migrateNote(n) {
   // Oldest format: {text, time} at top level
   if (n.text !== undefined) {
     return {
-      operational: { items: n.text ? [{ id: 1, text: n.text, time: n.time || '', priority: '', author: '' }] : [] },
+      operational: { items: n.text ? [{ id: 1, text: n.text, time: n.time || '', priority: '' }] : [] },
       procurement: EMPTY_CAT(),
       personnel:   EMPTY_CAT(),
       other:       EMPTY_CAT()
@@ -1647,7 +1644,7 @@ function loadSavedData() {
     }
   } catch(e) { console.log('No saved state'); }
   // Guard: if somehow no state was found at all, ensure dropdowns are populated
-  if (!document.querySelector('#marineFilter option:not([value=""])')) rebuildDropdowns();
+  if (!document.querySelector('#marineFilter option[value!=""]')) rebuildDropdowns();
 }
 
 function saveState() {
@@ -2396,7 +2393,7 @@ function buildNoteItem(cat, idx, item, placeholder) {
           placeholder="${placeholder}"
           oninput="autoResizeTA(this)"
           onfocus="autoResizeTA(this)">${escHtml(item.text || '')}</textarea>
-        <span class="note-saved-time" id="modal_time_${cat}_${idx}">${item.time ? 'Last saved: ' + item.time + (item.author ? ' • Updated by ' + escHtml(item.author) : '') : ''}</span>
+        <span class="note-saved-time" id="modal_time_${cat}_${idx}">${item.time ? 'Last saved: ' + item.time : ''}</span>
       </div>
     </div>`;
 }
@@ -2453,12 +2450,9 @@ function saveAllNotes() {
       const text = ta.value.trim();
       item.text     = text;
       item.priority = sel ? sel.value : (item.priority || '');
-      if (text) {
-        item.time = now;
-        if (typeof _currentUser !== 'undefined' && _currentUser && _currentUser.name) item.author = _currentUser.name;
-      }
+      if (text) item.time = now;
       const timeEl = document.getElementById(`modal_time_${cat}_${idx}`);
-      if (timeEl) timeEl.textContent = text ? 'Last saved: ' + now + (item.author ? ' • Updated by ' + item.author : '') : '';
+      if (timeEl) timeEl.textContent = text ? 'Last saved: ' + now : '';
     });
     // Filter out fully empty (no text) items
     notes[vn][cat].items = items.filter(it => it.text);
@@ -2487,7 +2481,7 @@ function addNoteItem(cat) {
   // Collect DOM state first
   _collectNotesFromDOM(vn);
   const items = notes[vn][cat].items;
-  items.push({ id: items.length + 1, text: '', time: '', priority: '', author: '' });
+  items.push({ id: items.length + 1, text: '', time: '', priority: '' });
   // Re-render this block
   const block = document.getElementById(`note_block_${cat}`);
   if (block) {
@@ -3038,7 +3032,7 @@ let _requestDigest = null;
 let _digestExpiry  = 0;
 
 // ── SharePoint base URL ───────────────────────────────────────
-function _spBase() { return CLOUD_SP_HOST + CLOUD_SITE_PATH; }
+function _spBase() { return 'https://yasaholding.sharepoint.com/sites/Marinesuperintendent'; }
 
 // ── Initialize MSAL ───────────────────────────────────────────
 function _initMsal() {
