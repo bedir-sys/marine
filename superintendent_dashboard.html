@@ -3356,6 +3356,16 @@ async function cloudInit() {
     if (accounts.length === 0) {
       console.log('[Cloud] No cached account, triggering login popup...');
       if (status) status.textContent = '🔑';
+
+      // Clear any stale MSAL interaction locks from sessionStorage
+      Object.keys(sessionStorage).forEach(k => {
+        if (k.indexOf('msal') !== -1 && k.indexOf('interaction.status') !== -1) {
+          sessionStorage.removeItem(k);
+        }
+      });
+      // Also clear the generic interaction status key
+      sessionStorage.removeItem('msal.interaction.status');
+
       try {
         const res = await app.loginPopup({ scopes: MSAL_SCOPES });
         _msalAccount = res.account;
