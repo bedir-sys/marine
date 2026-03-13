@@ -3339,19 +3339,26 @@ async function cloudInit() {
   const avatarEl = document.getElementById('userAvatar');
   console.log('[Cloud] Base URL:', _spBase());
   try {
-    // Initialize MSAL and attempt silent login first
     const app = _initMsal();
-    await app.handleRedirectPromise().catch(() => {});
+
+    // MUST await redirect promise first — clears any in-progress interaction state
+    let redirectResult = null;
+    try { redirectResult = await app.handleRedirectPromise(); } catch(e) {}
 
     let accounts = app.getAllAccounts();
+
+    // If redirect brought us back with a token, use it
+    if (redirectResult && redirectResult.account) {
+      _msalAccount = redirectResult.account;
+      accounts = [_msalAccount];
+    }
+
     if (accounts.length === 0) {
-      // No cached session — trigger login popup immediately
       console.log('[Cloud] No cached account, triggering login popup...');
       if (status) status.textContent = '🔑';
       try {
         const res = await app.loginPopup({ scopes: MSAL_SCOPES });
         _msalAccount = res.account;
-        accounts = [res.account];
       } catch(loginErr) {
         console.warn('[Cloud] Login popup failed/cancelled:', loginErr);
         if (nameEl) nameEl.textContent = 'Not signed in';
