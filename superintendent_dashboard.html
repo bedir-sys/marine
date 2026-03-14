@@ -1892,8 +1892,6 @@ function parseOperatorFormat(data, headers, fileName) {
 
 function parseOriginalFormat(data, fileName) {
   const vessels = [];
-  const VESSEL_COLS = 13;
-
   let vesselStartRows = [];
   for (let r = 0; r < data.length; r++) {
     const row = data[r];
@@ -3139,7 +3137,7 @@ window.lsaHandleFile = function(e) {
 
 var JSONBIN_BIN_ID  = '69b43178aa77b81da9e0a21d';
 var JSONBIN_API_KEY = '$2a$10$yM94lu8g7jxH0AR9pesl4.SNV7IUZFHmyfz8CsjYvoRRbb.lPcL4W';
-var JSONBIN_BASE    = 'https://api.jsonbin.io/v3/b/69b43178aa77b81da9e0a21d';
+var JSONBIN_BASE    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
 
 var _cloudReady    = false;
 var _currentUser   = null;
@@ -3272,7 +3270,7 @@ async function cloudInit() {
     }
     _cloudReady = true;
 
-    // Poll every 5 seconds
+    // Poll every 30 seconds (rate-limit friendly)
     setInterval(async function() {
       if (_isSaving || _saveTimer) return; // skip if currently writing
       try {
@@ -3285,7 +3283,7 @@ async function cloudInit() {
           _setStatus('☁️', 'Güncellendi: ' + _nowStr());
         }
       } catch(e) { /* silent */ }
-    }, 5000);
+    }, 30000);
 
   } catch(e) {
     console.warn('cloudInit failed:', e);
@@ -3437,38 +3435,43 @@ function _mergeSnapshots(cloud, local) {
 }
 
 // ── Apply snapshot to local state + UI ───────────────────────
-function _applySnapshot(data) {
-  // Vessels: cloud wins — always apply regardless of local state
-  if (data.vessels && data.vessels.length > 0) {
-    allVessels     = data.vessels;
-    reportFileName = data.reportFileName || '';
-    reportDate     = data.reportDate     || '';
+// Merges cloud data with current local state so concurrent edits are preserved.
+function _applySnapshot(cloudData) {
+  const local   = _buildSnapshot();
+  const merged  = _mergeSnapshots(cloudData, local);
+
+  // Vessels
+  if (merged.vessels && merged.vessels.length > 0) {
+    allVessels     = merged.vessels;
+    reportFileName = merged.reportFileName || '';
+    reportDate     = merged.reportDate     || '';
     localStorage.setItem('yasa_dashboard_state', JSON.stringify({ vessels: allVessels, reportFileName, reportDate }));
   }
-  // Notes: cloud wins — fully replace local notes
+
+  // Notes
   notes = {};
-  if (data.notes) {
-    Object.keys(data.notes).forEach(k => { notes[canonicalize(k)] = migrateNote(data.notes[k]); });
+  if (merged.notes) {
+    Object.keys(merged.notes).forEach(k => { notes[canonicalize(k)] = migrateNote(merged.notes[k]); });
   }
   localStorage.setItem('yasa_supt_notes', JSON.stringify(notes));
 
-  // Assignments: cloud wins
-  if (data.assignments) localStorage.setItem('yasa_assignments', JSON.stringify(data.assignments));
+  // Assignments
+  if (merged.assignments) localStorage.setItem('yasa_assignments', JSON.stringify(merged.assignments));
 
-  // Certs: cloud wins
-  if (data.certs) {
-    Object.keys(data.certs).forEach(v => localStorage.setItem(certKey(v), JSON.stringify(data.certs[v])));
+  // Certs
+  if (merged.certs) {
+    Object.keys(merged.certs).forEach(v => localStorage.setItem(certKey(v), JSON.stringify(merged.certs[v])));
   }
 
-  // LSA: cloud wins
-  if (data.lsa) {
-    Object.keys(data.lsa).forEach(v => localStorage.setItem('lsa_v2_' + v, JSON.stringify(data.lsa[v])));
+  // LSA
+  if (merged.lsa) {
+    Object.keys(merged.lsa).forEach(v => localStorage.setItem('lsa_v2_' + v, JSON.stringify(merged.lsa[v])));
   }
 
   // Re-render everything
   rebuildDropdowns();
   renderAll();
-  showReportBar();
+  if (allVessels.length > 0) showReportBar();
   renderAlertPanel();
 }
 
