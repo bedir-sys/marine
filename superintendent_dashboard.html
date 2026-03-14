@@ -1155,9 +1155,11 @@ body {
     <!-- Cloud sync status -->
     <div id="authArea" style="display:flex;align-items:center;gap:8px;">
       <div id="userInfo" style="display:flex;align-items:center;gap:8px;">
-        <span id="userAvatar" style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;">?</span>
-        <span id="userName" style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Connecting...</span>
-        <span id="cloudStatus" title="Cloud sync status" style="font-size:16px;">🔄</span>
+        <span id="userAvatar" style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;">Y</span>
+        <span id="userName" style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">YASA Shipping</span>
+        <span id="cloudStatus" title="Cloud sync status" style="font-size:16px;cursor:pointer;" onclick="manualSync()">☁️</span>
+        <span id="lastSyncLabel" style="font-size:10px;color:rgba(255,255,255,.55);white-space:nowrap;"></span>
+        <button onclick="manualSync()" title="Sync now" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;">↻ Sync</button>
       </div>
     </div>
     <label class="btn btn-gold" style="cursor:pointer">
@@ -3011,16 +3013,46 @@ window.lsaHandleFile = function(e) {
 };
 
 // ══════════════════════════════════════════════════════════════════
-//  CLOUD SYNC — JSONBin.io (no OAuth, no login required)
+//  CLOUD SYNC — JSONBin.io
+//  Rule: Cloud is ALWAYS the source of truth.
+//  On load → fetch cloud, apply it, ignore local.
+//  On save → write to cloud immediately.
+//  Poll every 5s → if cloud differs from last known, apply it.
 // ══════════════════════════════════════════════════════════════════
 
 var JSONBIN_BIN_ID  = '69b43178aa77b81da9e0a21d';
 var JSONBIN_API_KEY = '$2a$10$ObS5Kuheoa0pSHtP05h2f.qgM3xskVC0HBQayELUE8EGcMR/hxq/S';
 var JSONBIN_BASE    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
 
-var _cloudReady  = false;
-var _currentUser = null;
-var _saveTimer   = null;
+var _cloudReady    = false;
+var _currentUser   = null;
+var _saveTimer     = null;
+var _isSaving      = false;   // prevent poll from overwriting mid-save
+var _lastCloudStr  = null;    // last known cloud snapshot (stringified)
+
+// ── helpers ───────────────────────────────────────────────────
+function _setStatus(icon, label) {
+  var el = document.getElementById('cloudStatus');
+  var lb = document.getElementById('lastSyncLabel');
+  if (el) el.textContent = icon;
+  if (lb && label) lb.textContent = label;
+}
+
+function _nowStr() {
+  return new Date().toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+
+function _deepSortStringify(obj) {
+  return JSON.stringify(obj, function(key, value) {
+    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+      return Object.keys(value).sort().reduce(function(sorted, k) {
+        sorted[k] = value[k];
+        return sorted;
+      }, {});
+    }
+    return value;
+  });
+}
 
 // ── Fetch cloud data ──────────────────────────────────────────
 async function _fetchCloud() {
@@ -3049,6 +3081,97 @@ async function _writeCloud(data) {
     throw new Error('JSONBin write failed: ' + res.status + ' ' + err.substring(0, 200));
   }
 }
+
+// ── Save local state to cloud immediately ─────────────────────
+async function cloudSave() {
+  if (!_cloudReady) return;
+  if (_saveTimer) clearTimeout(_saveTimer);
+  // Debounce 800ms so rapid keystrokes don't spam API
+  await new Promise(function(resolve) { _saveTimer = setTimeout(resolve, 800); });
+  _saveTimer = null;
+  _isSaving = true;
+  _setStatus('🔄');
+  try {
+    var snapshot = _buildSnapshot();
+    await _writeCloud(snapshot);
+    _lastCloudStr = _deepSortStringify(snapshot);
+    _setStatus('☁️', 'Son kayıt: ' + _nowStr());
+  } catch(e) {
+    console.warn('cloudSave failed:', e);
+    _setStatus('⚠️', 'Kayıt hatası!');
+    showToast('Cloud save failed — data saved locally', 'error');
+  } finally {
+    _isSaving = false;
+  }
+}
+
+// ── Manual sync button ────────────────────────────────────────
+window.manualSync = async function() {
+  if (!_cloudReady) return;
+  _setStatus('🔄', 'Senkronize ediliyor...');
+  try {
+    var cloudData = await _fetchCloud();
+    if (cloudData) {
+      _applySnapshot(cloudData);
+      _lastCloudStr = _deepSortStringify(cloudData);
+      _setStatus('☁️', 'Son güncelleme: ' + _nowStr());
+      showToast('Cloud\'dan güncellendi', 'success');
+    } else {
+      _setStatus('☁️', 'Veri yok');
+    }
+  } catch(e) {
+    _setStatus('⚠️', 'Hata!');
+    console.warn('manualSync failed:', e);
+  }
+};
+
+// ── cloudInit: page load ──────────────────────────────────────
+async function cloudInit() {
+  _cloudReady = false;
+  _setStatus('🔄', 'Yükleniyor...');
+  try {
+    // ALWAYS fetch from cloud first — ignore localStorage
+    var cloudData = await _fetchCloud();
+    if (cloudData) {
+      _applySnapshot(cloudData);
+      _lastCloudStr = _deepSortStringify(cloudData);
+      _setStatus('☁️', 'Son güncelleme: ' + _nowStr());
+    } else {
+      // Cloud empty — write local data (first use)
+      var local = _buildSnapshot();
+      if (local.vessels && local.vessels.length > 0) {
+        await _writeCloud(local);
+        _lastCloudStr = _deepSortStringify(local);
+      }
+      _setStatus('☁️', 'Hazır');
+    }
+    _cloudReady = true;
+
+    // Poll every 5 seconds
+    setInterval(async function() {
+      if (_isSaving || _saveTimer) return; // skip if currently writing
+      try {
+        var cloudData = await _fetchCloud();
+        if (!cloudData) return;
+        var cloudStr = _deepSortStringify(cloudData);
+        if (cloudStr !== _lastCloudStr) {
+          _lastCloudStr = cloudStr;
+          _applySnapshot(cloudData);
+          _setStatus('☁️', 'Güncellendi: ' + _nowStr());
+        }
+      } catch(e) { /* silent */ }
+    }, 5000);
+
+  } catch(e) {
+    console.warn('cloudInit failed:', e);
+    _setStatus('⚠️', 'Bağlantı yok');
+    _cloudReady = true; // still allow local use
+  }
+}
+
+// ── cloudLogin / cloudLogout exposed for UI ──────────────────
+window.cloudLogin  = function() { showToast('Cloud sync aktif', 'success'); };
+window.cloudLogout = function() { showToast('Cloud sync her zaman aktif', 'success'); };
 
 // ── Build local snapshot ──────────────────────────────────────
 function _buildSnapshot() {
@@ -3216,105 +3339,6 @@ function _applySnapshot(data) {
   renderAlertPanel();
 }
 
-// ── cloudInit: runs on page load ──────────────────────────────
-async function cloudInit() {
-  var status   = document.getElementById('cloudStatus');
-  var nameEl   = document.getElementById('userName');
-  var avatarEl = document.getElementById('userAvatar');
-  try {
-    _currentUser = { name: 'YASA User', email: '' };
-    if (nameEl)   nameEl.textContent   = 'YASA Shipping';
-    if (avatarEl) avatarEl.textContent = 'Y';
-    _cloudReady = true;
-    if (status) status.textContent = '🔄';
-    await cloudLoad();
-    if (status) status.textContent = '☁️';
-    // Poll every 10 seconds for other users' changes
-    setInterval(async function() {
-      try {
-        if (!_cloudReady || _saveTimer) return;
-        var cloudData = await _fetchCloud();
-        if (!cloudData || cloudData.init) return;
-        var localStr  = _deepSortStringify(_buildSnapshot());
-        var cloudStr  = _deepSortStringify(cloudData);
-        if (cloudStr !== localStr) {
-          _applySnapshot(cloudData);
-          var status = document.getElementById('cloudStatus');
-          if (status) status.textContent = '☁️';
-        }
-      } catch(e) { console.warn('Poll failed:', e); }
-    }, 10000);
-  } catch(e) {
-    console.warn('cloudInit failed:', e);
-    if (nameEl)  nameEl.textContent  = 'Offline mode';
-    if (status)  status.textContent  = '⚠️';
-  }
-}
-
-// ── cloudSave: read → merge → write ──────────────────────────
-async function cloudSave() {
-  if (!_cloudReady) return;
-  // Debounce: if called rapidly, wait 1s then write once
-  if (_saveTimer) clearTimeout(_saveTimer);
-  await new Promise(resolve => { _saveTimer = setTimeout(resolve, 1000); });
-  _saveTimer = null;
-  const status = document.getElementById('cloudStatus');
-  try {
-    if (status) status.textContent = '🔄';
-    const local  = _buildSnapshot();
-    const cloudData = await _fetchCloud();
-    const merged = cloudData ? _mergeSnapshots(cloudData, local) : local;
-    await _writeCloud(merged);
-    _applySnapshot(merged);
-    if (status) status.textContent = '☁️';
-  } catch(e) {
-    console.warn('cloudSave failed:', e);
-    if (status) status.textContent = '⚠️';
-    showToast('Cloud save failed — data saved locally', 'error');
-  }
-}
-
-// ── cloudLoad: fetch → merge → apply ─────────────────────────
-// Deep-sort JSON stringify — ensures nested object key order is consistent
-// so the diff check is reliable regardless of insertion order.
-function _deepSortStringify(obj) {
-  return JSON.stringify(obj, function(key, value) {
-    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
-      return Object.keys(value).sort().reduce(function(sorted, k) {
-        sorted[k] = value[k];
-        return sorted;
-      }, {});
-    }
-    return value;
-  });
-}
-
-async function cloudLoad() {
-  if (!_cloudReady) return;
-  try {
-    var cloudData = await _fetchCloud();
-    if (!cloudData || cloudData.init) {
-      // No real cloud data — write local if we have vessels
-      var local = _buildSnapshot();
-      if (local.vessels && local.vessels.length > 0) await _writeCloud(local);
-      return;
-    }
-    // Apply cloud data directly — cloud is the source of truth on load
-    _applySnapshot(cloudData);
-    // Merge in any local notes that might be newer
-    var local  = _buildSnapshot();
-    var merged = _mergeSnapshots(cloudData, local);
-    var cloudStr  = _deepSortStringify(cloudData);
-    var mergedStr = _deepSortStringify(merged);
-    if (cloudStr !== mergedStr) await _writeCloud(merged);
-  } catch(e) {
-    console.warn('cloudLoad failed:', e);
-  }
-}
-
-// ── cloudLogin / cloudLogout exposed for UI ──────────────────
-window.cloudLogin  = function() { showToast('Cloud sync aktif', 'success'); };
-window.cloudLogout = function() { showToast('Cloud sync her zaman aktif', 'success'); };
 </script>
 
 <div id="page-settings" class="page">
