@@ -3232,20 +3232,15 @@ async function cloudInit() {
     // Poll every 10 seconds for other users' changes
     setInterval(async function() {
       try {
-        if (!_cloudReady || _saveTimer) return; // skip if we're currently saving
+        if (!_cloudReady || _saveTimer) return;
         var cloudData = await _fetchCloud();
-        if (!cloudData) return;
-        var local  = _buildSnapshot();
-        var merged = _mergeSnapshots(cloudData, local);
+        if (!cloudData || cloudData.init) return;
+        var localStr  = _deepSortStringify(_buildSnapshot());
         var cloudStr  = _deepSortStringify(cloudData);
-        var mergedStr = _deepSortStringify(merged);
-        if (cloudStr !== mergedStr) return; // local has newer data, don't overwrite
-        var localStr = _deepSortStringify(local);
         if (cloudStr !== localStr) {
-          // Cloud has newer data from another user — apply it
           _applySnapshot(cloudData);
+          var status = document.getElementById('cloudStatus');
           if (status) status.textContent = '☁️';
-          showToast('Başka bir kullanıcının değişiklikleri yüklendi', 'success');
         }
       } catch(e) { console.warn('Poll failed:', e); }
     }, 10000);
@@ -3297,18 +3292,21 @@ function _deepSortStringify(obj) {
 async function cloudLoad() {
   if (!_cloudReady) return;
   try {
-    const cloudData = await _fetchCloud();
-    if (!cloudData) { await cloudSave(); return; }
-    const local  = _buildSnapshot();
-    const merged = _mergeSnapshots(cloudData, local);
-    _applySnapshot(merged);
-    // Only write back if the merged result actually differs from what's on SharePoint.
-    // Uses deep-sort stringify so nested key ordering differences don't cause false positives.
-    const cloudStr  = _deepSortStringify(cloudData);
-    const mergedStr = _deepSortStringify(merged);
-    if (cloudStr !== mergedStr) {
-      await _writeCloud(merged);
+    var cloudData = await _fetchCloud();
+    if (!cloudData || cloudData.init) {
+      // No real cloud data — write local if we have vessels
+      var local = _buildSnapshot();
+      if (local.vessels && local.vessels.length > 0) await _writeCloud(local);
+      return;
     }
+    // Apply cloud data directly — cloud is the source of truth on load
+    _applySnapshot(cloudData);
+    // Merge in any local notes that might be newer
+    var local  = _buildSnapshot();
+    var merged = _mergeSnapshots(cloudData, local);
+    var cloudStr  = _deepSortStringify(cloudData);
+    var mergedStr = _deepSortStringify(merged);
+    if (cloudStr !== mergedStr) await _writeCloud(merged);
   } catch(e) {
     console.warn('cloudLoad failed:', e);
   }
