@@ -3021,7 +3021,7 @@ window.lsaHandleFile = function(e) {
 // ══════════════════════════════════════════════════════════════════
 
 var JSONBIN_BIN_ID  = '69b43178aa77b81da9e0a21d';
-var JSONBIN_API_KEY = '$2a$10$ObS5Kuheoa0pSHtP05h2f.qgM3xskVC0HBQayELUE8EGcMR/hxq/S';
+var JSONBIN_API_KEY = '$2a$10$yM94lu8g7jxH0AR9pesl4.SNV7IUZFHmyfz8CsjYvoRRbb.lPcL4W';
 var JSONBIN_BASE    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
 
 var _cloudReady    = false;
@@ -3057,7 +3057,7 @@ function _deepSortStringify(obj) {
 // ── Fetch cloud data ──────────────────────────────────────────
 async function _fetchCloud() {
   var res = await fetch(JSONBIN_BASE + '/latest', {
-    headers: { 'X-Access-Key': JSONBIN_API_KEY }
+    headers: { 'X-Master-Key': JSONBIN_API_KEY }
   });
   if (!res.ok) throw new Error('JSONBin fetch failed: ' + res.status);
   var data = await res.json();
@@ -3072,7 +3072,7 @@ async function _writeCloud(data) {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'X-Access-Key': JSONBIN_API_KEY
+      'X-Master-Key': JSONBIN_API_KEY
     },
     body: JSON.stringify(data)
   });
