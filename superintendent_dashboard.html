@@ -1566,14 +1566,14 @@ function mapGet(obj, vessel) {
   return '';
 }
 function getMarine(vessel) {
-  const saved = loadAssignments().marine;
+  const saved = loadAssignments().marine || {};
   const key = canonicalize(vessel);
   for (const [k,v] of Object.entries(saved))
     if (canonicalize(k) === key) return v;
   return mapGet(DEFAULT_MARINE, vessel);
 }
 function getOps(vessel) {
-  const saved = loadAssignments().ops;
+  const saved = loadAssignments().ops || {};
   const key = canonicalize(vessel);
   for (const [k,v] of Object.entries(saved))
     if (canonicalize(k) === key) return v;
@@ -3139,7 +3139,7 @@ window.lsaHandleFile = function(e) {
 
 var JSONBIN_BIN_ID  = '69b43178aa77b81da9e0a21d';
 var JSONBIN_API_KEY = '$2a$10$yM94lu8g7jxH0AR9pesl4.SNV7IUZFHmyfz8CsjYvoRRbb.lPcL4W';
-var JSONBIN_BASE    = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
+var JSONBIN_BASE    = 'https://api.jsonbin.io/v3/b/69b43178aa77b81da9e0a21d';
 
 var _cloudReady    = false;
 var _currentUser   = null;
