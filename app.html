@@ -43,7 +43,7 @@
   --orange: #ea580c;
   --purple: #7c3aed;
   --input-bg: #f8fafc;
-  --body-bg: #eef3fb;
+  --body-bg: #dde5f4;
   --topnav-from: #1e3a8a;
   --topnav-to: #2563eb;
 }
@@ -117,8 +117,9 @@ body.dark .filter-btn:hover,
 body.dark .filter-btn.active          { border-color: #c0c0c0; color: #f0f0f0; background: rgba(255,255,255,.06); }
 body.dark .upload-zone                { background: rgba(30,30,30,.8); border-color: #404040; }
 body.dark .upload-zone:hover          { border-color: #888; background: rgba(40,40,40,.8); }
-body.dark .tab.active                 { color: #f0f0f0; border-bottom-color: #d0d0d0; }
-body.dark .tab:hover                  { background: rgba(255,255,255,.05); }
+body.dark .tab                        { color: #9ab0d4; }
+body.dark .tab.active                 { color: #e8f0fe; border-bottom-color: #93b4f0; }
+body.dark .tab:hover                  { color: #e8f0fe; background: rgba(255,255,255,.07); }
 body.dark .modal-section-title        { color: #d0d0d0; border-bottom-color: rgba(200,200,200,.25); }
 body.dark .modal-section-title::before { background: #d0d0d0; }
 body.dark .data-key                   { color: #c0c0c0; }
@@ -213,13 +214,13 @@ body {
 
 /* MODULE TABS */
 .module-tabs {
-  background: #e8f0fe;
-  border-bottom: 2px solid rgba(37,99,235,0.3);
+  background: #d4e2f8;
+  border-bottom: 3px solid rgba(37,99,235,0.35);
   padding: 0 24px;
   display: flex;
   gap: 0;
   overflow-x: auto;
-  box-shadow: 0 1px 4px rgba(37,99,235,0.08);
+  box-shadow: 0 2px 6px rgba(37,99,235,0.12);
   position: sticky;
   top: 64px;
   z-index: 190;
@@ -228,13 +229,13 @@ body {
 .module-tabs::-webkit-scrollbar { height: 0; }
 
 .tab {
-  padding: 13px 22px;
+  padding: 14px 26px;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--text2);
+  color: #3b5a9a;
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: all 0.2s;
@@ -244,12 +245,12 @@ body {
   gap: 7px;
 }
 
-.tab:hover { color: var(--accent); background: rgba(37,99,235,0.07); }
+.tab:hover { color: var(--accent2); background: rgba(37,99,235,0.1); }
 
 .tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-  background: rgba(37,99,235,0.05);
+  color: var(--accent2);
+  border-bottom-color: var(--accent2);
+  background: rgba(37,99,235,0.08);
 }
 
 .tab-badge {
@@ -1395,7 +1396,7 @@ body.dark .note-block-other       .note-block-header { background: rgba(100,116,
 
   /* ── MODULE TABS ── */
   .module-tabs { padding: 0 8px; }
-  .tab { padding: 10px 10px; font-size: 11px; }
+  .tab { padding: 11px 12px; font-size: 12px; }
 
   /* ── TOOLBAR ── */
   .vn-toolbar {
@@ -1474,9 +1475,37 @@ body.dark .note-block-other       .note-block-header { background: rgba(100,116,
   .tab { padding: 9px 8px; font-size: 10px; letter-spacing: 0; }
 }
 
+/* ── VESSEL TO-DO LIST ──────────────────────────────────────────── */
+.todo-section { border-top:2px solid var(--border); margin-top:18px; padding-top:14px; }
+.todo-add-row { display:flex; gap:8px; align-items:flex-start; margin-bottom:12px; }
+.todo-textarea { flex:1; min-height:56px; max-height:120px; resize:vertical; padding:8px 11px; border:1px solid var(--border2); border-radius:8px; font-family:'Barlow',sans-serif; font-size:13px; color:var(--text); background:var(--input-bg); outline:none; line-height:1.5; }
+.todo-textarea:focus { border-color:var(--accent); }
+.todo-add-side { display:flex; flex-direction:column; gap:6px; }
+.todo-date-input { padding:6px 10px; border:1px solid var(--border2); border-radius:8px; font-family:'Barlow',sans-serif; font-size:12px; color:var(--text); background:var(--input-bg); outline:none; width:130px; }
+.todo-date-input:focus { border-color:var(--accent); }
+.todo-list { list-style:none; padding:0; margin:0; }
+.todo-item { display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border-radius:8px; margin-bottom:4px; background:var(--navy2); border-left:3px solid transparent; transition:background .12s; }
+.todo-item:hover { background:var(--navy3); }
+.todo-item.done { opacity:.6; background:var(--navy); }
+.todo-item.overdue { border-left-color:#dc2626; }
+.todo-item.due-soon { border-left-color:#f59e0b; }
+.todo-cb { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; margin-top:2px; }
+.todo-text { flex:1; font-size:13px; color:var(--text); line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+.todo-item.done .todo-text { text-decoration:line-through; color:var(--text3); }
+.todo-due { font-size:10px; font-family:'Barlow Condensed',sans-serif; font-weight:700; padding:2px 7px; border-radius:10px; white-space:nowrap; flex-shrink:0; align-self:center; }
+.todo-due-ok { background:#dcfce7; color:#166534; }
+.todo-due-warn { background:#fef9c3; color:#92400e; }
+.todo-due-soon { background:#ffedd5; color:#c2410c; }
+.todo-due-overdue { background:#fef2f2; color:#dc2626; }
+.todo-del { background:none; border:none; color:var(--text3); font-size:14px; cursor:pointer; padding:2px 5px; border-radius:4px; line-height:1; flex-shrink:0; }
+.todo-del:hover { color:var(--red); background:#fef2f2; }
+body.dark .todo-textarea, body.dark .todo-date-input { background:#252525; border-color:#404040; color:#f0f0f0; }
+body.dark .todo-item { background:#252525; }
+body.dark .todo-item:hover { background:#2e2e2e; }
+body.dark .todo-item.done { background:#1e1e1e; }
 /* ── MEETING NOTES ─────────────────────────────────────────────── */
 .mn-toolbar { display:flex; align-items:center; gap:10px; padding:14px 24px; background:var(--navy2); border-bottom:1px solid var(--border); flex-wrap:wrap; position:sticky; top:104px; z-index:180; }
-.mn-meeting-list { max-width:900px; margin:0 auto; padding:20px 20px 60px; }
+.mn-meeting-list { max-width:1200px; margin:0 auto; padding:20px 24px 60px; }
 .mn-empty { text-align:center; padding:60px 20px; color:var(--text3); }
 .mn-empty-icon { font-size:40px; margin-bottom:12px; }
 .mn-card { background:var(--navy); border:1px solid var(--border); border-radius:12px; margin-bottom:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.05); transition:box-shadow .15s; }
@@ -1491,8 +1520,9 @@ body.dark .note-block-other       .note-block-header { background: rgba(100,116,
 .mn-badge-participants { background:var(--blue); color:var(--accent); border:1px solid rgba(37,99,235,.2); }
 .mn-card-chevron { color:var(--text3); font-size:12px; transition:transform .2s; flex-shrink:0; }
 .mn-card.expanded .mn-card-chevron { transform:rotate(180deg); }
-.mn-card-body { padding:16px 18px; display:none; }
-.mn-card.expanded .mn-card-body { display:block; }
+.mn-card-body { padding:18px 22px; display:none; }
+.mn-card.expanded .mn-card-body { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.mn-card-col { min-width:0; }
 .mn-participants-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
 .mn-participant-chip { display:inline-flex; align-items:center; gap:4px; background:var(--blue); color:var(--accent); border:1px solid rgba(37,99,235,.2); border-radius:20px; padding:3px 10px; font-size:11px; font-family:'Barlow Condensed',sans-serif; font-weight:600; }
 .mn-items-list { list-style:none; padding:0; margin:0 0 14px; }
@@ -1506,7 +1536,15 @@ body.dark .note-block-other       .note-block-header { background: rgba(100,116,
 .mn-card-actions { display:flex; gap:8px; margin-top:14px; align-items:center; }
 /* ── Meeting Notes Modal ── */
 .mn-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100; display:flex; align-items:center; justify-content:center; padding:16px; }
-.mn-modal { background:var(--navy); border-radius:16px; width:100%; max-width:740px; max-height:90vh; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; }
+.mn-modal { background:var(--navy); border-radius:16px; width:100%; max-width:1120px; max-height:92vh; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; }
+.mn-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.mn-confirm-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1200; display:flex; align-items:center; justify-content:center; padding:16px; }
+.mn-confirm-box { background:var(--navy); border-radius:14px; padding:28px 32px; max-width:420px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,.3); text-align:center; }
+.mn-confirm-icon { font-size:36px; margin-bottom:12px; }
+.mn-confirm-title { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; color:var(--text); margin-bottom:8px; }
+.mn-confirm-msg { font-size:13px; color:var(--text2); margin-bottom:20px; line-height:1.5; }
+.mn-confirm-btns { display:flex; gap:10px; justify-content:center; }
+body.dark .mn-confirm-box { background:#1e1e1e; }
 .mn-modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; background:linear-gradient(135deg,var(--topnav-from),var(--topnav-to)); flex-shrink:0; }
 .mn-modal-title { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; color:#fff; }
 .mn-modal-close { background:rgba(255,255,255,.2); border:none; color:#fff; width:30px; height:30px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
@@ -1515,7 +1553,7 @@ body.dark .note-block-other       .note-block-header { background: rgba(100,116,
 .mn-section { margin-bottom:20px; }
 .mn-section-label { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
 .mn-group-title { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.07em; padding:6px 0 4px; margin-bottom:4px; border-bottom:1px solid var(--border); }
-.mn-participants-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:2px; }
+.mn-participants-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:2px; }
 .mn-check-item { display:flex; align-items:center; gap:8px; padding:5px 8px; border-radius:7px; cursor:pointer; transition:background .12s; }
 .mn-check-item:hover { background:var(--navy3); }
 .mn-check-item input[type=checkbox] { width:14px; height:14px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; }
@@ -1553,10 +1591,22 @@ body.dark .mn-drop-zone:hover, body.dark .mn-drop-zone.drag-over { background:rg
 body.dark .mn-attach-chip { background:#252525; border-color:#404040; color:#ddd; }
 body.dark .mn-file-chip { background:#252525; border-color:#404040; }
 body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
+@media (max-width:768px) {
+  .mn-card.expanded .mn-card-body { grid-template-columns:1fr; }
+  .mn-form-grid { grid-template-columns:1fr; }
+  .mn-modal { max-height:96vh; border-radius:12px; }
+  .mn-modal-header { border-radius:12px 12px 0 0; padding:14px 16px; }
+  .mn-modal-body { padding:14px 16px; }
+  .mn-modal-footer { padding:10px 16px; }
+  .mn-meeting-list { padding:14px 12px 60px; }
+  .mn-card-header { padding:12px 14px; flex-wrap:wrap; gap:8px; }
+  .mn-card-date { font-size:17px; min-width:auto; }
+}
 @media (max-width:600px) {
   .mn-participants-grid { grid-template-columns:1fr 1fr; }
   .mn-card-badges { display:none; }
-  .mn-toolbar { top:88px; }
+  .mn-toolbar { top:88px; padding:10px 14px; }
+  .mn-card-title { font-size:13px; }
 }
 </style>
 </head>
@@ -1727,8 +1777,8 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
       <div class="mn-modal-body">
         <input type="hidden" id="mnEditId">
 
-        <!-- Date & Title -->
-        <div style="display:grid;grid-template-columns:160px 1fr;gap:12px;margin-bottom:20px;">
+        <!-- Date & Title — full width -->
+        <div style="display:grid;grid-template-columns:180px 1fr;gap:14px;margin-bottom:20px;">
           <div>
             <div class="mn-section-label">Date</div>
             <input type="date" id="mnDate" class="mn-text-input">
@@ -1739,41 +1789,45 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
           </div>
         </div>
 
-        <!-- Participants -->
-        <div class="mn-section">
-          <div class="mn-section-label">Participants</div>
-          <div class="mn-group-title">Management</div>
-          <div class="mn-participants-grid" id="mnParticipants-management"></div>
-          <div class="mn-group-title" style="margin-top:10px;">Marine Superintendents</div>
-          <div class="mn-participants-grid" id="mnParticipants-marine"></div>
-          <div style="margin-top:10px;">
-            <div class="mn-group-title">Captain(s)</div>
-            <input type="text" id="mnCaptains" class="mn-text-input" placeholder="Captain name(s), comma separated (e.g. Capt. Smith, Capt. Yılmaz)">
-          </div>
-        </div>
+        <!-- Two-column body -->
+        <div class="mn-form-grid">
 
-        <!-- Note Items -->
-        <div class="mn-section">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-            <div class="mn-section-label" style="margin-bottom:0;">Meeting Notes / Action Items</div>
-            <button class="btn btn-outline btn-sm" onclick="mnAddItem()" style="font-size:11px;">+ Add Item</button>
+          <!-- LEFT: Participants -->
+          <div>
+            <div class="mn-section">
+              <div class="mn-section-label">Participants</div>
+              <div class="mn-group-title">Management</div>
+              <div class="mn-participants-grid" id="mnParticipants-management"></div>
+              <div class="mn-group-title" style="margin-top:10px;">Marine Superintendents</div>
+              <div class="mn-participants-grid" id="mnParticipants-marine"></div>
+            </div>
           </div>
-          <div id="mnItemsList"></div>
-        </div>
 
-        <!-- File Upload -->
-        <div class="mn-section">
-          <div class="mn-section-label">Attachments <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3);">(max 5 MB per file)</span></div>
-          <div class="mn-drop-zone" id="mnDropZone"
-               ondragover="event.preventDefault();this.classList.add('drag-over')"
-               ondragleave="this.classList.remove('drag-over')"
-               ondrop="mnHandleDrop(event)">
-            <input type="file" id="mnFileInput" multiple onchange="mnHandleFiles(this.files)">
-            <div style="font-size:24px;margin-bottom:4px;">📎</div>
-            <div style="font-size:12px;font-weight:600;color:var(--text2);">Drop files here or click to browse</div>
-            <div style="font-size:11px;margin-top:2px;">Any file type · Max 5 MB each</div>
+          <!-- RIGHT: Note items + File upload -->
+          <div>
+            <div class="mn-section">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div class="mn-section-label" style="margin-bottom:0;">Meeting Notes / Action Items</div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="mnAddItem()" style="font-size:11px;">+ Add Item</button>
+              </div>
+              <div id="mnItemsList"></div>
+            </div>
+
+            <div class="mn-section">
+              <div class="mn-section-label">Attachments <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3);">(max 5 MB per file)</span></div>
+              <div class="mn-drop-zone" id="mnDropZone"
+                   ondragover="event.preventDefault();this.classList.add('drag-over')"
+                   ondragleave="this.classList.remove('drag-over')"
+                   ondrop="mnHandleDrop(event)">
+                <input type="file" id="mnFileInput" multiple onchange="mnHandleFiles(this.files)">
+                <div style="font-size:22px;margin-bottom:4px;">📎</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text2);">Drop files here or click to browse</div>
+                <div style="font-size:11px;margin-top:2px;">Any file type · Max 5 MB each</div>
+              </div>
+              <div id="mnFileList" class="mn-file-list"></div>
+            </div>
           </div>
-          <div id="mnFileList" class="mn-file-list"></div>
+
         </div>
       </div>
       <div class="mn-modal-footer">
@@ -3085,6 +3139,8 @@ function buildModalBody(v) {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Save All Notes
       </button>
+
+      ${buildTodoSection(vn)}
     </div>
   `;
 }
@@ -3552,6 +3608,7 @@ function _executeClearData() {
   localStorage.setItem('yasa_supt_notes', JSON.stringify({}));
   localStorage.setItem('yasa_meetings', JSON.stringify([]));
   _mnMeetings = [];
+  VESSELS_ALL.forEach(function(v) { localStorage.removeItem('yasa_todos_' + canonicalize(v)); });
   if (_cloudReady) {
     const emptySnapshot = _buildSnapshot();
     _writeCloud(emptySnapshot).catch(e => console.warn('Cloud clear failed:', e));
@@ -4371,6 +4428,15 @@ function _buildSnapshot() {
     lsa:            lsaData,
     certs:          certData,
     cob:            cobData,
+    todos:          (function() {
+      var t = {};
+      VESSELS_ALL.forEach(function(v) {
+        var vn = canonicalize(v);
+        var raw = localStorage.getItem('yasa_todos_' + vn);
+        if (raw) { try { t[vn] = JSON.parse(raw); } catch(e) {} }
+      });
+      return t;
+    })(),
     meetings:       JSON.parse(localStorage.getItem('yasa_meetings') || '[]'),
     lastModifiedBy: _currentUser ? _currentUser.name : 'unknown',
     lastModified:   new Date().toISOString()
@@ -4509,6 +4575,23 @@ function _mergeSnapshots(cloud, local) {
     merged.cob[v] = new Date(lc._ts || 0) >= new Date(cc._ts || 0) ? lc : cc;
   });
 
+  // Merge todos: per-vessel, per-item last-write-wins by updatedAt
+  const cloudTodos = cloud.todos || {};
+  const localTodos = local.todos || {};
+  const allTodoKeys = new Set([...Object.keys(cloudTodos), ...Object.keys(localTodos)]);
+  merged.todos = {};
+  allTodoKeys.forEach(vn => {
+    const cArr = cloudTodos[vn] || [];
+    const lArr = localTodos[vn] || [];
+    const map = {};
+    [...cArr, ...lArr].forEach(it => {
+      const ex = map[it.id];
+      if (!ex || new Date(it.updatedAt || 0) >= new Date(ex.updatedAt || 0)) map[it.id] = it;
+    });
+    const merged_arr = Object.values(map);
+    if (merged_arr.length) merged.todos[vn] = merged_arr;
+  });
+
   // Merge meetings: per-meeting last-write-wins by updatedAt
   const cloudMtgs = cloud.meetings || [];
   const localMtgs = local.meetings || [];
@@ -4566,6 +4649,13 @@ function _applySnapshot(cloudData) {
     Object.keys(merged.cob).forEach(v => localStorage.setItem(cobKey(v), JSON.stringify(merged.cob[v])));
   }
 
+  // Todos
+  if (merged.todos) {
+    Object.keys(merged.todos).forEach(function(vn) {
+      localStorage.setItem('yasa_todos_' + vn, JSON.stringify(merged.todos[vn]));
+    });
+  }
+
   // Meetings
   if (merged.meetings) {
     localStorage.setItem('yasa_meetings', JSON.stringify(merged.meetings));
@@ -4577,6 +4667,137 @@ function _applySnapshot(cloudData) {
   renderAll();
   if (allVessels.length > 0) showReportBar();
   renderAlertPanel();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  VESSEL TO-DO LIST
+// ══════════════════════════════════════════════════════════════════
+
+function todoKey(vn) { return 'yasa_todos_' + vn; }
+
+function todoLoad(vn) {
+  try { return JSON.parse(localStorage.getItem(todoKey(vn)) || '[]'); } catch(e) { return []; }
+}
+
+function todoSave(vn, items) {
+  localStorage.setItem(todoKey(vn), JSON.stringify(items));
+  cloudSave().catch(function() {});
+}
+
+// Returns days until due: negative = overdue, 0 = today
+function todoDaysLeft(dueDate) {
+  if (!dueDate) return null;
+  var due = new Date(dueDate); due.setHours(0,0,0,0);
+  var today = new Date(); today.setHours(0,0,0,0);
+  return Math.round((due - today) / 86400000);
+}
+
+function todoDueBadge(dueDate) {
+  if (!dueDate) return '';
+  var d = todoDaysLeft(dueDate);
+  var label, cls;
+  if (d < 0)      { label = 'Overdue ' + Math.abs(d) + 'd'; cls = 'todo-due-overdue'; }
+  else if (d === 0) { label = 'Today';   cls = 'todo-due-soon'; }
+  else if (d <= 3)  { label = 'In ' + d + 'd'; cls = 'todo-due-soon'; }
+  else if (d <= 14) { label = 'In ' + d + 'd'; cls = 'todo-due-warn'; }
+  else {
+    var dd = new Date(dueDate);
+    label = (dd.getDate()) + '/' + (dd.getMonth()+1) + '/' + dd.getFullYear();
+    cls = 'todo-due-ok';
+  }
+  return '<span class="todo-due ' + cls + '">' + label + '</span>';
+}
+
+function buildTodoSection(vn) {
+  var items = todoLoad(vn);
+  var listHtml = items.length ? items.map(function(it) {
+    var dClass = '';
+    if (it.dueDate) {
+      var d = todoDaysLeft(it.dueDate);
+      if (d < 0) dClass = ' overdue';
+      else if (d <= 3) dClass = ' due-soon';
+    }
+    return '<li class="todo-item' + (it.done ? ' done' : '') + dClass + '" id="todoItem_' + escAttr(it.id) + '">' +
+      '<input type="checkbox" class="todo-cb"' + (it.done ? ' checked' : '') + ' onchange="todoToggle(\'' + escAttr(vn) + '\',\'' + escAttr(it.id) + '\',this.checked)">' +
+      '<span class="todo-text">' + escHtml(it.text) + '</span>' +
+      todoDueBadge(it.dueDate) +
+      '<button type="button" class="todo-del" onclick="todoDelete(\'' + escAttr(vn) + '\',\'' + escAttr(it.id) + '\')" title="Delete">✕</button>' +
+      '</li>';
+  }).join('') : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">No tasks yet.</li>';
+
+  return '<div class="todo-section">' +
+    '<div class="modal-section-title" style="margin-bottom:10px;">✅ To-Do List</div>' +
+    '<div class="todo-add-row">' +
+      '<textarea id="todoInput_' + vn + '" class="todo-textarea" placeholder="Add a task — paste text here..." onkeydown="if(event.key===\'Enter\'&&(event.ctrlKey||event.metaKey)){event.preventDefault();todoAdd(\'' + escAttr(vn) + '\');}"></textarea>' +
+      '<div class="todo-add-side">' +
+        '<input type="date" id="todoDue_' + vn + '" class="todo-date-input" title="Due date (optional)">' +
+        '<button type="button" class="btn btn-primary" style="font-size:12px;padding:7px 12px;" onclick="todoAdd(\'' + escAttr(vn) + '\')">+ Add</button>' +
+      '</div>' +
+    '</div>' +
+    '<ul class="todo-list" id="todoList_' + vn + '">' + listHtml + '</ul>' +
+  '</div>';
+}
+
+function todoAdd(vn) {
+  var inp = document.getElementById('todoInput_' + vn);
+  var dueEl = document.getElementById('todoDue_' + vn);
+  if (!inp) return;
+  var text = inp.value.trim();
+  if (!text) { inp.focus(); return; }
+  var due = dueEl ? dueEl.value : '';
+  var items = todoLoad(vn);
+  items.push({
+    id: 'td_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    text: text,
+    dueDate: due,
+    done: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
+  todoSave(vn, items);
+  inp.value = '';
+  if (dueEl) dueEl.value = '';
+  todoRerender(vn);
+}
+
+function todoToggle(vn, id, done) {
+  var items = todoLoad(vn);
+  var now = new Date().toISOString();
+  items = items.map(function(it) {
+    return it.id === id ? Object.assign({}, it, { done: done, updatedAt: now }) : it;
+  });
+  todoSave(vn, items);
+  todoRerender(vn);
+}
+
+function todoDelete(vn, id) {
+  var items = todoLoad(vn).filter(function(it) { return it.id !== id; });
+  todoSave(vn, items);
+  todoRerender(vn);
+}
+
+function todoRerender(vn) {
+  var listEl = document.getElementById('todoList_' + vn);
+  if (!listEl) return;
+  var items = todoLoad(vn);
+  if (!items.length) {
+    listEl.innerHTML = '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">No tasks yet.</li>';
+    return;
+  }
+  listEl.innerHTML = items.map(function(it) {
+    var dClass = '';
+    if (it.dueDate) {
+      var d = todoDaysLeft(it.dueDate);
+      if (d < 0) dClass = ' overdue';
+      else if (d <= 3) dClass = ' due-soon';
+    }
+    return '<li class="todo-item' + (it.done ? ' done' : '') + dClass + '" id="todoItem_' + escAttr(it.id) + '">' +
+      '<input type="checkbox" class="todo-cb"' + (it.done ? ' checked' : '') + ' onchange="todoToggle(\'' + escAttr(vn) + '\',\'' + escAttr(it.id) + '\',this.checked)">' +
+      '<span class="todo-text">' + escHtml(it.text) + '</span>' +
+      todoDueBadge(it.dueDate) +
+      '<button type="button" class="todo-del" onclick="todoDelete(\'' + escAttr(vn) + '\',\'' + escAttr(it.id) + '\')" title="Delete">✕</button>' +
+      '</li>';
+  }).join('');
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -4624,16 +4845,13 @@ function mnRender() {
 function mnCardHTML(m) {
   var critCount = (m.items || []).filter(function(it) { return it.critical; }).length;
   var critBadge = critCount ? '<span class="mn-badge mn-badge-critical">🔴 ' + critCount + ' Critical</span>' : '';
-  var pCount = (m.participants || []).length + (m.captains ? 1 : 0);
+  var pCount = (m.participants || []).length;
   var partBadge = '<span class="mn-badge mn-badge-participants">👥 ' + pCount + '</span>';
   var displayDate = m.date ? m.date.split('-').reverse().join('/') : '—';
 
   var participantChips = (m.participants || []).map(function(p) {
     return '<span class="mn-participant-chip">👤 ' + escHtml(p) + '</span>';
   }).join('');
-  var captainChips = m.captains ? m.captains.split(',').map(function(c) { return c.trim(); }).filter(Boolean).map(function(c) {
-    return '<span class="mn-participant-chip" style="background:#fef9c3;color:#92400e;border-color:#fde68a;">⚓ ' + escHtml(c) + '</span>';
-  }).join('') : '';
 
   var itemsHTML = (m.items || []).map(function(it) {
     return '<li class="mn-item' + (it.critical ? ' critical' : '') + '">' +
@@ -4660,14 +4878,22 @@ function mnCardHTML(m) {
     '<div class="mn-card-badges">' + critBadge + partBadge + '</div>' +
     '<div class="mn-card-chevron">▼</div></div>' +
     '<div class="mn-card-body">' +
-    '<div class="mn-participants-row">' + participantChips + captainChips + '</div>' +
-    (itemsHTML ? '<ul class="mn-items-list">' + itemsHTML + '</ul>' : '<div style="color:var(--text3);font-size:12px;margin-bottom:10px;">No note items recorded.</div>') +
-    attachHTML +
-    '<div class="mn-card-actions">' + createdBy +
-    '<div style="flex:1"></div>' +
-    '<button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation();mnEditMeeting(\'' + escAttr(m.id) + '\')">✏ Edit</button>' +
-    '<button type="button" class="btn btn-sm" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;" onclick="event.stopPropagation();mnDeleteMeeting(\'' + escAttr(m.id) + '\')">🗑 Delete</button>' +
-    '</div></div></div>';
+    // Left column: participants + note items
+    '<div class="mn-card-col">' +
+      '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-family:\'Barlow Condensed\',sans-serif;">Participants</div>' +
+      '<div class="mn-participants-row">' + participantChips + '</div>' +
+      (itemsHTML ? '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:14px;font-family:\'Barlow Condensed\',sans-serif;">Meeting Notes</div><ul class="mn-items-list">' + itemsHTML + '</ul>' : '') +
+    '</div>' +
+    // Right column: attachments + actions
+    '<div class="mn-card-col" style="display:flex;flex-direction:column;justify-content:space-between;">' +
+      (attachHTML || '<div style="color:var(--text3);font-size:12px;">No attachments.</div>') +
+      '<div class="mn-card-actions" style="margin-top:auto;padding-top:16px;">' + createdBy +
+      '<div style="flex:1"></div>' +
+      '<button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation();mnEditMeeting(\'' + escAttr(m.id) + '\')">✏ Edit</button>' +
+      '<button type="button" class="btn btn-sm" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;" onclick="event.stopPropagation();mnDeleteMeeting(\'' + escAttr(m.id) + '\')">🗑 Delete</button>' +
+      '</div>' +
+    '</div>' +
+    '</div></div>';
 }
 
 function mnToggleCard(id) {
@@ -4688,7 +4914,12 @@ function mnRenderCriticalBanner() {
   if (!critItems.length) { banner.style.display = 'none'; return; }
   banner.style.display = '';
   critList.innerHTML = critItems.map(function(ci) {
-    return '<span title="' + escAttr(ci.meeting) + '" style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:2px 10px;font-size:11px;font-family:\'Barlow Condensed\',sans-serif;font-weight:600;color:#dc2626;">' + escHtml(ci.text) + '</span>';
+    var displayDate = ci.date ? ci.date.split('-').reverse().join('/') : '';
+    var meta = escHtml(ci.meeting) + (displayDate ? ' · ' + displayDate : '');
+    return '<span style="display:inline-flex;align-items:baseline;gap:6px;background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:3px 12px;font-family:\'Barlow Condensed\',sans-serif;">' +
+      '<span style="font-size:12px;font-weight:700;color:#dc2626;">' + escHtml(ci.text) + '</span>' +
+      '<span style="font-size:10px;font-weight:500;color:#b91c1c;opacity:.8;">— ' + meta + '</span>' +
+      '</span>';
   }).join('');
 }
 
@@ -4700,7 +4931,6 @@ function mnOpenForm(editId) {
   document.getElementById('mnFormTitle').textContent = editId ? '✏ Edit Meeting' : '📝 New Meeting';
   document.getElementById('mnDate').value = new Date().toISOString().slice(0, 10);
   document.getElementById('mnTitle').value = '';
-  document.getElementById('mnCaptains').value = '';
   document.getElementById('mnItemsList').innerHTML = '';
   document.getElementById('mnFileList').innerHTML = '';
   mnBuildParticipants([]);
@@ -4710,7 +4940,6 @@ function mnOpenForm(editId) {
     if (m) {
       document.getElementById('mnDate').value = m.date || new Date().toISOString().slice(0, 10);
       document.getElementById('mnTitle').value = m.title || '';
-      document.getElementById('mnCaptains').value = m.captains || '';
       mnBuildParticipants(m.participants || []);
       (m.items || []).forEach(function(it) { mnAddItem(it.text, it.critical, it.id); });
       _mnFormFiles = JSON.parse(JSON.stringify(m.attachments || []));
@@ -4821,7 +5050,6 @@ function mnSaveMeeting() {
 
   var participants = [];
   document.querySelectorAll('.mn-participant-cb:checked').forEach(function(cb) { participants.push(cb.value); });
-  var captains = document.getElementById('mnCaptains').value.trim();
 
   var items = [];
   document.querySelectorAll('.mn-item-row').forEach(function(row) {
@@ -4838,14 +5066,14 @@ function mnSaveMeeting() {
   if (editId) {
     for (var i = 0; i < _mnMeetings.length; i++) {
       if (_mnMeetings[i].id === editId) {
-        _mnMeetings[i] = Object.assign({}, _mnMeetings[i], { date: date, title: title, participants: participants, captains: captains, items: items, attachments: _mnFormFiles, updatedAt: now });
+        _mnMeetings[i] = Object.assign({}, _mnMeetings[i], { date: date, title: title, participants: participants, items: items, attachments: _mnFormFiles, updatedAt: now });
         break;
       }
     }
   } else {
     _mnMeetings.push({
       id: 'mn_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-      date: date, title: title, participants: participants, captains: captains, items: items,
+      date: date, title: title, participants: participants, items: items,
       attachments: _mnFormFiles,
       createdBy: typeof _currentUser === 'string' ? _currentUser : (_currentUser ? (_currentUser.name || '') : ''),
       createdAt: now, updatedAt: now
@@ -4862,7 +5090,31 @@ function mnSaveMeeting() {
 function mnEditMeeting(id) { mnOpenForm(id); }
 
 function mnDeleteMeeting(id) {
-  if (!confirm('Delete this meeting? This cannot be undone.')) return;
+  var m = _mnMeetings.filter(function(x) { return x.id === id; })[0];
+  if (!m) return;
+  var displayDate = m.date ? m.date.split('-').reverse().join('/') : '';
+  var label = escHtml((m.title || 'Untitled Meeting') + (displayDate ? ' · ' + displayDate : ''));
+
+  var overlay = document.createElement('div');
+  overlay.className = 'mn-confirm-overlay';
+  overlay.id = 'mnDeleteConfirm';
+  overlay.innerHTML =
+    '<div class="mn-confirm-box">' +
+      '<div class="mn-confirm-icon">🗑</div>' +
+      '<div class="mn-confirm-title">Delete Meeting?</div>' +
+      '<div class="mn-confirm-msg">' + label + '<br><br>Bu toplantı kalıcı olarak silinecek. Geri alınamaz.</div>' +
+      '<div class="mn-confirm-btns">' +
+        '<button type="button" class="btn btn-outline" style="min-width:90px;" onclick="document.getElementById(\'mnDeleteConfirm\').remove()">İptal</button>' +
+        '<button type="button" class="btn btn-sm" style="background:#dc2626;color:#fff;border:none;min-width:90px;" onclick="mnConfirmDelete(\'' + id + '\')">Evet, Sil</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+}
+
+function mnConfirmDelete(id) {
+  var overlay = document.getElementById('mnDeleteConfirm');
+  if (overlay) overlay.remove();
   _mnMeetings = _mnMeetings.filter(function(x) { return x.id !== id; });
   mnSave();
   mnRender();
