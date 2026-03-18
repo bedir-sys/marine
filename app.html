@@ -874,6 +874,43 @@ body {
   color: var(--accent);
 }
 
+/* ── UNDER CONSTRUCTION TAB LABEL ── */
+.tab-uc {
+  display: block;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .4px;
+  color: #f59e0b;
+  opacity: .8;
+  margin-top: 1px;
+  text-transform: uppercase;
+}
+
+/* ── NOTE BLOCK CATEGORY COLORS ── */
+.note-block-operational { border-left-color: #2563eb; }
+.note-block-operational .note-block-label { color: #2563eb; }
+.note-block-operational .note-block-header { background: rgba(37,99,235,.06); border-bottom-color: rgba(37,99,235,.12); }
+
+.note-block-procurement { border-left-color: #0d9488; }
+.note-block-procurement .note-block-label { color: #0d9488; }
+.note-block-procurement .note-block-header { background: rgba(13,148,136,.06); border-bottom-color: rgba(13,148,136,.12); }
+.note-block-procurement .note-row-num { background: #0d9488; }
+
+.note-block-personnel { border-left-color: #7c3aed; }
+.note-block-personnel .note-block-label { color: #7c3aed; }
+.note-block-personnel .note-block-header { background: rgba(124,58,237,.06); border-bottom-color: rgba(124,58,237,.12); }
+.note-block-personnel .note-row-num { background: #7c3aed; }
+
+.note-block-other { border-left-color: #64748b; }
+.note-block-other .note-block-label { color: #64748b; }
+.note-block-other .note-block-header { background: rgba(100,116,139,.06); border-bottom-color: rgba(100,116,139,.12); }
+.note-block-other .note-row-num { background: #64748b; }
+
+/* dark mode overrides */
+body.dark .note-block-procurement .note-block-header { background: rgba(13,148,136,.1); }
+body.dark .note-block-personnel   .note-block-header { background: rgba(124,58,237,.1); }
+body.dark .note-block-other       .note-block-header { background: rgba(100,116,139,.1); }
+
 /* ── COMPACT NOTE ROWS ── */
 .note-row {
   display: flex;
@@ -1436,6 +1473,91 @@ body {
   .brand { gap: 8px; }
   .tab { padding: 9px 8px; font-size: 10px; letter-spacing: 0; }
 }
+
+/* ── MEETING NOTES ─────────────────────────────────────────────── */
+.mn-toolbar { display:flex; align-items:center; gap:10px; padding:14px 24px; background:var(--navy2); border-bottom:1px solid var(--border); flex-wrap:wrap; position:sticky; top:104px; z-index:180; }
+.mn-meeting-list { max-width:900px; margin:0 auto; padding:20px 20px 60px; }
+.mn-empty { text-align:center; padding:60px 20px; color:var(--text3); }
+.mn-empty-icon { font-size:40px; margin-bottom:12px; }
+.mn-card { background:var(--navy); border:1px solid var(--border); border-radius:12px; margin-bottom:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.05); transition:box-shadow .15s; }
+.mn-card:hover { box-shadow:0 3px 12px rgba(0,0,0,.1); }
+.mn-card-header { display:flex; align-items:center; gap:12px; padding:14px 18px; background:var(--navy2); border-bottom:1px solid transparent; cursor:pointer; -webkit-user-select:none; user-select:none; }
+.mn-card.expanded .mn-card-header { border-bottom-color:var(--border); }
+.mn-card-date { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; color:var(--accent); min-width:90px; flex-shrink:0; }
+.mn-card-title { flex:1; font-weight:600; font-size:14px; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mn-card-badges { display:flex; gap:6px; flex-shrink:0; }
+.mn-badge { font-size:10px; font-family:'Barlow Condensed',sans-serif; font-weight:700; padding:2px 8px; border-radius:10px; white-space:nowrap; }
+.mn-badge-critical { background:#fef2f2; color:#dc2626; border:1px solid #fca5a5; }
+.mn-badge-participants { background:var(--blue); color:var(--accent); border:1px solid rgba(37,99,235,.2); }
+.mn-card-chevron { color:var(--text3); font-size:12px; transition:transform .2s; flex-shrink:0; }
+.mn-card.expanded .mn-card-chevron { transform:rotate(180deg); }
+.mn-card-body { padding:16px 18px; display:none; }
+.mn-card.expanded .mn-card-body { display:block; }
+.mn-participants-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.mn-participant-chip { display:inline-flex; align-items:center; gap:4px; background:var(--blue); color:var(--accent); border:1px solid rgba(37,99,235,.2); border-radius:20px; padding:3px 10px; font-size:11px; font-family:'Barlow Condensed',sans-serif; font-weight:600; }
+.mn-items-list { list-style:none; padding:0; margin:0 0 14px; }
+.mn-item { display:flex; align-items:flex-start; gap:8px; padding:8px 12px; border-radius:8px; margin-bottom:4px; background:var(--navy2); }
+.mn-item.critical { background:#fef2f2; border-left:3px solid #dc2626; }
+.mn-item-bullet { flex-shrink:0; margin-top:1px; font-size:13px; }
+.mn-item-text { flex:1; font-size:13px; color:var(--text); line-height:1.4; }
+.mn-attachments { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.mn-attach-chip { display:inline-flex; align-items:center; gap:6px; background:var(--navy2); border:1px solid var(--border2); border-radius:8px; padding:5px 10px; font-size:11px; cursor:pointer; text-decoration:none; color:var(--text); }
+.mn-attach-chip:hover { background:var(--blue); }
+.mn-card-actions { display:flex; gap:8px; margin-top:14px; align-items:center; }
+/* ── Meeting Notes Modal ── */
+.mn-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100; display:flex; align-items:center; justify-content:center; padding:16px; }
+.mn-modal { background:var(--navy); border-radius:16px; width:100%; max-width:740px; max-height:90vh; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; }
+.mn-modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; background:linear-gradient(135deg,var(--topnav-from),var(--topnav-to)); flex-shrink:0; }
+.mn-modal-title { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; color:#fff; }
+.mn-modal-close { background:rgba(255,255,255,.2); border:none; color:#fff; width:30px; height:30px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.mn-modal-body { padding:20px 22px; overflow-y:auto; flex:1; }
+.mn-modal-footer { padding:14px 22px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; background:var(--navy2); flex-shrink:0; }
+.mn-section { margin-bottom:20px; }
+.mn-section-label { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+.mn-group-title { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.07em; padding:6px 0 4px; margin-bottom:4px; border-bottom:1px solid var(--border); }
+.mn-participants-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:2px; }
+.mn-check-item { display:flex; align-items:center; gap:8px; padding:5px 8px; border-radius:7px; cursor:pointer; transition:background .12s; }
+.mn-check-item:hover { background:var(--navy3); }
+.mn-check-item input[type=checkbox] { width:14px; height:14px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; }
+.mn-check-label { font-size:12px; font-family:'Barlow Condensed',sans-serif; font-weight:600; color:var(--text); cursor:pointer; line-height:1.3; }
+.mn-check-sub { font-size:10px; color:var(--text3); font-weight:400; }
+.mn-item-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.mn-item-input { flex:1; padding:7px 11px; border:1px solid var(--border2); border-radius:8px; font-family:'Barlow',sans-serif; font-size:13px; color:var(--text); background:var(--input-bg); outline:none; }
+.mn-item-input:focus { border-color:var(--accent); }
+.mn-item-critical-btn { padding:5px 11px; border-radius:8px; border:1px solid var(--border2); background:var(--navy2); font-size:11px; font-family:'Barlow Condensed',sans-serif; font-weight:700; cursor:pointer; color:var(--text2); transition:all .15s; white-space:nowrap; flex-shrink:0; }
+.mn-item-critical-btn.active { background:#fef2f2; border-color:#fca5a5; color:#dc2626; }
+.mn-item-del { background:none; border:none; color:var(--text3); font-size:16px; cursor:pointer; padding:2px 6px; border-radius:4px; flex-shrink:0; }
+.mn-item-del:hover { color:var(--red); background:#fef2f2; }
+.mn-drop-zone { border:2px dashed var(--border2); border-radius:10px; padding:16px; text-align:center; color:var(--text3); font-size:12px; cursor:pointer; position:relative; transition:all .15s; }
+.mn-drop-zone:hover, .mn-drop-zone.drag-over { border-color:var(--accent); background:var(--blue); }
+.mn-drop-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.mn-file-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.mn-file-chip { display:inline-flex; align-items:center; gap:6px; background:var(--navy2); border:1px solid var(--border2); border-radius:8px; padding:4px 10px; font-size:11px; }
+.mn-file-chip button { background:none; border:none; color:var(--text3); cursor:pointer; font-size:12px; padding:0; line-height:1; }
+.mn-file-chip button:hover { color:var(--red); }
+.mn-critical-banner { background:#fef2f2; border-bottom:2px solid #fca5a5; padding:10px 24px; }
+.mn-text-input { width:100%; padding:8px 12px; border:1px solid var(--border2); border-radius:8px; font-family:'Barlow',sans-serif; font-size:13px; color:var(--text); background:var(--input-bg); outline:none; box-sizing:border-box; }
+.mn-text-input:focus { border-color:var(--accent); }
+/* dark mode */
+body.dark .mn-card { background:#1e1e1e; border-color:#333; }
+body.dark .mn-card-header { background:#181818; }
+body.dark .mn-item { background:#252525; }
+body.dark .mn-item.critical { background:#2d1515; }
+body.dark .mn-modal { background:#1e1e1e; }
+body.dark .mn-modal-footer { background:#181818; }
+body.dark .mn-item-input, body.dark .mn-text-input { background:#252525; border-color:#404040; color:#f0f0f0; }
+body.dark .mn-item-critical-btn { background:#252525; border-color:#404040; color:#ccc; }
+body.dark .mn-check-item:hover { background:#252525; }
+body.dark .mn-drop-zone { border-color:#404040; }
+body.dark .mn-drop-zone:hover, body.dark .mn-drop-zone.drag-over { background:rgba(37,99,235,.1); }
+body.dark .mn-attach-chip { background:#252525; border-color:#404040; color:#ddd; }
+body.dark .mn-file-chip { background:#252525; border-color:#404040; }
+body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
+@media (max-width:600px) {
+  .mn-participants-grid { grid-template-columns:1fr 1fr; }
+  .mn-card-badges { display:none; }
+  .mn-toolbar { top:88px; }
+}
 </style>
 </head>
 <body>
@@ -1481,9 +1603,12 @@ body {
     Vessel Notes
     <span class="tab-badge" id="vesselCountBadge">0</span>
   </div>
-  <div class="tab" onclick="switchTab('lsa-ffe', this)">🛟 LSA &amp; FFE Survey</div>
-  <div class="tab" onclick="switchTab('emission', this)">🌿 Emission Calculation</div>
-  <div class="tab" onclick="switchTab('orders', this)">📋 Order Follow</div>
+  <div class="tab" onclick="switchTab('meeting-notes', this)">📝 Meeting Notes
+    <span class="tab-badge" id="meetingCountBadge" style="display:none">0</span>
+  </div>
+  <div class="tab" onclick="switchTab('lsa-ffe', this)">🛟 LSA &amp; FFE Survey<span class="tab-uc">🚧 Under Construction</span></div>
+  <div class="tab" onclick="switchTab('emission', this)">🌿 Emission Calculation<span class="tab-uc">🚧 Under Construction</span></div>
+  <div class="tab" onclick="switchTab('orders', this)">📋 Order Follow<span class="tab-uc">🚧 Under Construction</span></div>
   <div class="tab" onclick="switchTab('settings', this)" style="margin-left:auto;">⚙ Settings</div>
 </div>
 
@@ -1558,6 +1683,103 @@ body {
   <div class="vessels-list" id="vesselsList">
     <div class="list-container" id="listContainer" style="display:none">
       <div class="vessels-grid" id="vesselsGrid"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════ MEETING NOTES ════════════════════════ -->
+<div id="page-meeting-notes" class="page">
+
+  <!-- Toolbar -->
+  <div class="mn-toolbar">
+    <div style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text);">
+      📝 Meeting Notes &nbsp;<span id="mnMeetingCount" style="color:var(--text3);font-weight:400;font-size:13px;">0 meetings</span>
+    </div>
+    <button class="btn btn-primary" onclick="mnOpenForm()">+ New Meeting</button>
+  </div>
+
+  <!-- Critical items banner -->
+  <div id="mnCriticalBanner" class="mn-critical-banner" style="display:none;">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:#dc2626;flex-shrink:0;">🔴 CRITICAL ITEMS:</span>
+      <div id="mnCriticalList" style="display:flex;flex-wrap:wrap;gap:6px;flex:1;"></div>
+    </div>
+  </div>
+
+  <!-- Meeting list -->
+  <div class="mn-meeting-list">
+    <div id="mnEmptyState" class="mn-empty">
+      <div class="mn-empty-icon">📝</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;color:var(--text2);margin-bottom:6px;">No Meeting Notes Yet</div>
+      <div style="font-size:13px;color:var(--text3);">Click "New Meeting" to record your first meeting.</div>
+    </div>
+    <div id="mnList"></div>
+  </div>
+
+  <!-- New / Edit Meeting Modal -->
+  <div id="mnFormOverlay" class="mn-modal-overlay" style="display:none;" onclick="if(event.target===this)mnCloseForm()">
+    <div class="mn-modal" onclick="event.stopPropagation()">
+      <div class="mn-modal-header">
+        <span class="mn-modal-title" id="mnFormTitle">📝 New Meeting</span>
+        <button class="mn-modal-close" onclick="mnCloseForm()">✕</button>
+      </div>
+      <div class="mn-modal-body">
+        <input type="hidden" id="mnEditId">
+
+        <!-- Date & Title -->
+        <div style="display:grid;grid-template-columns:160px 1fr;gap:12px;margin-bottom:20px;">
+          <div>
+            <div class="mn-section-label">Date</div>
+            <input type="date" id="mnDate" class="mn-text-input">
+          </div>
+          <div>
+            <div class="mn-section-label">Meeting Subject / Title</div>
+            <input type="text" id="mnTitle" class="mn-text-input" placeholder="e.g. Monthly Safety Review, Pre-Arrival Meeting...">
+          </div>
+        </div>
+
+        <!-- Participants -->
+        <div class="mn-section">
+          <div class="mn-section-label">Participants</div>
+          <div class="mn-group-title">Management</div>
+          <div class="mn-participants-grid" id="mnParticipants-management"></div>
+          <div class="mn-group-title" style="margin-top:10px;">Marine Superintendents</div>
+          <div class="mn-participants-grid" id="mnParticipants-marine"></div>
+          <div style="margin-top:10px;">
+            <div class="mn-group-title">Captain(s)</div>
+            <input type="text" id="mnCaptains" class="mn-text-input" placeholder="Captain name(s), comma separated (e.g. Capt. Smith, Capt. Yılmaz)">
+          </div>
+        </div>
+
+        <!-- Note Items -->
+        <div class="mn-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div class="mn-section-label" style="margin-bottom:0;">Meeting Notes / Action Items</div>
+            <button class="btn btn-outline btn-sm" onclick="mnAddItem()" style="font-size:11px;">+ Add Item</button>
+          </div>
+          <div id="mnItemsList"></div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="mn-section">
+          <div class="mn-section-label">Attachments <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3);">(max 5 MB per file)</span></div>
+          <div class="mn-drop-zone" id="mnDropZone"
+               ondragover="event.preventDefault();this.classList.add('drag-over')"
+               ondragleave="this.classList.remove('drag-over')"
+               ondrop="mnHandleDrop(event)">
+            <input type="file" id="mnFileInput" multiple onchange="mnHandleFiles(this.files)">
+            <div style="font-size:24px;margin-bottom:4px;">📎</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text2);">Drop files here or click to browse</div>
+            <div style="font-size:11px;margin-top:2px;">Any file type · Max 5 MB each</div>
+          </div>
+          <div id="mnFileList" class="mn-file-list"></div>
+        </div>
+      </div>
+      <div class="mn-modal-footer">
+        <button class="btn btn-outline" onclick="mnCloseForm()">Cancel</button>
+        <button class="btn btn-primary" onclick="mnSaveMeeting()">💾 Save Meeting</button>
+      </div>
     </div>
   </div>
 
@@ -2271,6 +2493,7 @@ function switchTab(id, el) {
   if (id === 'settings') renderSettingsPage();
   if (id === 'lsa-ffe') lsaInit();
   if (id === 'emission') emInit();
+  if (id === 'meeting-notes') mnRender();
   if (id === 'orders') ordInit();
 }
 
@@ -3008,7 +3231,7 @@ function noteBlock(cat, label, data, placeholder) {
     : '';
 
   return `
-    <div class="note-block${blockClass}" id="note_block_${cat}">
+    <div class="note-block note-block-${cat}${blockClass}" id="note_block_${cat}">
       <div class="note-block-header">
         <div class="note-block-label">${label}${countHtml}</div>
       </div>
@@ -3180,11 +3403,11 @@ function switchModalTab(tab, el) {
   const not = document.querySelector('.modal-col-notes');
   if (!det || !not) return;
   if (tab === 'details') {
-    det.style.display = '';
+    det.style.display = 'block';
     not.style.display = 'none';
   } else {
     det.style.display = 'none';
-    not.style.display = '';
+    not.style.display = 'block';
   }
 }
 
@@ -3327,6 +3550,8 @@ function _executeClearData() {
   reportDate = '';
   localStorage.setItem('yasa_dashboard_state', JSON.stringify({ vessels: [], reportFileName: '', reportDate: '' }));
   localStorage.setItem('yasa_supt_notes', JSON.stringify({}));
+  localStorage.setItem('yasa_meetings', JSON.stringify([]));
+  _mnMeetings = [];
   if (_cloudReady) {
     const emptySnapshot = _buildSnapshot();
     _writeCloud(emptySnapshot).catch(e => console.warn('Cloud clear failed:', e));
@@ -4146,6 +4371,7 @@ function _buildSnapshot() {
     lsa:            lsaData,
     certs:          certData,
     cob:            cobData,
+    meetings:       JSON.parse(localStorage.getItem('yasa_meetings') || '[]'),
     lastModifiedBy: _currentUser ? _currentUser.name : 'unknown',
     lastModified:   new Date().toISOString()
   };
@@ -4283,6 +4509,19 @@ function _mergeSnapshots(cloud, local) {
     merged.cob[v] = new Date(lc._ts || 0) >= new Date(cc._ts || 0) ? lc : cc;
   });
 
+  // Merge meetings: per-meeting last-write-wins by updatedAt
+  const cloudMtgs = cloud.meetings || [];
+  const localMtgs = local.meetings || [];
+  const mtgMap = {};
+  [...cloudMtgs, ...localMtgs].forEach(m => {
+    if (!m || !m.id) return;
+    const existing = mtgMap[m.id];
+    if (!existing || new Date(m.updatedAt || 0) >= new Date(existing.updatedAt || 0)) {
+      mtgMap[m.id] = m;
+    }
+  });
+  merged.meetings = Object.values(mtgMap).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
   merged.lastModifiedBy = _currentUser ? _currentUser.name : 'unknown';
   merged.lastModified   = new Date().toISOString();
   return merged;
@@ -4327,12 +4566,311 @@ function _applySnapshot(cloudData) {
     Object.keys(merged.cob).forEach(v => localStorage.setItem(cobKey(v), JSON.stringify(merged.cob[v])));
   }
 
+  // Meetings
+  if (merged.meetings) {
+    localStorage.setItem('yasa_meetings', JSON.stringify(merged.meetings));
+    if (typeof mnLoad === 'function') { mnLoad(); }
+  }
+
   // Re-render everything
   rebuildDropdowns();
   renderAll();
   if (allVessels.length > 0) showReportBar();
   renderAlertPanel();
 }
+
+// ══════════════════════════════════════════════════════════════════
+//  MEETING NOTES MODULE
+// ══════════════════════════════════════════════════════════════════
+
+var _mnMeetings = [];
+var _mnFormFiles = [];
+var _mnItemCounter = 0;
+
+function mnLoad() {
+  try { _mnMeetings = JSON.parse(localStorage.getItem('yasa_meetings') || '[]'); } catch(e) { _mnMeetings = []; }
+}
+
+function mnSave() {
+  localStorage.setItem('yasa_meetings', JSON.stringify(_mnMeetings));
+  cloudSave().catch(e => console.warn('Meeting notes cloud save failed:', e));
+}
+
+// ── Render meeting list ───────────────────────────────────────────
+function mnRender() {
+  mnLoad();
+  var list = document.getElementById('mnList');
+  var empty = document.getElementById('mnEmptyState');
+  var badge = document.getElementById('meetingCountBadge');
+  var countEl = document.getElementById('mnMeetingCount');
+  if (!list) return;
+
+  var sorted = _mnMeetings.slice().sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+
+  if (countEl) countEl.textContent = sorted.length + ' meeting' + (sorted.length !== 1 ? 's' : '');
+  if (badge) { badge.textContent = sorted.length; badge.style.display = sorted.length > 0 ? '' : 'none'; }
+
+  if (!sorted.length) {
+    if (empty) empty.style.display = '';
+    list.innerHTML = '';
+    mnRenderCriticalBanner();
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  list.innerHTML = sorted.map(mnCardHTML).join('');
+  mnRenderCriticalBanner();
+}
+
+function mnCardHTML(m) {
+  var critCount = (m.items || []).filter(function(it) { return it.critical; }).length;
+  var critBadge = critCount ? '<span class="mn-badge mn-badge-critical">🔴 ' + critCount + ' Critical</span>' : '';
+  var pCount = (m.participants || []).length + (m.captains ? 1 : 0);
+  var partBadge = '<span class="mn-badge mn-badge-participants">👥 ' + pCount + '</span>';
+  var displayDate = m.date ? m.date.split('-').reverse().join('/') : '—';
+
+  var participantChips = (m.participants || []).map(function(p) {
+    return '<span class="mn-participant-chip">👤 ' + escHtml(p) + '</span>';
+  }).join('');
+  var captainChips = m.captains ? m.captains.split(',').map(function(c) { return c.trim(); }).filter(Boolean).map(function(c) {
+    return '<span class="mn-participant-chip" style="background:#fef9c3;color:#92400e;border-color:#fde68a;">⚓ ' + escHtml(c) + '</span>';
+  }).join('') : '';
+
+  var itemsHTML = (m.items || []).map(function(it) {
+    return '<li class="mn-item' + (it.critical ? ' critical' : '') + '">' +
+      '<span class="mn-item-bullet">' + (it.critical ? '🔴' : '•') + '</span>' +
+      '<span class="mn-item-text">' + escHtml(it.text) + '</span></li>';
+  }).join('');
+
+  var attachHTML = (m.attachments || []).length ? (
+    '<div style="margin-top:10px;">' +
+    '<div style="font-size:11px;color:var(--text3);font-weight:600;margin-bottom:6px;font-family:\'Barlow Condensed\',sans-serif;text-transform:uppercase;">Attachments</div>' +
+    '<div class="mn-attachments">' +
+    (m.attachments || []).map(function(a) {
+      return '<a class="mn-attach-chip" href="' + a.data + '" download="' + escAttr(a.name) + '" onclick="event.stopPropagation()">📎 ' + escHtml(a.name) + '</a>';
+    }).join('') +
+    '</div></div>'
+  ) : '';
+
+  var createdBy = m.createdBy ? '<span style="font-size:11px;color:var(--text3);font-family:\'Barlow Condensed\',sans-serif;">By ' + escHtml(m.createdBy) + '</span>' : '';
+
+  return '<div class="mn-card" id="mnCard_' + escAttr(m.id) + '">' +
+    '<div class="mn-card-header" onclick="mnToggleCard(\'' + escAttr(m.id) + '\')">' +
+    '<div class="mn-card-date">' + escHtml(displayDate) + '</div>' +
+    '<div class="mn-card-title">' + escHtml(m.title || 'Untitled Meeting') + '</div>' +
+    '<div class="mn-card-badges">' + critBadge + partBadge + '</div>' +
+    '<div class="mn-card-chevron">▼</div></div>' +
+    '<div class="mn-card-body">' +
+    '<div class="mn-participants-row">' + participantChips + captainChips + '</div>' +
+    (itemsHTML ? '<ul class="mn-items-list">' + itemsHTML + '</ul>' : '<div style="color:var(--text3);font-size:12px;margin-bottom:10px;">No note items recorded.</div>') +
+    attachHTML +
+    '<div class="mn-card-actions">' + createdBy +
+    '<div style="flex:1"></div>' +
+    '<button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation();mnEditMeeting(\'' + escAttr(m.id) + '\')">✏ Edit</button>' +
+    '<button type="button" class="btn btn-sm" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;" onclick="event.stopPropagation();mnDeleteMeeting(\'' + escAttr(m.id) + '\')">🗑 Delete</button>' +
+    '</div></div></div>';
+}
+
+function mnToggleCard(id) {
+  var card = document.getElementById('mnCard_' + id);
+  if (card) card.classList.toggle('expanded');
+}
+
+function mnRenderCriticalBanner() {
+  var banner = document.getElementById('mnCriticalBanner');
+  var critList = document.getElementById('mnCriticalList');
+  if (!banner || !critList) return;
+  var critItems = [];
+  _mnMeetings.forEach(function(m) {
+    (m.items || []).forEach(function(it) {
+      if (it.critical) critItems.push({ text: it.text, meeting: m.title || 'Untitled', date: m.date });
+    });
+  });
+  if (!critItems.length) { banner.style.display = 'none'; return; }
+  banner.style.display = '';
+  critList.innerHTML = critItems.map(function(ci) {
+    return '<span title="' + escAttr(ci.meeting) + '" style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:2px 10px;font-size:11px;font-family:\'Barlow Condensed\',sans-serif;font-weight:600;color:#dc2626;">' + escHtml(ci.text) + '</span>';
+  }).join('');
+}
+
+// ── Form open/close ───────────────────────────────────────────────
+function mnOpenForm(editId) {
+  _mnFormFiles = [];
+  _mnItemCounter = 0;
+  document.getElementById('mnEditId').value = editId || '';
+  document.getElementById('mnFormTitle').textContent = editId ? '✏ Edit Meeting' : '📝 New Meeting';
+  document.getElementById('mnDate').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('mnTitle').value = '';
+  document.getElementById('mnCaptains').value = '';
+  document.getElementById('mnItemsList').innerHTML = '';
+  document.getElementById('mnFileList').innerHTML = '';
+  mnBuildParticipants([]);
+
+  if (editId) {
+    var m = _mnMeetings.filter(function(x) { return x.id === editId; })[0];
+    if (m) {
+      document.getElementById('mnDate').value = m.date || new Date().toISOString().slice(0, 10);
+      document.getElementById('mnTitle').value = m.title || '';
+      document.getElementById('mnCaptains').value = m.captains || '';
+      mnBuildParticipants(m.participants || []);
+      (m.items || []).forEach(function(it) { mnAddItem(it.text, it.critical, it.id); });
+      _mnFormFiles = JSON.parse(JSON.stringify(m.attachments || []));
+      mnRenderFileList();
+    }
+  } else {
+    mnAddItem();
+  }
+  document.getElementById('mnFormOverlay').style.display = 'flex';
+}
+
+function mnCloseForm() {
+  document.getElementById('mnFormOverlay').style.display = 'none';
+  _mnFormFiles = [];
+}
+
+function mnBuildParticipants(selected) {
+  var selectedSet = {};
+  (selected || []).forEach(function(n) { selectedSet[n] = true; });
+  var mgmt = document.getElementById('mnParticipants-management');
+  var marine = document.getElementById('mnParticipants-marine');
+  if (!mgmt || !marine) return;
+
+  var mgmtPeople = [['GAZİ GÖKPINAR', 'Deputy GM'], ['TÜRKER İPEK', 'Ops Manager']];
+  mgmt.innerHTML = mgmtPeople.map(function(pair) {
+    return '<label class="mn-check-item"><input type="checkbox" class="mn-participant-cb" value="' + escAttr(pair[0]) + '"' + (selectedSet[pair[0]] ? ' checked' : '') + '>' +
+      '<span class="mn-check-label">' + escHtml(pair[0]) + ' <span class="mn-check-sub">· ' + pair[1] + '</span></span></label>';
+  }).join('');
+
+  marine.innerHTML = ALL_MARINE_NAMES.map(function(n) {
+    return '<label class="mn-check-item"><input type="checkbox" class="mn-participant-cb" value="' + escAttr(n) + '"' + (selectedSet[n] ? ' checked' : '') + '>' +
+      '<span class="mn-check-label">' + escHtml(n) + '</span></label>';
+  }).join('');
+}
+
+// ── Note items ────────────────────────────────────────────────────
+function mnAddItem(text, critical, id) {
+  _mnItemCounter++;
+  var iid = id || ('mnitem_' + _mnItemCounter);
+  var container = document.getElementById('mnItemsList');
+  if (!container) return;
+  var row = document.createElement('div');
+  row.className = 'mn-item-row';
+  row.id = 'mnItemRow_' + iid;
+  row.innerHTML =
+    '<input type="text" class="mn-item-input" id="mnItemText_' + iid + '" placeholder="Note item or action point..." value="' + escAttr(text || '') + '" onkeydown="if(event.key===\'Enter\'){event.preventDefault();mnAddItem();}">' +
+    '<button type="button" class="mn-item-critical-btn' + (critical ? ' active' : '') + '" id="mnItemCrit_' + iid + '" onclick="mnToggleCritical(\'' + iid + '\')" title="Mark as critical">🔴 Critical</button>' +
+    '<button type="button" class="mn-item-del" onclick="mnRemoveItem(\'' + iid + '\')" title="Remove">✕</button>';
+  container.appendChild(row);
+  var inp = document.getElementById('mnItemText_' + iid);
+  if (inp && !text) inp.focus();
+}
+
+function mnToggleCritical(iid) {
+  var btn = document.getElementById('mnItemCrit_' + iid);
+  if (btn) btn.classList.toggle('active');
+}
+
+function mnRemoveItem(iid) {
+  var row = document.getElementById('mnItemRow_' + iid);
+  if (row) row.remove();
+}
+
+// ── File handling ─────────────────────────────────────────────────
+function mnHandleDrop(e) {
+  e.preventDefault();
+  var dz = document.getElementById('mnDropZone');
+  if (dz) dz.classList.remove('drag-over');
+  if (e.dataTransfer && e.dataTransfer.files) mnHandleFiles(e.dataTransfer.files);
+}
+
+function mnHandleFiles(files) {
+  if (!files || !files.length) return;
+  Array.prototype.forEach.call(files, function(file) {
+    if (file.size > 5 * 1024 * 1024) { showToast('File too large (max 5 MB): ' + file.name, 'error'); return; }
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      _mnFormFiles.push({ name: file.name, data: ev.target.result, type: file.type, size: file.size });
+      mnRenderFileList();
+    };
+    reader.readAsDataURL(file);
+  });
+  var fi = document.getElementById('mnFileInput');
+  if (fi) fi.value = '';
+}
+
+function mnRenderFileList() {
+  var el = document.getElementById('mnFileList');
+  if (!el) return;
+  el.innerHTML = _mnFormFiles.map(function(f, i) {
+    return '<div class="mn-file-chip">📎 ' + escHtml(f.name) +
+      ' <span style="color:var(--text3)">(' + (f.size / 1024).toFixed(0) + ' KB)</span>' +
+      '<button type="button" onclick="mnRemoveFile(' + i + ')" title="Remove">✕</button></div>';
+  }).join('');
+}
+
+function mnRemoveFile(i) {
+  _mnFormFiles.splice(i, 1);
+  mnRenderFileList();
+}
+
+// ── Save meeting ──────────────────────────────────────────────────
+function mnSaveMeeting() {
+  var date = document.getElementById('mnDate').value;
+  var title = document.getElementById('mnTitle').value.trim();
+  if (!date) { showToast('Please select a date.', 'error'); return; }
+  if (!title) { showToast('Please enter a meeting subject.', 'error'); return; }
+
+  var participants = [];
+  document.querySelectorAll('.mn-participant-cb:checked').forEach(function(cb) { participants.push(cb.value); });
+  var captains = document.getElementById('mnCaptains').value.trim();
+
+  var items = [];
+  document.querySelectorAll('.mn-item-row').forEach(function(row) {
+    var iid = row.id.replace('mnItemRow_', '');
+    var textEl = document.getElementById('mnItemText_' + iid);
+    var critEl = document.getElementById('mnItemCrit_' + iid);
+    var text = textEl ? textEl.value.trim() : '';
+    if (text) items.push({ id: iid, text: text, critical: critEl ? critEl.classList.contains('active') : false });
+  });
+
+  var editId = document.getElementById('mnEditId').value;
+  var now = new Date().toISOString();
+
+  if (editId) {
+    for (var i = 0; i < _mnMeetings.length; i++) {
+      if (_mnMeetings[i].id === editId) {
+        _mnMeetings[i] = Object.assign({}, _mnMeetings[i], { date: date, title: title, participants: participants, captains: captains, items: items, attachments: _mnFormFiles, updatedAt: now });
+        break;
+      }
+    }
+  } else {
+    _mnMeetings.push({
+      id: 'mn_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      date: date, title: title, participants: participants, captains: captains, items: items,
+      attachments: _mnFormFiles,
+      createdBy: typeof _currentUser === 'string' ? _currentUser : (_currentUser ? (_currentUser.name || '') : ''),
+      createdAt: now, updatedAt: now
+    });
+  }
+
+  mnSave();
+  mnCloseForm();
+  mnRender();
+  showToast('Meeting saved.', 'success');
+}
+
+// ── Edit / Delete ─────────────────────────────────────────────────
+function mnEditMeeting(id) { mnOpenForm(id); }
+
+function mnDeleteMeeting(id) {
+  if (!confirm('Delete this meeting? This cannot be undone.')) return;
+  _mnMeetings = _mnMeetings.filter(function(x) { return x.id !== id; });
+  mnSave();
+  mnRender();
+  showToast('Meeting deleted.', 'info');
+}
+
+// ── Init on page load ────────────────────────────────────────────
+(function() { mnLoad(); })();
 
 // ══════════════════════════════════════════════════════════════════
 //  SEFER BAZLI HESAPLAMA — Voyage-level FuelEU
@@ -4537,9 +5075,74 @@ function ordDragLeave(e){ if(!e.currentTarget.contains(e.relatedTarget)) documen
 function ordDrop(e){
   e.preventDefault();
   document.getElementById('ordDropZone')?.classList.remove('drag-over');
-  [...(e.dataTransfer?.files||[])].forEach(ordProcessEmailFile);
+  const files = [...(e.dataTransfer?.files||[])];
+  if(files.length){ files.forEach(ordProcessEmailFile); return; }
+  // Outlook direct drag — no file object, exposes text/html and text/plain
+  const html = e.dataTransfer?.getData('text/html') || '';
+  const text = e.dataTransfer?.getData('text/plain') || e.dataTransfer?.getData('Text') || '';
+  if(html || text) ordProcessOutlookDrag(html, text);
 }
 function ordFileInput(e){ [...(e.target?.files||[])].forEach(ordProcessEmailFile); if(e.target) e.target.value=''; }
+
+// ── Outlook direct drag handler (no file object) ──────────────────
+function ordProcessOutlookDrag(html, text){
+  let subject = '';
+  let from    = '';
+  let date    = new Date().toISOString().slice(0,10);
+  let body    = '';
+
+  // 1. Parse text/plain — Outlook prepends a header block separated by a blank line
+  if(text){
+    const lines = text.split(/\r?\n/);
+    let bodyStart = -1;
+    let foundHeader = false;
+    const HEADER_KEY = /^(from|kimden|gönderen|sent|date|tarih|to|alıcı|cc|bcc|subject|konu)\s*:/i;
+    for(let i = 0; i < lines.length; i++){
+      if(HEADER_KEY.test(lines[i])){
+        foundHeader = true;
+        const colon = lines[i].indexOf(':');
+        const key   = lines[i].slice(0, colon).trim().toLowerCase();
+        const val   = lines[i].slice(colon + 1).trim();
+        if((key==='subject'||key==='konu') && !subject)               subject = val;
+        if((key==='from'||key==='kimden'||key==='gönderen') && !from) from    = val;
+        if(key==='sent'||key==='date'||key==='tarih'){
+          const d = new Date(val);
+          if(!isNaN(d)) date = d.toISOString().slice(0,10);
+        }
+      } else if(foundHeader && lines[i].trim() === ''){
+        bodyStart = i + 1;
+        break;
+      }
+    }
+    if(bodyStart >= 0) body = lines.slice(bodyStart).join('\n').trim();
+    else if(!foundHeader) body = text.trim();
+  }
+
+  // 2. Fallback: strip HTML tags from text/html
+  if(!body && html){
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    tmp.querySelectorAll('script,style').forEach(n=>n.remove());
+    body = (tmp.innerText || tmp.textContent || '').trim();
+    // Strip Outlook header block from HTML innerText too
+    if(body){
+      const hlines = body.split(/\r?\n/);
+      let bStart = -1, fh = false;
+      const HK = /^(from|kimden|sent|date|tarih|to|cc|bcc|subject|konu)\s*:/i;
+      for(let i=0;i<hlines.length;i++){
+        if(HK.test(hlines[i])) fh=true;
+        else if(fh && hlines[i].trim()===''){bStart=i+1;break;}
+      }
+      if(bStart>=0) body = hlines.slice(bStart).join('\n').trim();
+    }
+  }
+
+  if(!subject) subject = '(Outlook drag — no subject)';
+  if(!body)    body    = '(No readable content)';
+  if(body.length > 8000) body = body.slice(0, 8000) + '\n[...truncated]';
+
+  ordAutoSave({ subject, date, from, body }, 'outlook-drag');
+}
 
 function ordProcessEmailFile(file){
   const isMsg = file.name.toLowerCase().endsWith('.msg');
@@ -4784,7 +5387,7 @@ function ordAutoSave(parsed, filename){
   };
   const list=ordLoad(); list.push(entry); ordSave(list); ordRender();
   const vi=vessels.length?' · '+vessels.slice(0,2).join(', ')+(vessels.length>2?'…':''):'';
-  ordShowDropToast('✓ Kaydedildi: '+subject.slice(0,50)+vi, false);
+  ordShowDropToast('✓ Saved: '+subject.slice(0,50)+vi, false);
 }
 
 function ordShowDropToast(msg,isError){
