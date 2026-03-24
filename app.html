@@ -16,6 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <!-- MSGReader (CommonJS fallback ile güvenli bir şekilde ekleniyor) -->
 <script>
 // Isolate mammoth from MSGReader's module/exports shim
@@ -1623,7 +1625,7 @@ body.dark .antbi-upload-zone { border-color:#555; background:rgba(255,255,255,.0
 .mn-card-chevron { color:var(--text3); font-size:12px; transition:transform .2s; flex-shrink:0; }
 .mn-card.expanded .mn-card-chevron { transform:rotate(180deg); }
 .mn-card-body { padding:18px 22px; display:none; }
-.mn-card.expanded .mn-card-body { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.mn-card.expanded .mn-card-body { display:flex; flex-direction:column; gap:16px; }
 .mn-card-col { min-width:0; }
 .mn-participants-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
 .mn-participant-chip { display:inline-flex; align-items:center; gap:4px; background:var(--blue); color:var(--accent); border:1px solid rgba(37,99,235,.2); border-radius:20px; padding:3px 10px; font-size:11px; font-family:'Barlow Condensed',sans-serif; font-weight:600; }
@@ -1637,9 +1639,9 @@ body.dark .antbi-upload-zone { border-color:#555; background:rgba(255,255,255,.0
 .mn-attach-chip:hover { background:var(--blue); }
 .mn-card-actions { display:flex; gap:8px; margin-top:14px; align-items:center; }
 /* ── Meeting Notes Modal ── */
-.mn-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100; display:flex; align-items:center; justify-content:center; padding:16px; }
-.mn-modal { background:var(--navy); border-radius:16px; width:100%; max-width:1120px; max-height:92vh; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; }
-.mn-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.mn-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100; display:flex; align-items:center; justify-content:center; padding:12px; }
+.mn-modal { background:var(--navy); border-radius:16px; width:100%; max-width:min(1560px,97vw); max-height:94vh; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; }
+.mn-form-grid { display:grid; grid-template-columns:400px 1fr; gap:32px; }
 .mn-confirm-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1200; display:flex; align-items:center; justify-content:center; padding:16px; }
 .mn-confirm-box { background:var(--navy); border-radius:14px; padding:28px 32px; max-width:420px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,.3); text-align:center; }
 .mn-confirm-icon { font-size:36px; margin-bottom:12px; }
@@ -1650,7 +1652,8 @@ body.dark .mn-confirm-box { background:#1e1e1e; }
 .mn-modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; background:linear-gradient(135deg,var(--topnav-from),var(--topnav-to)); flex-shrink:0; }
 .mn-modal-title { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; color:#fff; }
 .mn-modal-close { background:rgba(255,255,255,.2); border:none; color:#fff; width:30px; height:30px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.mn-modal-body { padding:20px 22px; overflow-y:auto; flex:1; }
+.mn-modal-body { padding:22px 28px; overflow-y:auto; flex:1; }
+#mnItemsList { min-height:120px; }
 .mn-modal-footer { padding:14px 22px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; background:var(--navy2); flex-shrink:0; }
 .mn-section { margin-bottom:20px; }
 .mn-section-label { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
@@ -1661,8 +1664,8 @@ body.dark .mn-confirm-box { background:#1e1e1e; }
 .mn-check-item input[type=checkbox] { width:14px; height:14px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; }
 .mn-check-label { font-size:12px; font-family:'Barlow Condensed',sans-serif; font-weight:600; color:var(--text); cursor:pointer; line-height:1.3; }
 .mn-check-sub { font-size:10px; color:var(--text3); font-weight:400; }
-.mn-item-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-.mn-item-input { flex:1; padding:7px 11px; border:1px solid var(--border2); border-radius:8px; font-family:'Barlow',sans-serif; font-size:13px; color:var(--text); background:var(--input-bg); outline:none; }
+.mn-item-row { display:flex; align-items:flex-start; gap:8px; margin-bottom:8px; }
+.mn-item-input { flex:1; padding:8px 11px; border:1px solid var(--border2); border-radius:8px; font-family:'Barlow',sans-serif; font-size:13px; color:var(--text); background:var(--input-bg); outline:none; min-height:42px; resize:none; overflow:hidden; line-height:1.5; }
 .mn-item-input:focus { border-color:var(--accent); }
 .mn-item-critical-btn { padding:5px 11px; border-radius:8px; border:1px solid var(--border2); background:var(--navy2); font-size:11px; font-family:'Barlow Condensed',sans-serif; font-weight:700; cursor:pointer; color:var(--text2); transition:all .15s; white-space:nowrap; flex-shrink:0; }
 .mn-item-critical-btn.active { background:#fef2f2; border-color:#fca5a5; color:#dc2626; }
@@ -1694,7 +1697,6 @@ body.dark .mn-attach-chip { background:#252525; border-color:#404040; color:#ddd
 body.dark .mn-file-chip { background:#252525; border-color:#404040; }
 body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
 @media (max-width:768px) {
-  .mn-card.expanded .mn-card-body { grid-template-columns:1fr; }
   .mn-form-grid { grid-template-columns:1fr; }
   .mn-modal { max-height:96vh; border-radius:12px; }
   .mn-modal-header { border-radius:12px 12px 0 0; padding:14px 16px; }
@@ -1767,20 +1769,28 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
 
 /* ── DEVICE LIST ── */
 .device-item {
-  background:var(--navy); border:1px solid var(--border2); border-radius:8px; padding:12px 14px;
-  margin-bottom:8px; cursor:pointer; transition:border-color .15s;
+  background:var(--navy); border:1px solid var(--border2); border-radius:6px; padding:6px 10px;
+  margin-bottom:3px; cursor:pointer; transition:border-color .15s;
 }
 .device-item:hover { border-color:var(--accent); }
-.device-header { display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
-.device-barcode { font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:var(--text); }
-.device-location { font-size:11px; padding:2px 8px; border-radius:10px; font-family:'Barlow Condensed',sans-serif; font-weight:700; }
+.device-row-main { display:flex; align-items:center; gap:8px; min-height:32px; }
+.device-barcode { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:var(--text); white-space:nowrap; }
+.device-model { font-size:11px; color:var(--text3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
+.device-location { font-size:11px; padding:2px 7px; border-radius:10px; font-family:'Barlow Condensed',sans-serif; font-weight:700; white-space:nowrap; flex-shrink:0; }
 .loc-vessel { background:rgba(37,99,235,.15); color:#60a5fa; border:1px solid rgba(37,99,235,.25); }
 .loc-egemar { background:rgba(245,158,11,.15); color:#fbbf24; border:1px solid rgba(245,158,11,.25); }
-.device-date { font-size:11px; color:var(--text3); margin-left:auto; }
+.device-date { font-size:10px; color:var(--text3); white-space:nowrap; flex-shrink:0; }
 .device-desc { font-size:12px; color:var(--text2); }
-.device-history-wrap { display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border2); }
+.dr-move-btn, .dr-del-btn {
+  background:transparent; border:none; cursor:pointer; padding:3px 5px;
+  font-size:13px; border-radius:4px; flex-shrink:0; line-height:1;
+}
+.dr-move-btn:hover { background:rgba(37,99,235,.2); }
+.dr-del-btn:hover { background:rgba(220,38,38,.15); }
+.dr-hist-count { font-size:10px; color:var(--text3); flex-shrink:0; width:20px; text-align:right; }
+.device-history-wrap { display:none; margin-top:6px; padding-top:8px; border-top:1px solid var(--border2); }
 .device-history-wrap.open { display:block; }
-.history-item { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--border); font-size:12px; }
+.history-item { display:flex; align-items:center; gap:8px; padding:4px 0; border-bottom:1px solid var(--border); font-size:11px; }
 .history-item:last-child { border-bottom:none; }
 .hist-arrow { color:var(--text3); }
 .hist-date { color:var(--text3); font-family:'JetBrains Mono',monospace; font-size:10px; }
@@ -4710,6 +4720,11 @@ function _buildSnapshot() {
       return a;
     })(),
     meetings:       JSON.parse(localStorage.getItem('yasa_meetings') || '[]'),
+    gas:            JSON.parse(localStorage.getItem('yasa_gas_detectors') || 'null'),
+    gasOverrides:   {
+      total: localStorage.getItem('yasa_gas_total_override'),
+      egemar: localStorage.getItem('yasa_gas_egemar_override')
+    },
     lastModifiedBy: _currentUser ? _currentUser.name : 'unknown',
     lastModified:   new Date().toISOString()
   };
@@ -4930,6 +4945,26 @@ function _mergeSnapshots(cloud, local) {
   });
   merged.meetings = Object.values(mtgMap).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
+  // Merge Gas Detectors
+  const cloudGas = cloud.gas || [];
+  const localGas = local.gas || [];
+  const gasMap = {};
+  [...cloudGas, ...localGas].forEach(d => {
+    if (!d || !d.id) return;
+    const ex = gasMap[d.id];
+    if (!ex || new Date(d.updatedAt||0) >= new Date(ex.updatedAt||0)) {
+      gasMap[d.id] = d;
+    }
+  });
+  merged.gas = Object.values(gasMap);
+
+  // Merge Gas Overrides (last write wins based on snapshot time)
+  if (localSnapshotTs >= cloudSnapshotTs) {
+    merged.gasOverrides = local.gasOverrides || {};
+  } else {
+    merged.gasOverrides = cloud.gasOverrides || {};
+  }
+
   merged.lastModifiedBy = _currentUser ? _currentUser.name : 'unknown';
   merged.lastModified   = new Date().toISOString();
   return merged;
@@ -4996,6 +5031,22 @@ function _applySnapshot(cloudData) {
     if (typeof mnLoad === 'function') { mnLoad(); }
   }
 
+  // Gas Detectors
+  if (merged.gas) {
+    localStorage.setItem('yasa_gas_detectors', JSON.stringify(merged.gas));
+  }
+  if (merged.gasOverrides) {
+    if (merged.gasOverrides.total) localStorage.setItem('yasa_gas_total_override', merged.gasOverrides.total);
+    else localStorage.removeItem('yasa_gas_total_override');
+
+    if (merged.gasOverrides.egemar) localStorage.setItem('yasa_gas_egemar_override', merged.gasOverrides.egemar);
+    else localStorage.removeItem('yasa_gas_egemar_override');
+  }
+  if (typeof gasRenderList === 'function') {
+    gasRenderStats();
+    gasRenderList();
+  }
+
   // Re-render everything
   rebuildDropdowns();
   renderAll();
@@ -5060,7 +5111,10 @@ function buildTodoSection(vn) {
   }).join('') : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">No tasks yet.</li>';
 
   return '<div class="todo-section">' +
-    '<div class="modal-section-title" style="margin-bottom:10px;">✅ To-Do List</div>' +
+    '<div class="modal-section-title" style="margin-bottom:10px;justify-content:space-between;">' +
+      '<span>✅ To-Do List</span>' +
+      '<button type="button" style="background:transparent;border:1px solid rgba(220,38,38,.3);color:#dc2626;border-radius:4px;padding:3px 8px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.background=\'#fef2f2\';this.style.borderColor=\'#fca5a5\';" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\'rgba(220,38,38,.3)\';" onclick="todoClearAll(\'' + escAttr(vn) + '\')" title="Tüm listeyi sil">🗑 TÜMÜNÜ SİL</button>' +
+    '</div>' +
     '<div class="todo-add-row">' +
       '<textarea id="todoInput_' + vn + '" class="todo-textarea" placeholder="Add a task — paste text here..." onkeydown="if(event.key===\'Enter\'&&(event.ctrlKey||event.metaKey)){event.preventDefault();todoAdd(\'' + escAttr(vn) + '\');}"></textarea>' +
       '<div class="todo-add-side">' +
@@ -5108,6 +5162,18 @@ function todoDelete(vn, id) {
   var items = todoLoad(vn).filter(function(it) { return it.id !== id; });
   todoSave(vn, items);
   todoRerender(vn);
+}
+
+function todoClearAll(vn) {
+  var items = todoLoad(vn);
+  if (!items.length) {
+    showToast('Liste zaten boş.', 'info');
+    return;
+  }
+  if (!confirm('Tüm To-Do List maddelerini (' + items.length + ' adet) silmek istediğinize emin misiniz?\n\nBu işlem kalıcıdır ve geri alınamaz!')) return;
+  todoSave(vn, []);
+  todoRerender(vn);
+  showToast('To-Do List tamamen temizlendi.', 'success');
 }
 
 function todoRerender(vn) {
@@ -5182,17 +5248,30 @@ function buildAntbiSection(vn) {
         + '</div>'
     : '';
 
-  var listHtml = items.length
-    ? items.map(function(it) { return _antbiItemHtml(vn, it); }).join('')
-    : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">Henüz eksiklik kaydı yok.</li>';
+  var openItems = items.filter(function(it) { return !it.done; });
+  var closedItems = items.filter(function(it) { return it.done; });
+
+  var openHtml = openItems.length ? openItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">Henüz açık kayıt yok.</li>';
+  var closedHtml = closedItems.length ? closedItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '';
+
+  var listContent = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Open Findings</div>' +
+                 '<ul class="antbi-list" style="margin-bottom:14px;">' + openHtml + '</ul>';
+
+  if (closedItems.length) {
+    listContent += '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Completed Findings</div>' +
+                '<ul class="antbi-list">' + closedHtml + '</ul>';
+  }
 
   return ''
     + '<div class="antbi-section">'
-    +   '<div class="modal-section-title" style="margin-bottom:10px;">&#9888; ANTBI &#8212; Deficiency List</div>'
+    +   '<div class="modal-section-title" style="margin-bottom:10px;justify-content:space-between;">'
+    +     '<span>&#9888; Finding List</span>'
+    +     '<button type="button" style="background:transparent;border:1px solid rgba(220,38,38,.3);color:#dc2626;border-radius:4px;padding:3px 8px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.background=\'#fef2f2\';this.style.borderColor=\'#fca5a5\';" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\'rgba(220,38,38,.3)\';" onclick="antbiClearAll(\'' + evn + '\')" title="Tüm listeyi sil">🗑 TÜMÜNÜ SİL</button>'
+    +   '</div>'
 
     // ── Paste zone ──
     +   '<div style="background:rgba(245,158,11,.05);border:1.5px dashed rgba(245,158,11,.4);border-radius:10px;padding:14px 16px;margin-bottom:14px;">'
-    +     '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#b45309;margin-bottom:8px;">&#128203; ANTBI Listesini Yapıştır</div>'
+    +     '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#b45309;margin-bottom:8px;">&#128203; Finding List Yapıştır</div>'
     +     '<div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Word dokümanından tüm maddeleri kopyalayıp yapıştırın. Sistem otomatik ayırır.</div>'
     +     '<textarea id="antbiPaste_' + vn + '" data-vn="' + evn + '"'
     +              ' style="width:100%;min-height:90px;max-height:180px;resize:vertical;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;font-family:\'Barlow\',sans-serif;font-size:12px;color:var(--text);background:var(--input-bg);outline:none;line-height:1.5;box-sizing:border-box;"'
@@ -5221,15 +5300,19 @@ function buildAntbiSection(vn) {
     +   '</div>'
 
     +   stats
-    +   '<ul class="antbi-list" id="antbiList_' + vn + '">' + listHtml + '</ul>'
+    +   '<div id="antbiListContainer_' + vn + '">' + listContent + '</div>'
     + '</div>';
 }
 
 function _antbiItemHtml(vn, it) {
   var d = it.dueDate ? todoDaysLeft(it.dueDate) : null;
   var dClass = '';
+  var dateInputClass = 'antbi-date-input';
   if (!it.done && d !== null) {
-    if (d < 0) dClass = ' overdue';
+    if (d < 0) {
+      dClass = ' overdue';
+      dateInputClass += ' overdue-date';
+    }
     else if (d <= 7) dClass = ' due-soon';
   }
   var evn = escAttr(vn);
@@ -5251,7 +5334,7 @@ function _antbiItemHtml(vn, it) {
     +     '</div>'
     +     '<div class="antbi-date-row">'
     +       '<span class="antbi-date-label">Target:</span>'
-    +       '<input type="date" class="antbi-date-input" value="' + escAttr(it.dueDate || '') + '"'
+    +       '<input type="date" class="' + dateInputClass + '" value="' + escAttr(it.dueDate || '') + '"'
     +              ' style="width:120px;" title="Target close date"'
     +              ' data-vn="' + evn + '" data-id="' + eid + '"'
     +              ' onchange="antbiSetDate(this.dataset.vn,this.dataset.id,this.value)"'
@@ -5354,7 +5437,7 @@ function _antbiShowImportModal(vn, parsed, label) {
     + '<div style="background:var(--navy);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:700px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.3);">'
     +   '<div style="padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">'
     +     '<div>'
-    +       '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:17px;font-weight:700;color:var(--text);">&#9888; ANTBI Import &mdash; ' + parsed.length + ' madde</div>'
+    +       '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:17px;font-weight:700;color:var(--text);">&#9888; Finding Import &mdash; ' + parsed.length + ' madde</div>'
     +       '<div style="font-size:11px;color:var(--text3);margin-top:2px;">' + escHtml(label) + ' &middot; Target tarih girin (opsiyonel)</div>'
     +     '</div>'
     +     '<button onclick="document.getElementById(\'antbiImportModal\').remove()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;padding:4px 8px;line-height:1;">&#10005;</button>'
@@ -5414,7 +5497,7 @@ function _antbiConfirmImport(vn, parsed, startNum) {
   if (modal) modal.remove();
 
   antbiRerender(vn);
-  showToast('&#10003; ' + parsed.length + ' ANTBI maddesi kaydedildi', 'success');
+  showToast('&#10003; ' + parsed.length + ' Finding kaydedildi', 'success');
 }
 
 function antbiAdd(vn) {
@@ -5478,13 +5561,25 @@ function antbiDelete(vn, id) {
   antbiRerender(vn);
 }
 
+function antbiClearAll(vn) {
+  var items = antbiLoad(vn);
+  if (!items.length) {
+    showToast('Liste zaten boş.', 'info');
+    return;
+  }
+  if (!confirm('Tüm Finding List maddelerini (' + items.length + ' adet) silmek istediğinize emin misiniz?\n\nBu işlem kalıcıdır ve geri alınamaz!')) return;
+  antbiSave(vn, []);
+  antbiRerender(vn);
+  showToast('Finding List tamamen temizlendi.', 'success');
+}
+
 function antbiRerender(vn) {
-  var listEl = document.getElementById('antbiList_' + vn);
-  if (!listEl) return;
+  var listContainer = document.getElementById('antbiListContainer_' + vn);
+  if (!listContainer) return;
   var items  = antbiLoad(vn);
   var open   = items.filter(function(it) { return !it.done; }).length;
   var closed = items.filter(function(it) { return it.done; }).length;
-  var section = listEl.closest('.antbi-section');
+  var section = listContainer.closest('.antbi-section');
   if (section) {
     var statsEl = section.querySelector('.antbi-stats');
     var statsHtml = items.length
@@ -5495,11 +5590,24 @@ function antbiRerender(vn) {
           + '</div>'
       : '';
     if (statsEl) statsEl.outerHTML = statsHtml;
-    else if (statsHtml) listEl.insertAdjacentHTML('beforebegin', statsHtml);
+    else if (statsHtml) listContainer.insertAdjacentHTML('beforebegin', statsHtml);
   }
-  listEl.innerHTML = items.length
-    ? items.map(function(it) { return _antbiItemHtml(vn, it); }).join('')
-    : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">Henüz eksiklik kaydı yok.</li>';
+
+  var openItems = items.filter(function(it) { return !it.done; });
+  var closedItems = items.filter(function(it) { return it.done; });
+
+  var openHtml = openItems.length ? openItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">Henüz açık kayıt yok.</li>';
+  var closedHtml = closedItems.length ? closedItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '';
+
+  var listContent = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Open Findings</div>' +
+                 '<ul class="antbi-list" style="margin-bottom:14px;">' + openHtml + '</ul>';
+
+  if (closedItems.length) {
+    listContent += '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Completed Findings</div>' +
+                '<ul class="antbi-list">' + closedHtml + '</ul>';
+  }
+
+  listContainer.innerHTML = listContent;
 }
 
 
@@ -5581,20 +5689,25 @@ function mnCardHTML(m) {
     '<div class="mn-card-badges">' + critBadge + partBadge + '</div>' +
     '<div class="mn-card-chevron">▼</div></div>' +
     '<div class="mn-card-body">' +
-    // Left column: participants + note items
-    '<div class="mn-card-col">' +
+    // Row 1: Participants (full width, horizontal wrap)
+    '<div>' +
       '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-family:\'Barlow Condensed\',sans-serif;">Participants</div>' +
-      '<div class="mn-participants-row">' + participantChips + '</div>' +
-      (itemsHTML ? '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:14px;font-family:\'Barlow Condensed\',sans-serif;">Meeting Notes</div><ul class="mn-items-list">' + itemsHTML + '</ul>' : '') +
+      '<div class="mn-participants-row">' + (participantChips || '<span style="font-size:12px;color:var(--text3);">—</span>') + '</div>' +
     '</div>' +
-    // Right column: attachments + actions
-    '<div class="mn-card-col" style="display:flex;flex-direction:column;justify-content:space-between;">' +
-      (attachHTML || '<div style="color:var(--text3);font-size:12px;">No attachments.</div>') +
-      '<div class="mn-card-actions" style="margin-top:auto;padding-top:16px;">' + createdBy +
+    // Row 2: Notes (full width)
+    (itemsHTML ? (
+      '<div>' +
+        '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;font-family:\'Barlow Condensed\',sans-serif;">Meeting Notes / Action Items</div>' +
+        '<ul class="mn-items-list">' + itemsHTML + '</ul>' +
+      '</div>'
+    ) : '') +
+    // Row 3: Attachments (full width if present)
+    (attachHTML ? attachHTML : '') +
+    // Row 4: Actions bar
+    '<div class="mn-card-actions" style="padding-top:8px;border-top:1px solid var(--border);">' + createdBy +
       '<div style="flex:1"></div>' +
       '<button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation();mnEditMeeting(\'' + escAttr(m.id) + '\')">✏ Edit</button>' +
       '<button type="button" class="btn btn-sm" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;" onclick="event.stopPropagation();mnDeleteMeeting(\'' + escAttr(m.id) + '\')">🗑 Delete</button>' +
-      '</div>' +
     '</div>' +
     '</div></div>';
 }
@@ -5697,12 +5810,16 @@ function mnAddItem(text, critical, id) {
   row.className = 'mn-item-row';
   row.id = 'mnItemRow_' + iid;
   row.innerHTML =
-    '<input type="text" class="mn-item-input" id="mnItemText_' + iid + '" placeholder="Note item or action point..." value="' + escAttr(text || '') + '" onkeydown="if(event.key===\'Enter\'){event.preventDefault();mnAddItem();}">' +
+    '<textarea class="mn-item-input" id="mnItemText_' + iid + '" placeholder="Note item or action point... (Ctrl+Enter for new item)" rows="2" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'" onkeydown="if(event.key===\'Enter\'&&event.ctrlKey){event.preventDefault();mnAddItem();}">' + escHtml(text || '') + '</textarea>' +
     '<button type="button" class="mn-item-critical-btn' + (critical ? ' active' : '') + '" id="mnItemCrit_' + iid + '" onclick="mnToggleCritical(\'' + iid + '\')" title="Mark as critical">🔴 Critical</button>' +
     '<button type="button" class="mn-item-del" onclick="mnRemoveItem(\'' + iid + '\')" title="Remove">✕</button>';
   container.appendChild(row);
   var inp = document.getElementById('mnItemText_' + iid);
-  if (inp && !text) inp.focus();
+  if (inp) {
+    inp.style.height = 'auto';
+    inp.style.height = inp.scrollHeight + 'px';
+    if (!text) inp.focus();
+  }
 }
 
 function mnToggleCritical(iid) {
@@ -7350,10 +7467,12 @@ function stockInit() {
   // Populate vessel dropdowns for gas modal
   const locSel  = document.getElementById('gasModalLoc');
   const filSel  = document.getElementById('gasFilterLoc');
+  const manSel  = document.getElementById('manualLoc');
   if (locSel && locSel.options.length <= 1) {
     VESSELS_ALL.forEach(v => {
       const o1 = new Option('⚓ ' + v, v); locSel.appendChild(o1);
       const o2 = new Option('⚓ ' + v, v); filSel.appendChild(o2);
+      if (manSel) { const o3 = new Option('⚓ ' + v, v); manSel.appendChild(o3); }
     });
   }
   gasRenderStats();
@@ -7484,6 +7603,7 @@ var GAS_SEED_DATA = [
 
 const STORAGE_KEY = 'yasa_gas_detectors';
 const TOTAL_OVERRIDE_KEY = 'yasa_gas_total_override';
+const EGEMAR_OVERRIDE_KEY = 'yasa_gas_egemar_override';
 
 let html5QrCode = null;
 let pendingBarcode = null;
@@ -7503,6 +7623,7 @@ function loadDevices() {
 }
 function saveDevices(list) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  cloudSave().catch(function() {});
 }
 
 // ── One-time seed migration (merges historical records into localStorage) ──
@@ -7558,7 +7679,7 @@ function startZXing() {
 
     // Get back camera
     ZXing.BrowserCodeReader.listVideoInputDevices().then(devices => {
-      if (!devices.length) { showToast('Kamera bulunamadı', true); return; }
+      if (!devices.length) { showToast('Kamera bulunamadı', 'error'); return; }
       const cam = devices.find(d =>
         d.label.toLowerCase().includes('back') ||
         d.label.toLowerCase().includes('arka') ||
@@ -7593,7 +7714,7 @@ function startZXing() {
         }
       ).catch(err => {
         console.warn('ZXing err:', err);
-        showToast('Kamera başlatılamadı', true);
+        showToast('Kamera başlatılamadı', 'error');
         stopGasScan();
       });
     }).catch(() => { startHtml5QR(); });
@@ -7606,9 +7727,9 @@ function startZXing() {
 function startHtml5QR() {
   const container = document.getElementById('gas-qr-reader');
   container.innerHTML = '';
-  html5QrCode = new Html5Qrcode('qr-reader');
+  html5QrCode = new Html5Qrcode('gas-qr-reader');
   Html5Qrcode.getCameras().then(cameras => {
-    if (!cameras.length) { showToast('Kamera bulunamadı', true); return; }
+    if (!cameras.length) { showToast('Kamera bulunamadı', 'error'); return; }
     const cam = cameras.find(c =>
       c.label.toLowerCase().includes('back') ||
       c.label.toLowerCase().includes('arka')
@@ -7639,8 +7760,8 @@ function startHtml5QR() {
         gasOpenModal(decodedText.trim());
       },
       (err) => {}
-    ).catch(err => showToast('Kamera hatası: ' + err, true));
-  }).catch(() => showToast('Kamera erişimi reddedildi', true));
+    ).catch(err => showToast('Kamera hatası: ' + err, 'error'));
+  }).catch(() => showToast('Kamera erişimi reddedildi', 'error'));
 }
 
 function stopGasScan() {
@@ -7666,17 +7787,17 @@ async function readClipboard() {
       if (text && text.trim()) {
         handleScannedCode(text.trim());
       } else {
-        showToast('Pano boş — önce Samsung kamera ile tara', true);
+        showToast('Pano boş — önce Samsung kamera ile tara', 'error');
       }
     } else {
       // Fallback: focus input and paste
       const inp = document.getElementById('manualBarcode');
       inp.focus();
-      showToast('Pano erişimi yok — kodu manuel yapıştır', true);
+      showToast('Pano erişimi yok — kodu manuel yapıştır', 'error');
     }
   } catch(e) {
     // Permission denied — guide user
-    showToast('Pano izni gerekli — izin ver veya manuel yapıştır', true);
+    showToast('Pano izni gerekli — izin ver veya manuel yapıştır', 'error');
     const inp = document.getElementById('manualBarcode');
     inp.focus();
   }
@@ -7821,13 +7942,14 @@ function onScanSuccess(code, imgUrl) {
 
 function gasManualAdd() {
   const v = document.getElementById('manualBarcode').value.trim();
-  if (!v) { showToast('QR kod boş olamaz', true); return; }
+  if (!v) { showToast('QR kod boş olamaz', 'error'); return; }
   document.getElementById('manualBarcode').value = '';
-  gasOpenModal(v);
+  const loc = document.getElementById('manualLoc')?.value;
+  gasOpenModal(v, loc);
 }
 
 // ── MODAL ─────────────────────────────────────────────────────────
-function gasOpenModal(barcode) {
+function gasOpenModal(barcode, preselectLoc) {
   pendingBarcode = barcode;
   document.getElementById('gasModalBarcode').textContent = barcode;
   document.getElementById('gasModalDesc').value = '';
@@ -7842,13 +7964,18 @@ function gasOpenModal(barcode) {
     for (let i = 0; i < sel.options.length; i++) {
       if (sel.options[i].value === existing.location) { sel.selectedIndex = i; break; }
     }
+  } else if (preselectLoc) {
+    const sel = document.getElementById('gasModalLoc');
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === preselectLoc) { sel.selectedIndex = i; break; }
+    }
   }
 
-  document.getElementById('gasModal').classList.add('open');
+  document.getElementById('gasModal').style.display = 'flex';
 }
 
 function gasCloseModal() {
-  document.getElementById('gasModal').classList.remove('open');
+  document.getElementById('gasModal').style.display = 'none';
   pendingBarcode = null;
 }
 
@@ -7888,7 +8015,7 @@ function gasSaveDevice() {
   gasCloseModal();
   gasRenderStats();
   gasRenderList();
-  showToast('✓ Kaydedildi → ' + location);
+  showToast('✓ Kaydedildi → ' + location, 'success');
 }
 
 // ── RENDER STATS ──────────────────────────────────────────────────
@@ -7896,19 +8023,32 @@ function gasRenderStats() {
   const devices  = loadDevices();
   const savedTotal = localStorage.getItem(TOTAL_OVERRIDE_KEY);
   const total    = savedTotal !== null ? parseInt(savedTotal, 10) : devices.length;
-  const egemar   = devices.filter(d => d.location === 'EGEMAR CALİBRATION').length;
-  const onVessel = devices.length - egemar;
+  
+  const actualEgemar = devices.filter(d => d.location === 'EGEMAR CALİBRATION').length;
+  const savedEgemar = localStorage.getItem(EGEMAR_OVERRIDE_KEY);
+  const egemar = savedEgemar !== null ? parseInt(savedEgemar, 10) : actualEgemar;
+  
+  const onVessel = total - egemar;
   const nextNum  = _nextDeviceNum();
+  
   const manuelTag = savedTotal !== null
     ? `<span style="font-size:9px;color:var(--text3);font-weight:400;display:block;margin-top:1px;">(manuel)</span>`
     : '';
+    
+  const manuelTagEgemar = savedEgemar !== null
+    ? `<span style="font-size:9px;color:var(--text3);font-weight:400;display:block;margin-top:1px;">(manuel)</span>`
+    : '';
+
   document.getElementById('gasStatsRow').innerHTML = `
     <div class="stat-box" style="cursor:pointer;position:relative;" onclick="gasEditTotal()" title="Toplam cihaz sayısını düzenle">
       <div class="stat-num">${total} <span style="font-size:13px;color:var(--text3);opacity:.7;">✎</span></div>
       <div class="stat-lbl">Toplam Cihaz${manuelTag}</div>
     </div>
     <div class="stat-box"><div class="stat-num" style="color:var(--green);">${onVessel}</div><div class="stat-lbl">Gemilerde</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:var(--gold);">${egemar}</div><div class="stat-lbl">Egemar'da</div></div>
+    <div class="stat-box" style="cursor:pointer;position:relative;" onclick="gasEditEgemar()" title="Egemar'daki cihaz sayısını düzenle">
+      <div class="stat-num" style="color:var(--gold);">${egemar} <span style="font-size:13px;color:var(--text3);opacity:.7;">✎</span></div>
+      <div class="stat-lbl">Egemar'da${manuelTagEgemar}</div>
+    </div>
     <div class="stat-box"><div class="stat-num" style="color:var(--accent);font-size:14px;">#${nextNum}</div><div class="stat-lbl">Sonraki No</div></div>
   `;
 }
@@ -7925,13 +8065,38 @@ function gasEditTotal() {
   const trimmed = val.trim();
   if (trimmed === '') {
     localStorage.removeItem(TOTAL_OVERRIDE_KEY);
-    showToast('Toplam cihaz sayısı otomatik sayıma döndü.');
+    showToast('Toplam cihaz sayısı otomatik sayıma döndü.', 'info');
   } else {
     const n = parseInt(trimmed, 10);
     if (isNaN(n) || n < 0) { showToast('Geçersiz sayı.', 'error'); return; }
     localStorage.setItem(TOTAL_OVERRIDE_KEY, n);
-    showToast('Toplam cihaz sayısı ' + n + ' olarak güncellendi.');
+    showToast('Toplam cihaz sayısı ' + n + ' olarak güncellendi.', 'success');
   }
+    cloudSave().catch(function(){});
+  gasRenderStats();
+}
+
+function gasEditEgemar() {
+  const savedEgemar = localStorage.getItem(EGEMAR_OVERRIDE_KEY);
+  const devices = loadDevices();
+  const actualEgemar = devices.filter(d => d.location === 'EGEMAR CALİBRATION').length;
+  const current = savedEgemar !== null ? savedEgemar : actualEgemar;
+  const val = prompt(
+    'Egemar\'daki cihaz sayısını girin.\n\nOtomatik sayıma dönmek için boş bırakın.\n\nMevcut takip edilen: ' + actualEgemar + ' cihaz',
+    current
+  );
+  if (val === null) return;
+  const trimmed = val.trim();
+  if (trimmed === '') {
+    localStorage.removeItem(EGEMAR_OVERRIDE_KEY);
+    showToast('Egemar cihaz sayısı otomatik sayıma döndü.', 'info');
+  } else {
+    const n = parseInt(trimmed, 10);
+    if (isNaN(n) || n < 0) { showToast('Geçersiz sayı.', 'error'); return; }
+    localStorage.setItem(EGEMAR_OVERRIDE_KEY, n);
+    showToast('Egemar cihaz sayısı ' + n + ' olarak güncellendi.', 'success');
+  }
+  cloudSave().catch(function(){});
   gasRenderStats();
 }
 
@@ -7949,7 +8114,7 @@ function gasRenderList() {
       if (!d.barcode.toLowerCase().includes(searchF) &&
           !(d.desc||'').toLowerCase().includes(searchF) &&
           !numStr.toLowerCase().includes(searchF) &&
-          !d.location.toLowerCase().includes(searchF)) return false;
+          !(d.location||'').toLowerCase().includes(searchF)) return false;
     }
     return true;
   });
@@ -7973,7 +8138,9 @@ function gasRenderList() {
     const locLabel = isEgemar ? '⚙ Egemar' : '⚓ ' + d.location;
     const date     = d.updatedAt ? new Date(d.updatedAt).toLocaleDateString('tr-TR') : '';
     const hist     = d.history || [];
-    const numBadge = d.num ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:22px;background:rgba(37,99,235,.12);color:var(--accent);border:1px solid rgba(37,99,235,.25);border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:0 6px;flex-shrink:0;">#${d.num}</span>` : `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:22px;background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.2);border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:0 6px;flex-shrink:0;">YENİ</span>`;
+    const numBadge = d.num
+      ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:20px;background:rgba(37,99,235,.12);color:var(--accent);border:1px solid rgba(37,99,235,.25);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:0 5px;flex-shrink:0;">#${d.num}</span>`
+      : `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:20px;background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.2);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;padding:0 5px;flex-shrink:0;">YENİ</span>`;
     const histHtml = hist.map((h,i) => {
       const prev = hist[i+1];
       return `<div class="history-item">
@@ -7982,31 +8149,22 @@ function gasRenderList() {
       </div>`;
     }).join('');
 
-    // Model name (strip the " #N" suffix from desc for display)
     const modelName = (d.desc||'').replace(/\s*#\d+$/, '');
 
     return `<div class="device-item" onclick="toggleHistory('dh_${d.id}', this)">
-      <div class="device-header" style="align-items:flex-start;">
-        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;">
-          ${numBadge}
-          <div style="min-width:0;">
-            <div class="device-barcode" style="font-size:12px;">${escHtml(d.barcode)}</div>
-            ${modelName ? `<div style="font-size:11px;color:var(--text3);margin-top:1px;">${escHtml(modelName)}</div>` : ''}
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;">
-          <span class="device-location ${locClass}">${locLabel}</span>
-          <span class="device-date">${date}</span>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px;" onclick="event.stopPropagation()">
-        <button onclick="gasOpenModal('${escAttr(d.barcode)}')" style="padding:4px 12px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;cursor:pointer;">📍 Taşı</button>
-        <button onclick="gasDeleteDevice('${d.id}')" style="padding:4px 10px;background:transparent;color:var(--red);border:1px solid rgba(220,38,38,.3);border-radius:5px;font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;cursor:pointer;">🗑</button>
-        ${hist.length > 0 ? `<span style="font-size:11px;color:var(--text3);padding:4px 0;">↓ ${hist.length} hareket</span>` : ''}
+      <div class="device-row-main">
+        ${numBadge}
+        <span class="device-barcode">${escHtml(d.barcode)}</span>
+        <span class="device-model">${escHtml(modelName)}</span>
+        <span class="device-location ${locClass}">${locLabel}</span>
+        <span class="device-date">${date}</span>
+        <button class="dr-move-btn" onclick="event.stopPropagation();gasOpenModal('${escAttr(d.barcode)}')" title="Taşı">📍</button>
+        <button class="dr-del-btn" onclick="event.stopPropagation();gasDeleteDevice('${d.id}')" title="Sil">🗑</button>
+        <span class="dr-hist-count">${hist.length > 0 ? '▾' + hist.length : ''}</span>
       </div>
       <div class="device-history-wrap" id="dh_${d.id}">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:6px;">Hareket Geçmişi</div>
-        ${histHtml || '<div style="font-size:12px;color:var(--text3);">Geçmiş yok</div>'}
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px;">Hareket Geçmişi</div>
+        ${histHtml || '<div style="font-size:11px;color:var(--text3);">Geçmiş yok</div>'}
       </div>
     </div>`;
   }).join('');
@@ -8030,7 +8188,7 @@ function gasDeleteDevice(id) {
 // ── EXPORT: Vessel-first (gemi bazlı) ─────────────────────────────
 function gasExportVesselFirst() {
   const devices = loadDevices();
-  if (!devices.length) { showToast('Export edilecek cihaz yok', true); return; }
+  if (!devices.length) { showToast('Export edilecek cihaz yok', 'error'); return; }
 
   // Group by location (vessel)
   const grouped = {};
@@ -8076,7 +8234,7 @@ function gasExportVesselFirst() {
   XLSX.utils.book_append_sheet(wb, ws, 'Gas Detectors');
   const date = new Date().toLocaleDateString('tr-TR').replace(/\./g, '-');
   XLSX.writeFile(wb, `gas_detectors_gemi_bazli_${date}.xlsx`);
-  showToast('✓ Export tamamlandı');
+  showToast('✓ Export tamamlandı', 'success');
 }
 
 
@@ -8223,7 +8381,7 @@ body.dark .ord-content-text{background:#181818;}
 
 <!-- ════════════════════════ STOCK TRACKER ════════════════════════ -->
 <div id="page-stock" class="page">
-<div style="padding:20px 24px 60px;max-width:900px;">
+<div style="padding:20px 24px 80px;max-width:1400px;">
 
   <!-- Gas Detector Sub-tab -->
   <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto;">
@@ -8245,7 +8403,11 @@ body.dark .ord-content-text{background:#181818;}
 
       <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:7px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.6px;">— veya manuel giriş —</div>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
-        <input type="text" id="manualBarcode" placeholder="Kodu buraya yapıştır / yaz..." style="flex:1;background:var(--input-bg);border:1px solid var(--border2);color:var(--text);border-radius:7px;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;">
+        <select id="manualLoc" style="flex:1;background:var(--input-bg);border:1px solid var(--border2);color:var(--text);border-radius:7px;padding:10px 12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;outline:none;">
+          <option value="">— Gemi Seç (Opsiyonel) —</option>
+          <option value="EGEMAR CALİBRATION">⚙ Egemar</option>
+        </select>
+        <input type="text" id="manualBarcode" placeholder="Kodu buraya yapıştır / yaz..." style="flex:2;background:var(--input-bg);border:1px solid var(--border2);color:var(--text);border-radius:7px;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;" onkeydown="if(event.key==='Enter') gasManualAdd()">
         <button onclick="gasManualAdd()" style="padding:10px 16px;background:var(--navy2);color:var(--text);border:1px solid var(--border2);border-radius:7px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Ekle</button>
       </div>
 
