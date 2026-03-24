@@ -18,6 +18,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <!-- MSGReader (CommonJS fallback ile güvenli bir şekilde ekleniyor) -->
 <script>
 // Isolate mammoth from MSGReader's module/exports shim
@@ -5266,7 +5268,10 @@ function buildAntbiSection(vn) {
     + '<div class="antbi-section">'
     +   '<div class="modal-section-title" style="margin-bottom:10px;justify-content:space-between;">'
     +     '<span>&#9888; Finding List</span>'
-    +     '<button type="button" style="background:transparent;border:1px solid rgba(220,38,38,.3);color:#dc2626;border-radius:4px;padding:3px 8px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.background=\'#fef2f2\';this.style.borderColor=\'#fca5a5\';" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\'rgba(220,38,38,.3)\';" onclick="antbiClearAll(\'' + evn + '\')" title="Tüm listeyi sil">🗑 TÜMÜNÜ SİL</button>'
+    +     '<div style="display:flex;gap:6px;">'
+    +       '<button type="button" style="background:transparent;border:1px solid rgba(37,99,235,.3);color:#2563eb;border-radius:4px;padding:3px 8px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.background=\'rgba(37,99,235,.1)\';this.style.borderColor=\'var(--accent)\';" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\'rgba(37,99,235,.3)\';" onclick="antbiExportPDF(\'' + evn + '\')" title="PDF İndir">📄 PDF EXPORT</button>'
+    +       '<button type="button" style="background:transparent;border:1px solid rgba(220,38,38,.3);color:#dc2626;border-radius:4px;padding:3px 8px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.background=\'#fef2f2\';this.style.borderColor=\'#fca5a5\';" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\'rgba(220,38,38,.3)\';" onclick="antbiClearAll(\'' + evn + '\')" title="Tüm listeyi sil">🗑 TÜMÜNÜ SİL</button>'
+    +     '</div>'
     +   '</div>'
 
     // ── Paste zone ──
@@ -5561,6 +5566,74 @@ function antbiDelete(vn, id) {
   antbiRerender(vn);
 }
 
+function antbiExportPDF(vn) {
+  var items = antbiLoad(vn);
+  if (!items.length) {
+    showToast('Export edilecek madde yok.', 'info');
+    return;
+  }
+  
+  var trToEng = function(text) {
+    return (text || '').replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
+                       .replace(/ş/g, 's').replace(/Ş/g, 'S')
+                       .replace(/ı/g, 'i').replace(/İ/g, 'I')
+                       .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+                       .replace(/ç/g, 'c').replace(/Ç/g, 'C')
+                       .replace(/ü/g, 'u').replace(/Ü/g, 'U');
+  };
+
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF();
+  
+  doc.setFontSize(16);
+  doc.text('Finding List - ' + trToEng(vn), 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text('Date: ' + new Date().toLocaleDateString('en-GB'), 14, 28);
+  
+  // Sort items: open ones first, then closed
+  var sortedItems = items.slice().sort(function(a, b) {
+    if (a.done === b.done) {
+      return (a.num || 0) - (b.num || 0);
+    }
+    return a.done ? 1 : -1;
+  });
+  
+  var rows = sortedItems.map(function(it) {
+    var status = it.done ? 'Closed' : 'Open';
+    if (it.done && it.closedAt) {
+      status += '\n(' + new Date(it.closedAt).toLocaleDateString('en-GB') + ')';
+    }
+    var target = it.dueDate ? new Date(it.dueDate).toLocaleDateString('en-GB') : '-';
+    
+    return [
+      (it.num || '-').toString(),
+      trToEng(it.text || ''),
+      target,
+      status
+    ];
+  });
+  
+  doc.autoTable({
+    startY: 35,
+    head: [['No', 'Finding', 'Target Date', 'Status']],
+    body: rows,
+    theme: 'grid',
+    headStyles: { fillColor: [37, 99, 235] },
+    columnStyles: {
+      0: { cellWidth: 15, halign: 'center' },
+      1: { cellWidth: 'auto' },
+      2: { cellWidth: 25, halign: 'center' },
+      3: { cellWidth: 30, halign: 'center' }
+    },
+    styles: { fontSize: 9, cellPadding: 3, overflow: 'linebreak' }
+  });
+  
+  var filename = 'Finding_List_' + vn.replace(/[^A-Za-z0-9]/g, '_') + '_' + new Date().toISOString().slice(0,10) + '.pdf';
+  doc.save(filename);
+  showToast('PDF indirildi.', 'success');
+}
+
 function antbiClearAll(vn) {
   var items = antbiLoad(vn);
   if (!items.length) {
@@ -5706,10 +5779,56 @@ function mnCardHTML(m) {
     // Row 4: Actions bar
     '<div class="mn-card-actions" style="padding-top:8px;border-top:1px solid var(--border);">' + createdBy +
       '<div style="flex:1"></div>' +
+      '<button type="button" class="btn btn-outline btn-sm" style="color:#2563eb;border-color:rgba(37,99,235,.3);" onclick="event.stopPropagation();mnExportPDF(\'' + escAttr(m.id) + '\')">📄 PDF</button>' +
       '<button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation();mnEditMeeting(\'' + escAttr(m.id) + '\')">✏ Edit</button>' +
       '<button type="button" class="btn btn-sm" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;" onclick="event.stopPropagation();mnDeleteMeeting(\'' + escAttr(m.id) + '\')">🗑 Delete</button>' +
     '</div>' +
     '</div></div>';
+}
+
+function mnExportPDF(id) {
+  var m = _mnMeetings.filter(function(x) { return x.id === id; })[0];
+  if (!m) return;
+
+  var trToEng = function(text) {
+    return (text || '').replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
+                       .replace(/ş/g, 's').replace(/Ş/g, 'S')
+                       .replace(/ı/g, 'i').replace(/İ/g, 'I')
+                       .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+                       .replace(/ç/g, 'c').replace(/Ç/g, 'C')
+                       .replace(/ü/g, 'u').replace(/Ü/g, 'U');
+  };
+
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text(trToEng(m.title || 'Meeting Notes'), 14, 20);
+
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  var displayDate = m.date ? m.date.split('-').reverse().join('/') : '-';
+  doc.text('Date: ' + displayDate, 14, 28);
+  
+  var parts = (m.participants || []).map(function(p) { return trToEng(p); }).join(', ');
+  var splitParts = doc.splitTextToSize('Participants: ' + (parts || '-'), 180);
+  doc.text(splitParts, 14, 34);
+
+  var rows = (m.items || []).map(function(it, idx) {
+    return [(idx + 1).toString(), trToEng(it.text || ''), it.critical ? 'Critical' : 'Normal'];
+  });
+
+  var finalY = 34 + (splitParts.length * 5);
+
+  if (rows.length > 0) {
+    doc.autoTable({ startY: finalY, head: [['No', 'Action Item / Note', 'Priority']], body: rows, theme: 'grid', headStyles: { fillColor: [37, 99, 235] }, columnStyles: { 0: { cellWidth: 15, halign: 'center' }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 25, halign: 'center' } }, styles: { fontSize: 9, cellPadding: 3, overflow: 'linebreak' } });
+  } else {
+    doc.text('No action items recorded.', 14, finalY + 10);
+  }
+
+  var filename = 'Meeting_' + trToEng(m.title || 'Notes').replace(/[^A-Za-z0-9]/g, '_') + '_' + (m.date || '') + '.pdf';
+  doc.save(filename);
+  showToast('Meeting Notes PDF indirildi.', 'success');
 }
 
 function mnToggleCard(id) {
