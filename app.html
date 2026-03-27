@@ -2458,6 +2458,7 @@ function mvPrefix(name) {
 // ─── STATE ─────────────────────────────────────────────────────────────────
 let allVessels = [];
 let notes = {};
+let noteTombstones = {}; // { itemId: deletedAtTimestamp } — silinen notların kalıcı kaydı
 let currentFilter = 'all';
 let currentSearch = '';
 let currentMarine  = '';
@@ -2741,6 +2742,11 @@ function hasAnyNote(vesselName) {
 
 function loadSavedData() {
   try {
+    // Load tombstones before notes so we can filter on first render
+    noteTombstones = {};
+    const savedTombstones = localStorage.getItem('yasa_note_tombstones');
+    if (savedTombstones) { try { noteTombstones = JSON.parse(savedTombstones); } catch(e) {} }
+
     // Load notes FIRST so renderAll/renderAlertPanel sees them immediately
     notes = {};
     const savedNotes = localStorage.getItem('yasa_supt_notes');
@@ -2778,6 +2784,7 @@ function saveState() {
     reportDate
   }));
   localStorage.setItem('yasa_supt_notes', JSON.stringify(notes));
+  localStorage.setItem('yasa_note_tombstones', JSON.stringify(noteTombstones));
   // Push to SharePoint (async, non-blocking)
   cloudSave().catch(e => console.warn('Cloud save failed:', e));
 }
@@ -3684,6 +3691,12 @@ function deleteNoteItem(cat, idx) {
   if (!items[idx]) return;
   if (items[idx].text && !confirm('Delete this note?')) return;
   _collectNotesFromDOM(vn);
+  // Tombstone: silinen öğenin ID'sini kaydet, merge sırasında geri gelmesin
+  const deletedId = items[idx].id;
+  if (deletedId != null) {
+    noteTombstones[deletedId] = Date.now();
+    localStorage.setItem('yasa_note_tombstones', JSON.stringify(noteTombstones));
+  }
   items.splice(idx, 1);
   const block = document.getElementById(`note_block_${cat}`);
   if (block) {
@@ -4738,6 +4751,7 @@ function _buildSnapshot() {
       total: localStorage.getItem('yasa_gas_total_override'),
       egemar: localStorage.getItem('yasa_gas_egemar_override')
     },
+    noteTombstones: noteTombstones,
     lastModifiedBy: _currentUser ? _currentUser.name : 'unknown',
     lastModified:   new Date().toISOString()
   };
@@ -4770,6 +4784,15 @@ function _mergeSnapshots(cloud, local) {
     } catch(e) { return 0; }
   };
 
+  // Tombstone merge: union of both sides, keep the latest deletion timestamp per id
+  const cloudTombstones = cloud.noteTombstones || {};
+  const localTombstones = local.noteTombstones || {};
+  const mergedTombstones = Object.assign({}, cloudTombstones);
+  Object.keys(localTombstones).forEach(id => {
+    mergedTombstones[id] = Math.max(mergedTombstones[id] || 0, localTombstones[id]);
+  });
+  merged.noteTombstones = mergedTombstones;
+
   const cloudNotes = cloud.notes  || {};
   const localNotes = local.notes  || {};
   const allNoteKeys = new Set([...Object.keys(cloudNotes), ...Object.keys(localNotes)]);
@@ -4801,7 +4824,14 @@ function _mergeSnapshots(cloud, local) {
           map[it.id] = parseTime(it.time) >= parseTime(existing.time) ? it : existing;
         }
       });
-      merged.notes[vk][cat] = { items: Object.values(map).filter(it => it.text) };
+      // Tombstone filter: bir not silinmişse (tombstone zamanı >= notun son kayıt zamanından) geri getirme
+      merged.notes[vk][cat] = { items: Object.values(map).filter(it => {
+        if (!it.text) return false;
+        if (it.id == null) return true;
+        const deletedAt = mergedTombstones[it.id];
+        if (!deletedAt) return true;
+        return parseTime(it.time) > deletedAt; // notun güncelleme zamanı silme zamanından sonraysa tut
+      }) };
     });
     const allEmpty = ['operational','procurement','personnel','other'].every(cat =>
       !(merged.notes[vk][cat]?.items?.length)
@@ -4997,6 +5027,12 @@ function _applySnapshot(cloudData) {
     reportFileName = merged.reportFileName || '';
     reportDate     = merged.reportDate     || '';
     localStorage.setItem('yasa_dashboard_state', JSON.stringify({ vessels: allVessels, reportFileName, reportDate }));
+  }
+
+  // Tombstones
+  if (merged.noteTombstones) {
+    noteTombstones = merged.noteTombstones;
+    localStorage.setItem('yasa_note_tombstones', JSON.stringify(noteTombstones));
   }
 
   // Notes
