@@ -1901,7 +1901,7 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
   <div class="tab" onclick="switchTab('emission', this)">🌿 Emission Calculation<span class="tab-uc">🚧</span></div>
   <div class="tab" onclick="switchTab('orders', this)">📋 Order Follow<span class="tab-uc">🚧</span></div>
   <div class="tab" onclick="switchTab('stock', this)">📦 Stock Tracker</div>
-  <div class="tab" onclick="switchTab('port-expenses', this)">💰 Port Expenses</div>
+  <div class="tab" onclick="peRequestAccess(this)">💰 Port Expenses</div>
   <div class="tab" onclick="switchTab('settings', this)" style="margin-left:auto;">⚙ Settings</div>
 </div>
 
@@ -2459,6 +2459,8 @@ function mvPrefix(name) {
 let allVessels = [];
 let notes = {};
 let noteTombstones = {}; // { itemId: deletedAtTimestamp } — silinen notların kalıcı kaydı
+let meetingTombstones = {}; // { meetingId: deletedAtTimestamp } — silinen toplantıların kalıcı kaydı
+var _peUnlocked = false; // Port Expenses PIN oturumu
 let currentFilter = 'all';
 let currentSearch = '';
 let currentMarine  = '';
@@ -4746,6 +4748,7 @@ function _buildSnapshot() {
       return a;
     })(),
     meetings:       JSON.parse(localStorage.getItem('yasa_meetings') || '[]'),
+    meetingTombstones: meetingTombstones,
     gas:            JSON.parse(localStorage.getItem('yasa_gas_detectors') || 'null'),
     gasOverrides:   {
       total: localStorage.getItem('yasa_gas_total_override'),
@@ -4975,12 +4978,23 @@ function _mergeSnapshots(cloud, local) {
     if (arr.length) merged.antbi[vn] = arr;
   });
 
-  // Merge meetings: per-meeting last-write-wins by updatedAt
+  // Merge meeting tombstones: union, en son silinme zamanı kazanır
+  const cloudMtgTombstones = cloud.meetingTombstones || {};
+  const localMtgTombstones = local.meetingTombstones || {};
+  const mergedMtgTombstones = Object.assign({}, cloudMtgTombstones);
+  Object.keys(localMtgTombstones).forEach(id => {
+    mergedMtgTombstones[id] = Math.max(mergedMtgTombstones[id] || 0, localMtgTombstones[id]);
+  });
+  merged.meetingTombstones = mergedMtgTombstones;
+
+  // Merge meetings: per-meeting last-write-wins by updatedAt, tombstone kontrolü
   const cloudMtgs = cloud.meetings || [];
   const localMtgs = local.meetings || [];
   const mtgMap = {};
   [...cloudMtgs, ...localMtgs].forEach(m => {
     if (!m || !m.id) return;
+    const deletedAt = mergedMtgTombstones[m.id];
+    if (deletedAt && new Date(m.updatedAt || 0).getTime() <= deletedAt) return; // silinmiş, geri getirme
     const existing = mtgMap[m.id];
     if (!existing || new Date(m.updatedAt || 0) >= new Date(existing.updatedAt || 0)) {
       mtgMap[m.id] = m;
@@ -5075,6 +5089,10 @@ function _applySnapshot(cloudData) {
   }
 
   // Meetings
+  if (merged.meetingTombstones) {
+    meetingTombstones = merged.meetingTombstones;
+    localStorage.setItem('yasa_meeting_tombstones', JSON.stringify(meetingTombstones));
+  }
   if (merged.meetings) {
     localStorage.setItem('yasa_meetings', JSON.stringify(merged.meetings));
     if (typeof mnLoad === 'function') { mnLoad(); }
@@ -5741,10 +5759,12 @@ var _mnItemCounter = 0;
 
 function mnLoad() {
   try { _mnMeetings = JSON.parse(localStorage.getItem('yasa_meetings') || '[]'); } catch(e) { _mnMeetings = []; }
+  try { meetingTombstones = JSON.parse(localStorage.getItem('yasa_meeting_tombstones') || '{}'); } catch(e) { meetingTombstones = {}; }
 }
 
 function mnSave() {
   localStorage.setItem('yasa_meetings', JSON.stringify(_mnMeetings));
+  localStorage.setItem('yasa_meeting_tombstones', JSON.stringify(meetingTombstones));
   cloudSave().catch(e => console.warn('Meeting notes cloud save failed:', e));
 }
 
@@ -6110,6 +6130,7 @@ function mnDeleteMeeting(id) {
 function mnConfirmDelete(id) {
   var overlay = document.getElementById('mnDeleteConfirm');
   if (overlay) overlay.remove();
+  meetingTombstones[id] = Date.now();
   _mnMeetings = _mnMeetings.filter(function(x) { return x.id !== id; });
   mnSave();
   mnRender();
@@ -8636,6 +8657,26 @@ body.dark .ord-content-text{background:#181818;}
 
 
 
+<!-- PIN Modal — Port Expenses -->
+<div id="pePinOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.78);z-index:9000;display:none;align-items:center;justify-content:center;">
+  <div style="background:var(--navy);border-radius:16px;padding:36px 40px;max-width:360px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.35);text-align:center;">
+    <div style="font-size:36px;margin-bottom:10px;">🔒</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--text);letter-spacing:1px;margin-bottom:6px;">Port Expenses</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:24px;">Erişim için PIN giriniz.</div>
+    <input type="password" id="pePinInput" maxlength="4" inputmode="numeric" pattern="[0-9]*"
+      style="width:130px;text-align:center;font-size:26px;letter-spacing:10px;padding:10px 12px;
+        border:2px solid var(--border2);border-radius:10px;background:var(--input-bg);color:var(--text);
+        font-family:'JetBrains Mono',monospace;outline:none;display:block;margin:0 auto 10px;"
+      onkeydown="if(event.key==='Enter')peCheckPin()"
+      oninput="document.getElementById('pePinErr').style.display='none'">
+    <div id="pePinErr" style="display:none;color:#ef4444;font-size:12px;margin-bottom:14px;">Hatalı PIN. Tekrar deneyin.</div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:4px;">
+      <button onclick="pePinCancel()" style="background:transparent;border:1px solid var(--border2);color:var(--text2);padding:9px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">İptal</button>
+      <button onclick="peCheckPin()" style="background:var(--accent);color:#fff;border:none;padding:9px 28px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Giriş</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═════════════════════════ PORT EXPENSES PAGE ═════════════════════════ -->
 <div id="page-port-expenses" class="page">
 <style>
@@ -8658,7 +8699,7 @@ body.dark .pe-toolbar{background:#1e1e1e;border-color:#333;}
 .pe-sel:focus{border-color:var(--accent);}
 .pe-sel option{background:var(--input-bg);color:var(--text);padding:4px;}
 .pe-sum-bar{padding:9px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
-  background:rgba(37,99,235,.04);border-bottom:1px solid rgba(37,99,235,.1);}
+  background:var(--navy);border-bottom:1px solid rgba(37,99,235,.15);z-index:95;}
 .pe-sum-item{font-size:12px;color:var(--text2);}
 .pe-sum-val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);}
 .pe-form-wrap{margin:14px 20px;background:var(--navy2);border:1px solid var(--border2);
@@ -8710,6 +8751,7 @@ body.dark .pe-modal-footer{background:#181818;}
       <input type="text" id="peQ" placeholder="Search..." oninput="peRender()">
     </div>
     <select id="peV" class="pe-sel" onchange="peRender()"><option value="">All Vessels</option></select>
+    <select id="pePrt" class="pe-sel" onchange="peRender()"><option value="">All Ports</option></select>
     <select id="peC" class="pe-sel" onchange="peRender()"><option value="">All Countries</option></select>
     <select id="peY" class="pe-sel" onchange="peRender()"><option value="">All Years</option></select>
     <div style="flex:1;"></div>
@@ -8992,6 +9034,40 @@ function _peSeed() {
   _peSt('yasa_pe_v1', 1);
 }
 
+function peRequestAccess(el) {
+  if (_peUnlocked) { switchTab('port-expenses', el); return; }
+  var overlay = document.getElementById('pePinOverlay');
+  if (!overlay) return;
+  overlay._pendingEl = el;
+  overlay.style.display = 'flex';
+  var inp = document.getElementById('pePinInput');
+  if (inp) { inp.value = ''; setTimeout(function(){ inp.focus(); }, 80); }
+  var err = document.getElementById('pePinErr');
+  if (err) err.style.display = 'none';
+}
+
+function peCheckPin() {
+  var inp = document.getElementById('pePinInput');
+  if (!inp) return;
+  if (inp.value === '1234') {
+    _peUnlocked = true;
+    var overlay = document.getElementById('pePinOverlay');
+    var el = overlay ? overlay._pendingEl : null;
+    if (overlay) overlay.style.display = 'none';
+    switchTab('port-expenses', el);
+  } else {
+    var err = document.getElementById('pePinErr');
+    if (err) err.style.display = 'block';
+    inp.value = '';
+    inp.focus();
+  }
+}
+
+function pePinCancel() {
+  var overlay = document.getElementById('pePinOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
 function peInit() {
   _peSeed();
   _peFillDropdowns();
@@ -8999,6 +9075,23 @@ function peInit() {
   var d = document.getElementById('peDate');
   if (d && !d.value) d.value = new Date().toISOString().slice(0,10);
   _peReady = true;
+  // Sticky header top pozisyonunu dinamik hesapla
+  setTimeout(function() {
+    var toolbar = document.querySelector('#page-port-expenses .pe-toolbar');
+    var sumBar  = document.querySelector('#page-port-expenses .pe-sum-bar');
+    if (!toolbar) return;
+    var tbRect = toolbar.getBoundingClientRect();
+    var sbH = sumBar ? sumBar.offsetHeight : 0;
+    var theadTop = tbRect.bottom + sbH;
+    document.querySelectorAll('#page-port-expenses .pe-tbl thead th').forEach(function(th) {
+      th.style.top = theadTop + 'px';
+    });
+    if (sumBar) {
+      sumBar.style.position = 'sticky';
+      sumBar.style.top = tbRect.bottom + 'px';
+      sumBar.style.zIndex = '95';
+    }
+  }, 50);
 }
 
 function _peFillDropdowns() {
@@ -9044,10 +9137,16 @@ function _peFillDropdowns() {
       ys.map(function(y){ return '<option value="'+y+'">'+y+'</option>'; }).join('');
   }
 
-  // Ports datalist
+  // Ports datalist + filter dropdown
   var ps = Array.from(new Set(opts.ports.concat(recs.map(function(r){ return r.port; })))).filter(Boolean).sort();
   var pdl = document.getElementById('pePortDL');
   if (pdl) pdl.innerHTML = ps.map(function(p){ return '<option value="'+escAttr(p)+'">'; }).join('');
+  var prtSel = document.getElementById('pePrt');
+  if (prtSel) {
+    var cur = prtSel.value;
+    prtSel.innerHTML = '<option value="">All Ports</option>' +
+      ps.map(function(p){ return '<option value="'+escAttr(p)+'"'+(p===cur?' selected':'')+'>'+escHtml(p)+'</option>'; }).join('');
+  }
 
   // Authorities datalist
   var as = Array.from(new Set(opts.authorities.concat(recs.map(function(r){ return r.authority; })))).filter(Boolean).sort();
@@ -9057,13 +9156,15 @@ function _peFillDropdowns() {
 
 function peRender() {
   var recs = peRecords();
-  var q  = ((document.getElementById('peQ')||{}).value||'').toLowerCase().trim();
-  var vf = (document.getElementById('peV')||{}).value||'';
-  var cf = (document.getElementById('peC')||{}).value||'';
-  var yf = (document.getElementById('peY')||{}).value||'';
+  var q   = ((document.getElementById('peQ')  ||{}).value||'').toLowerCase().trim();
+  var vf  = (document.getElementById('peV')   ||{}).value||'';
+  var pf  = (document.getElementById('pePrt') ||{}).value||'';
+  var cf  = (document.getElementById('peC')   ||{}).value||'';
+  var yf  = (document.getElementById('peY')   ||{}).value||'';
 
   var list = recs.filter(function(r) {
     if (vf && r.vessel  !== vf) return false;
+    if (pf && r.port    !== pf) return false;
     if (cf && r.country !== cf) return false;
     if (yf && (!r.date || r.date.slice(0,4) !== yf)) return false;
     if (q) {
