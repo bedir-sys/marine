@@ -8698,10 +8698,7 @@ body.dark .pe-toolbar{background:#1e1e1e;border-color:#333;}
   background-repeat:no-repeat;background-position:right 10px center;}
 .pe-sel:focus{border-color:var(--accent);}
 .pe-sel option{background:var(--input-bg);color:var(--text);padding:4px;}
-.pe-sum-bar{padding:9px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
-  background:var(--navy);border-bottom:1px solid rgba(37,99,235,.15);z-index:95;}
-.pe-sum-item{font-size:12px;color:var(--text2);}
-.pe-sum-val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);}
+/* Summary bar now integrated above table */
 .pe-form-wrap{margin:14px 20px;background:var(--navy2);border:1px solid var(--border2);
   border-radius:10px;padding:18px;display:none;}
 .pe-form-wrap.open{display:block;}
@@ -8720,7 +8717,7 @@ body.dark .pe-toolbar{background:#1e1e1e;border-color:#333;}
 .pe-tbl thead th{padding:9px 10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;
   font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);
   text-align:left;border-bottom:2px solid var(--border2);background:var(--navy2);
-  white-space:nowrap;position:sticky;top:155px;z-index:40;}
+  white-space:nowrap;position:sticky;top:106px;z-index:90;}
 .pe-tbl td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}
 .pe-tbl tbody tr:hover{background:var(--navy2);}
 .pe-cost{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);
@@ -8813,15 +8810,8 @@ body.dark .pe-modal-footer{background:#181818;}
     </div>
   </div>
 
-  <!-- Summary bar -->
-  <div class="pe-sum-bar" id="peSumBar">
-    <span class="pe-sum-item">Showing: <b class="pe-sum-val" id="peSumN">—</b></span>
-    <span class="pe-sum-item">Total: <b class="pe-sum-val" id="peSumT">—</b></span>
-    <span class="pe-sum-item" id="peSumAvgWrap">Avg/entry: <b class="pe-sum-val" id="peSumAvg">—</b></span>
-  </div>
-
   <!-- Table -->
-  <div class="pe-tbl-wrap">
+  <div class="pe-tbl-wrap" style="margin-top:10px;">
     <table class="pe-tbl">
       <thead>
         <tr>
@@ -8835,6 +8825,18 @@ body.dark .pe-modal-footer{background:#181818;}
           <th style="width:70px;text-align:center;">Action</th>
         </tr>
       </thead>
+      <!-- Summary row -->
+      <tbody>
+        <tr style="background:transparent!important;">
+          <td colspan="8" style="padding:8px 10px;border-bottom:1px solid var(--border2);font-size:12px;color:var(--text2);">
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+              <span>Showing: <b style="color:var(--accent);font-family:'JetBrains Mono',monospace;" id="peSumN">—</b></span>
+              <span>Total: <b style="color:var(--accent);font-family:'JetBrains Mono',monospace;" id="peSumT">—</b></span>
+              <span id="peSumAvgWrap">Avg/entry: <b style="color:var(--accent);font-family:'JetBrains Mono',monospace;" id="peSumAvg">—</b></span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
       <tbody id="peTbl">
         <tr><td colspan="8" style="text-align:center;padding:50px;color:var(--text3);">
           Click the "Port Expenses" tab to load data.
@@ -9313,140 +9315,3 @@ function _peGetUniqueVessels(vessels) {
 
 /* ── Edit / Delete functions ── */
 function peOpenEdit(id) {
-  var recs = peRecords();
-  var rec = recs.find(function(r){ return r.id === id; });
-  if (!rec) { showToast('Record not found', 'error'); return; }
-  
-  document.getElementById('peEditId').value = rec.id;
-  document.getElementById('peEditDate').value = rec.date || '';
-  document.getElementById('peEditPort').value = rec.port || '';
-  document.getElementById('peEditCtry').value = rec.country || '';
-  document.getElementById('peEditAuth').value = rec.authority || '';
-  document.getElementById('peEditCost').value = rec.cost || '';
-  document.getElementById('peEditRmk').value = rec.remark || '';
-  
-  // Fill vessel dropdown
-  var vs = Array.from(new Set(
-    (typeof VESSELS_ALL !== 'undefined' ? VESSELS_ALL : []).concat(_PVE, recs.map(function(r){ return r.vessel; }))
-  )).filter(Boolean);
-  vs = _peGetUniqueVessels(vs);
-  
-  var recVesselNormalized = _peNormalizeVesselName(rec.vessel||'');
-  var sel = document.getElementById('peEditVsl');
-  sel.innerHTML = '<option value="">— Select —</option>' +
-    vs.map(function(v){ return '<option value="'+escAttr(v)+'"'+(v===recVesselNormalized?' selected':'')+'>'+escHtml(v)+'</option>'; }).join('');
-  
-  document.getElementById('peEditModal').classList.add('open');
-}
-
-function peCloseEdit() {
-  document.getElementById('peEditModal').classList.remove('open');
-}
-
-function peSaveEdit() {
-  var id = document.getElementById('peEditId').value;
-  var date = document.getElementById('peEditDate').value;
-  var vsl = _peNormalizeVesselName(document.getElementById('peEditVsl').value);
-  var port = document.getElementById('peEditPort').value.trim();
-  var ctry = document.getElementById('peEditCtry').value.trim();
-  var auth = document.getElementById('peEditAuth').value.trim();
-  var cost = document.getElementById('peEditCost').value.trim();
-  var rmk = document.getElementById('peEditRmk').value.trim();
-  
-  if (!date) { showToast('Date required', 'error'); return; }
-  if (!vsl)  { showToast('Vessel required', 'error'); return; }
-  if (!port) { showToast('Port required', 'error'); return; }
-  if (!ctry) { showToast('Country required', 'error'); return; }
-  if (!auth) { showToast('Authority required', 'error'); return; }
-  if (!cost) { showToast('Amount required', 'error'); return; }
-  
-  var recs = peRecords();
-  var idx = recs.findIndex(function(r){ return r.id === id; });
-  if (idx === -1) { showToast('Record not found', 'error'); return; }
-  
-  recs[idx] = {
-    id: id, date: date, vessel: vsl, port: port, country: ctry,
-    authority: auth, cost: parseFloat(cost)||0, costRaw: cost,
-    remark: rmk, currency: 'USD',
-    updatedAt: new Date().toISOString()
-  };
-  _peSt('yasa_pe', recs);
-  try { cloudSave(); } catch(e) {}
-  
-  // Update option lists
-  var opts = peOpts();
-  var ch = false;
-  if (port && !opts.ports.includes(port))       { opts.ports.push(port); ch=true; }
-  if (ctry && !opts.countries.includes(ctry))   { opts.countries.push(ctry); ch=true; }
-  if (auth && !opts.authorities.includes(auth)) { opts.authorities.push(auth); ch=true; }
-  if (ch) { opts.ports.sort(); opts.countries.sort(); opts.authorities.sort(); _peSt('yasa_pe_opts', opts); }
-  
-  peCloseEdit();
-  _peFillDropdowns();
-  peRender();
-  showToast('Updated: ' + vsl + ' / ' + port, 'success');
-}
-
-function peDeleteRecord() {
-  var id = document.getElementById('peEditId').value;
-  if (!confirm('Are you sure you want to delete this record?')) return;
-  
-  var recs = peRecords();
-  var idx = recs.findIndex(function(r){ return r.id === id; });
-  if (idx === -1) { showToast('Record not found', 'error'); return; }
-  
-  var vsl = recs[idx].vessel;
-  recs.splice(idx, 1);
-  _peSt('yasa_pe', recs);
-  try { cloudSave(); } catch(e) {}
-  
-  peCloseEdit();
-  _peFillDropdowns();
-  peRender();
-  showToast('Deleted: ' + vsl, 'success');
-}
-
-/* ── Clean up invalid entries (cost < 10 USD) ── */
-function peCleanupInvalid() {
-  var recs = peRecords();
-  var beforeCount = recs.length;
-  var invalidIds = [];
-  
-  recs.forEach(function(r) {
-    // Flag entries with cost < 10 USD as likely invalid
-    if (!r.cost || r.cost < 10) {
-      invalidIds.push(r.id);
-    }
-  });
-  
-  if (invalidIds.length === 0) {
-    showToast('No invalid entries found (all entries >= 10 USD)', 'info');
-    return;
-  }
-  
-  if (!confirm('Found ' + invalidIds.length + ' entries with amount < 10 USD.\n\nThese are likely invalid (e.g., "1 USD" entries).\n\nDelete them?')) {
-    return;
-  }
-  
-  var cleaned = recs.filter(function(r){ return !invalidIds.includes(r.id); });
-  _peSt('yasa_pe', cleaned);
-  try { cloudSave(); } catch(e) {}
-  
-  _peFillDropdowns();
-  peRender();
-  showToast('Cleaned up ' + invalidIds.length + ' invalid entries', 'success');
-}
-
-</script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('SW registered'))
-      .catch(err => console.log('SW error:', err));
-  });
-}
-</script>
-</body>
-</html>
