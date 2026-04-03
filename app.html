@@ -3928,9 +3928,7 @@ function restoreFromJSON(input) {
       const snapshot = JSON.parse(ev.target.result);
       // Basic sanity check
       if (typeof snapshot !== 'object' || snapshot === null) throw new Error('Invalid format');
-      _applySnapshot(snapshot);
-      // Persist locally
-      const merged = _buildSnapshot();
+      _safeApplySnapshot(snapshot);
       localStorage.setItem('yasa_dashboard_state', JSON.stringify({
         vessels: allVessels, reportFileName, reportDate
       }));
@@ -4484,10 +4482,12 @@ async function _writeCloud(data) {
 // ── Save local state to cloud ─────────────────────────────────
 async function cloudSave() {
   if (!_cloudReady) return;
+  if (_isSaving) return; // concurrent save guard — ikinci kayıt başlamadan önce ilki bitsin
   if (_saveTimer) clearTimeout(_saveTimer);
   // Debounce 800ms — hızlı keystrokes API'yi spam etmesin
   await new Promise(function(resolve) { _saveTimer = setTimeout(resolve, 800); });
   _saveTimer = null;
+  if (_isSaving) return; // debounce sırasında başka bir save başlamış olabilir
   _isSaving = true;
   _setStatus('🔄');
   try {
@@ -4520,12 +4520,8 @@ window.manualSync = async function() {
   try {
     var cloudData = await _fetchCloud();
     if (cloudData) {
-      _applySnapshot(cloudData);
+      _safeApplySnapshot(cloudData);
       var merged = _buildSnapshot();
-      await _writeCloud(merged);
-      _lastCloudStr = _deepSortStringify(merged);
-      _setStatus('☁️', 'Last updated: ' + _nowStr());
-      showToast('Synced', 'success');
     } else {
       var local = _buildSnapshot();
       await _writeCloud(local);
@@ -4657,7 +4653,7 @@ async function cloudInit() {
   try {
     var cloudData = await _fetchCloud();
     if (cloudData) {
-      _applySnapshot(cloudData);
+      _safeApplySnapshot(cloudData);
       var merged = _buildSnapshot();
       await _writeCloud(merged);
       _lastCloudStr = _deepSortStringify(merged);
@@ -4681,7 +4677,7 @@ async function cloudInit() {
         if (!cd) return;
         var cs = _deepSortStringify(cd);
         if (cs !== _lastCloudStr) {
-          _applySnapshot(cd);
+          _safeApplySnapshot(cd);
           var merged = _buildSnapshot();
           var mergedStr = _deepSortStringify(merged);
           if (mergedStr !== cs) {
@@ -4756,12 +4752,7 @@ function _buildSnapshot() {
       egemar: localStorage.getItem('yasa_gas_egemar_override')
     },
     noteTombstones: noteTombstones,
-    lastModifiedBy: _currentUser ? _currentUser.name : 'unknown',
-    lastModified:   new Date().toISOString()
-  };
-}
-
-// ── Merge two snapshots ───────────────────────────────────────
+    lastModifiedBy: _currentUser || 'unknown',
 function _mergeSnapshots(cloud, local) {
   const merged = JSON.parse(JSON.stringify(cloud));
 
@@ -5023,9 +5014,40 @@ function _mergeSnapshots(cloud, local) {
     merged.gasOverrides = cloud.gasOverrides || {};
   }
 
-  merged.lastModifiedBy = _currentUser ? _currentUser.name : 'unknown';
+  merged.lastModifiedBy = _currentUser || 'unknown';
   merged.lastModified   = new Date().toISOString();
   return merged;
+}
+
+// ── Safe wrapper: modal açıkken snapshot uygula ───────────────
+// Önce DOM'daki note değerlerini toplar (kayıp önleme),
+// snapshot'ı uygular, ardından modal açıksa body'yi yeniden
+// oluşturur (cert input'ları ve note sırası güncel kalır).
+function _safeApplySnapshot(cloudData) {
+  const modal = document.getElementById('vesselModal');
+  const modalOpen = modal && modal.classList.contains('open') && activeVessel;
+
+  // 1. Modal açıksa, kullanıcının henüz kaydetmediği DOM değerlerini
+  //    notes global'ine aktar — poll sonrası kaybolmasınlar.
+  if (modalOpen) {
+    const vn = canonicalize(activeVessel.name);
+    _collectNotesFromDOM(vn);
+  }
+
+  // 2. Snapshot'ı uygula (notes, certs, vessels vb. güncellenir)
+  _applySnapshot(cloudData);
+
+  // 3. Modal açıksa modal body'yi yeniden oluştur:
+  //    - Cert input'ları artık localStorage'daki güncel değerleri gösterir
+  //    - Note item sırası notes global'iyle eşleşir
+  if (modalOpen) {
+    try {
+      document.getElementById('modalBody').innerHTML = buildModalBody(activeVessel);
+      setTimeout(function() {
+        document.querySelectorAll('#vesselModal .note-row-text').forEach(function(ta) { autoResizeTA(ta); });
+      }, 30);
+    } catch(e) { /* modal kapanmış olabilir */ }
+  }
 }
 
 // ── Apply snapshot to local state + UI ───────────────────────
