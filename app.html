@@ -4522,6 +4522,10 @@ window.manualSync = async function() {
     if (cloudData) {
       _safeApplySnapshot(cloudData);
       var merged = _buildSnapshot();
+      await _writeCloud(merged);
+      _lastCloudStr = _deepSortStringify(merged);
+      _setStatus('☁️', 'Last updated: ' + _nowStr());
+      showToast('Synced', 'success');
     } else {
       var local = _buildSnapshot();
       await _writeCloud(local);
@@ -4753,6 +4757,11 @@ function _buildSnapshot() {
     },
     noteTombstones: noteTombstones,
     lastModifiedBy: _currentUser || 'unknown',
+    lastModified:   new Date().toISOString()
+  };
+}
+
+// ── Merge two snapshots ───────────────────────────────────────
 function _mergeSnapshots(cloud, local) {
   const merged = JSON.parse(JSON.stringify(cloud));
 
