@@ -132,17 +132,32 @@ body.dark .modal-col-notes            { background: #181818; }
 body.dark .data-val                   { color: #f0f0f0; }
 body.dark .rob-section                { background: #252525; border-color: #404040; }
 body.dark .voyage-section             { background: #252525; border-color: #404040; }
-body.dark .note-block                 { background: #1e1e1e; border-color: #404040; border-left-color: #555; }
-body.dark .note-block-header          { background: #252525; border-bottom-color: #333; }
-body.dark .note-row                   { background: #1e1e1e; border-bottom-color: #333; }
-body.dark .note-row:hover             { background: #252525; }
-body.dark .note-row.prio-watch        { background: rgba(245,158,11,0.08); }
-body.dark .note-row.prio-critical     { background: rgba(220,38,38,0.08); }
-body.dark .note-row-text              { color: #f0f0f0; }
-body.dark .note-row-text::placeholder { color: #505050; }
-body.dark .note-row-prio              { background: #2a2a2a; border-color: #444; color: #aaa; }
-body.dark .note-row-prio.prio-watch   { background: rgba(245,158,11,0.12); color: #d97706; }
-body.dark .note-row-prio.prio-critical{ background: rgba(220,38,38,0.1); color: #ef4444; }
+body.dark .ntab-bar                   { background: #1a1a1a; border-bottom-color: #333; }
+body.dark .ntab                       { color: #7a90b4; border-bottom-color: transparent; }
+body.dark .ntab.active                { color: #93b4f0; }
+body.dark .ntab:not(.active):hover    { background: rgba(255,255,255,.04); color: #b0c4e8; }
+body.dark .ntab-badge                 { background: #2a2a2a; color: #7a90b4; }
+body.dark .ntab.active .ntab-badge    { background: rgba(99,140,210,.2); color: #93b4f0; }
+body.dark .ntab-pane                  { background: #181818; }
+body.dark .nc                         { background: #1e1e1e; border-color: #383838; }
+body.dark .nc:hover                   { box-shadow: 0 2px 8px rgba(0,0,0,.3); border-color: #484848; }
+body.dark .nc.prio-watch              { border-left-color: #d97706; }
+body.dark .nc.prio-critical           { border-left-color: #ef4444; }
+body.dark .nc-text                    { color: #f0f0f0; background: #1e1e1e; }
+body.dark .nc-text::placeholder       { color: #4a4a4a; }
+body.dark .nc-text:focus              { background: rgba(37,99,235,0.07); }
+body.dark .nc-footer                  { background: #252525; border-top-color: #333; }
+body.dark .nc-prio                    { background: #2a2a2a; border-color: #444; color: #aaa; }
+body.dark .nc-prio.prio-watch         { background: rgba(245,158,11,0.12); color: #d97706; border-color: rgba(245,158,11,0.4); }
+body.dark .nc-prio.prio-critical      { background: rgba(220,38,38,0.10); color: #ef4444; border-color: rgba(220,38,38,0.4); }
+body.dark .nc-time                    { color: #555; }
+body.dark .nc-del                     { color: #555; }
+body.dark .nc-del:hover               { color: #ef4444; }
+body.dark .nc-empty                   { color: #3a3a3a; border-color: #2a2a2a; }
+body.dark .nc-add-btn                 { color: #505050; border-top-color: #2a2a2a; }
+body.dark .nc-add-btn:hover           { color: #93b4f0; background: rgba(37,99,235,0.06); }
+body.dark .ntab-save-row              { background: #1a1a1a; border-top-color: #2a2a2a; }
+body.dark .note-block                 { background: transparent; border: none; }
 body.dark .alert-panel                { background: #1e1e1e; border-color: rgba(160,80,80,.3); box-shadow: none; }
 body.dark .alert-panel-header         { background: #252525; border-bottom-color: rgba(160,80,80,.2); }
 body.dark .alert-row:hover            { background: #252525; }
@@ -164,7 +179,6 @@ body.dark .tab:hover                  { color: #e8f0fe; background: rgba(255,255
 body.dark .modal-section-title        { color: #d0d0d0; border-bottom-color: rgba(200,200,200,.25); }
 body.dark .modal-section-title::before { background: #d0d0d0; }
 body.dark .data-key                   { color: #c0c0c0; }
-body.dark .note-block.prio-critical   { border-color: rgba(220,38,38,0.3); }
 body.dark .modal-overlay              { background: rgba(0,0,0,.7); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -895,160 +909,363 @@ body {
 }
 
 /* NOTES SECTION IN MODAL */
-.note-block {
-  background: var(--navy);
-  border-radius: 8px;
-  border: 1px solid var(--border2);
-  border-left: 3px solid var(--accent);
-  margin-bottom: 10px;
+/* ══════════════════════════════════════════════════════════
+   NOTES COLUMN — INNER TAB BAR
+   ══════════════════════════════════════════════════════════ */
+.modal-col-notes {
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
   overflow: hidden;
 }
 
-.note-block.prio-watch   { border-left-color: #f59e0b; border-color: rgba(245,158,11,0.35); }
-.note-block.prio-critical{ border-left-color: #dc2626; border-color: rgba(220,38,38,0.35); }
+.ntab-bar {
+  display: flex;
+  background: #fff;
+  border-bottom: 1.5px solid var(--border2);
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.ntab-bar::-webkit-scrollbar { display: none; }
 
-.note-block-header {
+.ntab {
+  flex: 1;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 6px 7px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text3);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 2.5px solid transparent;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+  position: relative;
+}
+.ntab:not(.active):hover { color: var(--text2); background: rgba(0,0,0,.03); }
+.ntab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.ntab-icon { font-size: 13px; line-height: 1; }
+.ntab-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700;
+  background: var(--border2);
+  color: var(--text3);
+  border-radius: 8px;
+  padding: 1px 5px;
+  min-width: 16px;
+  text-align: center;
+  transition: background 0.15s, color 0.15s;
+}
+.ntab.active .ntab-badge { background: rgba(37,99,235,.15); color: var(--accent); }
+
+/* Category accent colors for active tab underline */
+/* 3-tab accent colors */
+.ntab-notes.active  { border-bottom-color: #2563eb; color: #2563eb; }
+.ntab-notes.active .ntab-badge { background: rgba(37,99,235,.12); color: #2563eb; }
+.ntab-find.active   { border-bottom-color: #dc2626; color: #dc2626; }
+.ntab-find.active .ntab-badge  { background: rgba(220,38,38,.12); color: #dc2626; }
+.ntab-td.active     { border-bottom-color: #d97706; color: #d97706; }
+.ntab-td.active .ntab-badge    { background: rgba(217,119,6,.12); color: #d97706; }
+
+/* Priority indicator dot on tab */
+.ntab-dot {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+.ntab-dot-critical { background: #dc2626; }
+.ntab-dot-watch    { background: #f59e0b; }
+
+/* ── Tab Panes ── */
+.ntab-pane { display: none; flex: 1; overflow-y: auto; padding: 12px 14px 0; flex-direction: column; }
+.ntab-pane.active { display: flex; }
+.ntab-pane::-webkit-scrollbar { width: 4px; }
+.ntab-pane::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* note-block: transparent wrapper, kept for JS compatibility */
+.note-block { background: transparent; border: none; margin: 0; }
+
+/* Save row at bottom of each notes pane */
+.ntab-save-row {
+  position: sticky; bottom: 0;
+  background: #f8fafc;
+  border-top: 1px solid var(--border2);
+  padding: 8px 0 10px;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+.ntab-save-row button {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 9px 0;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: .06em;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.ntab-save-row button:hover { opacity: .88; }
+
+/* ══════════════════════════════════════════════════════════
+   NOTE CARDS  (.nc)
+   ══════════════════════════════════════════════════════════ */
+.nc {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  margin-bottom: 5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  overflow: hidden;
+  transition: box-shadow .15s, border-color .15s;
+}
+.nc:hover { box-shadow: 0 3px 10px rgba(0,0,0,.09); border-color: #cbd5e1; }
+.nc.prio-watch    { border-left-color: #f59e0b; border-color: rgba(245,158,11,.35); background: #fffef8; }
+.nc.prio-critical { border-left-color: #dc2626; border-color: rgba(220,38,38,.35); background: #fff9f9; }
+.nc.stale { opacity: .6; }
+
+/* Textarea area */
+.nc-text {
+  display: block;
+  width: 100%;
+  padding: 7px 10px 4px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  min-height: 28px;
+  overflow: hidden;
+}
+.nc-text::placeholder { color: #c0cad6; font-style: italic; }
+.nc-text:focus { background: rgba(37,99,235,.025); }
+
+/* Footer row */
+.nc-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 7px 12px 7px 10px;
-  background: var(--navy2);
-  border-bottom: 1px solid var(--border);
-  gap: 8px;
+  justify-content: flex-start;
+  padding: 3px 10px 4px 10px;
+  background: transparent;
+  border-top: 1px solid #f1f5f9;
+  gap: 6px;
 }
+.nc-footer-left  { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.nc-footer-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 
-.note-block-label {
+/* Priority dropdown in card footer */
+.nc-prio {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent);
+  font-size: 9px; font-weight: 700; letter-spacing: .05em;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 1px 14px 1px 5px;
+  background: #f1f5f9;
+  color: var(--text3);
+  cursor: pointer; outline: none;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2394a3b8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  transition: all .15s;
+}
+.nc-prio.prio-watch    { border-color: #f59e0b; color: #92400e; background-color: #fffbeb; }
+.nc-prio.prio-critical { border-color: #dc2626; color: #991b1b; background-color: #fef2f2; font-weight: 800; }
+
+/* Timestamp */
+.nc-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: #b0bec8;
+  white-space: nowrap;
 }
 
-/* ── UNDER CONSTRUCTION TAB LABEL ── */
-.tab-uc {
+/* Delete button */
+.nc-del {
+  background: none; border: none;
+  color: #cbd5e1;
+  cursor: pointer;
+  font-size: 12px; line-height: 1;
+  padding: 1px 3px;
+  border-radius: 3px;
+  opacity: .6;
+  transition: opacity .12s, color .12s;
+}
+.nc-del:hover { color: #dc2626; opacity: 1; }
+
+/* Empty state */
+.nc-empty {
+  text-align: center;
+  padding: 14px 16px;
+  color: #b0bec8;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  letter-spacing: .04em;
+  border: 1.5px dashed #e2e8f0;
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+
+/* Add Note button */
+.nc-add-btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 5px;
+  border: none; border-top: 1px dashed var(--border2);
+  background: transparent;
+  color: var(--text3);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0 0 5px 5px;
+  transition: all .15s;
+  margin-top: 0;
+}
+.nc-add-btn:hover { color: var(--accent); background: rgba(37,99,235,.04); }
+
+/* ── Note category sections (stacked in NOTES pane) ── */
+.ncat-section {
+  margin-bottom: 14px;
+}
+.ncat-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  background: rgba(var(--cat-rgb, 37,99,235), .06);
+  border-left: 3px solid var(--cat-color, var(--accent));
+  border-radius: 6px 6px 0 0;
+  margin-bottom: 0;
+}
+.ncat-icon  { font-size: 13px; line-height: 1; }
+.ncat-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--cat-color, var(--accent)); flex: 1;
+}
+.ncat-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  background: rgba(0,0,0,.07); color: var(--text3);
+  border-radius: 8px; padding: 1px 6px; min-width: 16px; text-align: center;
+}
+.ncat-section .note-block { border-radius: 0 0 6px 6px; overflow: hidden; }
+.ncat-section .nc         { border-radius: 0; border-left-color: var(--cat-color, var(--accent)); }
+.ncat-section .nc:first-child { border-top: none; }
+
+/* ── Contenteditable nc-text ── */
+.nc-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px 3px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.nc-num {
   display: inline-flex;
   align-items: center;
-  font-size: 13px;
-  line-height: 1;
-  margin-left: 2px;
-}
-
-/* ── NOTE BLOCK CATEGORY COLORS ── */
-.note-block-operational { border-left-color: #2563eb; }
-.note-block-operational .note-block-label { color: #2563eb; }
-.note-block-operational .note-block-header { background: rgba(37,99,235,.06); border-bottom-color: rgba(37,99,235,.12); }
-
-.note-block-procurement { border-left-color: #0d9488; }
-.note-block-procurement .note-block-label { color: #0d9488; }
-.note-block-procurement .note-block-header { background: rgba(13,148,136,.06); border-bottom-color: rgba(13,148,136,.12); }
-.note-block-procurement .note-row-num { background: #0d9488; }
-
-.note-block-personnel { border-left-color: #7c3aed; }
-.note-block-personnel .note-block-label { color: #7c3aed; }
-.note-block-personnel .note-block-header { background: rgba(124,58,237,.06); border-bottom-color: rgba(124,58,237,.12); }
-.note-block-personnel .note-row-num { background: #7c3aed; }
-
-.note-block-other { border-left-color: #64748b; }
-.note-block-other .note-block-label { color: #64748b; }
-.note-block-other .note-block-header { background: rgba(100,116,139,.06); border-bottom-color: rgba(100,116,139,.12); }
-.note-block-other .note-row-num { background: #64748b; }
-
-/* dark mode overrides */
-body.dark .note-block-procurement .note-block-header { background: rgba(13,148,136,.1); }
-body.dark .note-block-personnel   .note-block-header { background: rgba(124,58,237,.1); }
-body.dark .note-block-other       .note-block-header { background: rgba(100,116,139,.1); }
-
-/* ── COMPACT NOTE ROWS ── */
-.note-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  padding: 8px 12px 8px 10px;
-  border-bottom: 1px solid var(--border);
-  background: var(--navy);
-  transition: background 0.12s;
-}
-.note-row:last-child { border-bottom: none; }
-.note-row:hover { background: var(--navy2); }
-.note-row.prio-watch    { background: rgba(245,158,11,0.05); border-left: 3px solid #f59e0b; padding-left: 8px; }
-.note-row.prio-critical { background: rgba(220,38,38,0.05);  border-left: 3px solid #dc2626; padding-left: 8px; }
-.note-row.stale { opacity: 0.55; }
-
-.note-row-num {
-  width: 19px; height: 19px;
+  justify-content: center;
+  width: 17px; height: 17px;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-size: 10px; font-weight: 700;
+  font-size: 9px;
+  font-weight: 800;
   font-family: 'JetBrains Mono', monospace;
-  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  margin-top: 2px;
+  transition: background .15s;
 }
-.note-row.prio-watch    .note-row-num { background: #f59e0b; }
-.note-row.prio-critical .note-row-num { background: #dc2626; }
-
-.note-row-text {
-  flex: 1;
-  border: none;
-  background: transparent;
-  resize: none;
-  outline: none;
-  font-family: 'Barlow', sans-serif;
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.55;
-  min-height: 21px;
-  padding: 1px 0;
-  overflow: hidden;
-}
-.note-row-text::placeholder { color: var(--text3); }
-.note-row-text:focus { background: rgba(37,99,235,0.04); border-radius: 3px; padding: 1px 5px; margin: 0 -5px; }
-
-.note-row-meta {
+.nc-header-right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 3px;
-  flex-shrink: 0;
-  padding-top: 1px;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
 }
-.note-row-actions { display: flex; align-items: center; gap: 5px; }
+body.dark .nc-header { border-bottom-color: #333; }
 
+.nc-text[contenteditable] {
+  cursor: text;
+  min-height: 28px;
+  line-height: 1.5;
+  font-size: 13px;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+.nc-text[contenteditable]:empty::before {
+  content: attr(data-placeholder);
+  color: #c0cad6;
+  font-style: italic;
+  pointer-events: none;
+}
+.nc-text[contenteditable]:focus { outline: none; }
+.nc-text[contenteditable] strong,
+.nc-text[contenteditable] b { font-weight: 700; color: inherit; }
+.nc-text[contenteditable] em,
+.nc-text[contenteditable] i  { font-style: italic; }
+
+/* ── Bold / Italic buttons ── */
+.nc-bold-btn, .nc-italic-btn {
+  background: var(--navy2);
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  padding: 0px 5px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--text2);
+  transition: background .12s, border-color .12s;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+.nc-bold-btn:hover   { background: #e8eef8; border-color: var(--accent); color: var(--accent); }
+.nc-italic-btn:hover { background: #e8eef8; border-color: var(--accent); color: var(--accent); }
+.nc-bold-btn b       { font-weight: 800; letter-spacing: -.02em; }
+.nc-italic-btn i     { font-style: italic; }
+
+/* Dark mode */
+body.dark .ncat-header         { background: rgba(255,255,255,.04); }
+body.dark .ncat-count          { background: rgba(255,255,255,.08); color: #666; }
+body.dark .nc-text[contenteditable] { color: #f0f0f0; }
+body.dark .nc-text[contenteditable]:empty::before { color: #4a4a4a; }
+body.dark .nc-bold-btn, body.dark .nc-italic-btn { background: #2a2a2a; border-color: #444; color: #aaa; }
+body.dark .nc-bold-btn:hover, body.dark .nc-italic-btn:hover { background: rgba(37,99,235,.15); border-color: #93b4f0; color: #93b4f0; }
+
+/* Keep old .note-row-prio for backwards compat (used in alert panel etc) */
 .note-row-prio {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 0.04em;
-  border: 1px solid var(--border2);
-  border-radius: 4px;
-  padding: 2px 6px;
-  background: var(--navy2);
-  color: var(--text2);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  border: 1px solid var(--border2); border-radius: 4px;
+  padding: 2px 6px; background: var(--navy2); color: var(--text2);
   cursor: pointer; outline: none;
 }
 .note-row-prio.prio-watch    { border-color: #f59e0b; color: #92400e; background: #fffbeb; }
 .note-row-prio.prio-critical { border-color: #dc2626; color: #991b1b; background: #fef2f2; }
-
-.note-row-time {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--text3);
-  white-space: nowrap;
+.add-note-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 6px; border: none; border-top: 1px dashed var(--border2);
+  cursor: pointer; color: var(--text3); font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  background: transparent; transition: all 0.15s;
 }
+.add-note-btn:hover { color: var(--accent); background: rgba(37,99,235,0.04); }
 
-.note-row-del {
-  background: none; border: none;
-  color: var(--text3);
-  cursor: pointer;
-  font-size: 12px; padding: 1px 3px; line-height: 1;
-  opacity: 0.5; transition: opacity 0.12s, color 0.12s;
-  border-radius: 3px;
-}
-.note-row-del:hover { color: #dc2626; opacity: 1; }
-
-/* PRIORITY SELECT */
+/* PRIORITY SELECT (used in alert panel, legacy selects) */
 .priority-select {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 11px;
@@ -1482,7 +1699,7 @@ body.dark .note-block-other       .note-block-header { background: rgba(100,116,
   }
   .modal-col { padding: 14px; }
   .modal-col-details { border-right: none; border-bottom: none; }
-  .modal-col-notes   { display: none; }   /* tab'la açılır */
+  .modal-col-notes   { display: none; flex-direction: column; }   /* tab'la açılır — flex'e geçince flex-direction gerekli */
   .modal-mobile-tabs { display: flex; }
   .modal-vessel-name { font-size: 20px; }
   .modal-header { padding: 14px 16px; }
@@ -1552,6 +1769,54 @@ body.dark .todo-textarea, body.dark .todo-date-input { background:#252525; borde
 body.dark .todo-item { background:#252525; }
 body.dark .todo-item:hover { background:#2e2e2e; }
 body.dark .todo-item.done { background:#1e1e1e; }
+
+/* ── INSPECTION LIST BAR (alb = antbi list bar) ── */
+.alb-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 0 0 10px;
+  align-items: center;
+}
+.alb-tab {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  padding: 4px 10px;
+  border: 1.5px solid var(--border2);
+  border-radius: 20px;
+  background: var(--navy2);
+  color: var(--text3);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.alb-tab:hover  { border-color: #f59e0b; color: #92400e; background: #fffbeb; }
+.alb-tab.active { border-color: #f59e0b; color: #92400e; background: #fffbeb; font-weight: 800; }
+.alb-date { font-weight: 400; font-size: 10px; color: inherit; opacity: .7; }
+.alb-badge {
+  display: inline-block;
+  background: #dc2626; color: #fff;
+  border-radius: 8px; padding: 0 5px;
+  font-size: 9px; font-weight: 800; line-height: 1.4;
+  margin-left: 2px; vertical-align: middle;
+}
+.alb-new-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  padding: 4px 10px;
+  border: 1.5px dashed var(--border2);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all .15s;
+}
+.alb-new-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(37,99,235,.05); }
+
+body.dark .alb-tab { background: #2a2a2a; border-color: #444; color: #7a90b4; }
+body.dark .alb-tab:hover, body.dark .alb-tab.active { border-color: #d97706; color: #d97706; background: rgba(245,158,11,.1); }
+body.dark .alb-new-btn { border-color: #444; color: #555; }
+body.dark .alb-new-btn:hover { border-color: #93b4f0; color: #93b4f0; }
 
 /* ── ANTBI DEFICIENCY LIST ── */
 .antbi-section { border-top:2px solid var(--border); margin-top:18px; padding-top:14px; }
@@ -2469,6 +2734,7 @@ let currentOps     = '';
 let reportFileName = '';
 let reportDate     = '';
 let activeVessel   = null;
+let _activeNoteTab = 'operational'; // tracks which notes inner-tab is open
 
 // ── Vessel list (canonical names, no M/V prefix) ─────────────────────────
 let VESSELS_ALL = [
@@ -2634,8 +2900,35 @@ const CERT_FIELDS = [
 ];
 
 function certKey(vessel)       { return 'yasa_certs_' + canonicalize(vessel); }
+
+// DOM'daki cert input değerlerini localStorage'a yaz (poll öncesi güvenlik)
+function _collectCertsFromDOM(vesselName) {
+  const data = loadCerts(vesselName);
+  let changed = false;
+  CERT_FIELDS.forEach(function(f) {
+    const el = document.getElementById('cert_' + f.key);
+    if (el && el.value !== undefined) {
+      const val = el.value;
+      if (val !== (data[f.key] || '')) {
+        data[f.key] = val;
+        if (!data._ts) data._ts = {};
+        data._ts[f.key] = new Date().toISOString();
+        changed = true;
+      }
+    }
+  });
+  if (changed) {
+    localStorage.setItem(certKey(vesselName), JSON.stringify(data));
+  }
+}
 function loadCerts(vessel)     { try { return JSON.parse(localStorage.getItem(certKey(vessel)) || 'null') || {}; } catch(e) { return {}; } }
 function saveCertsLocal(vessel, data) {
+  // Her kayıtta _ts yoksa şimdi doldur — merge'de local her zaman kazansın
+  const now = new Date().toISOString();
+  if (!data._ts) data._ts = {};
+  CERT_FIELDS.forEach(function(f) {
+    if (data[f.key] && !data._ts[f.key]) data._ts[f.key] = now;
+  });
   localStorage.setItem(certKey(vessel), JSON.stringify(data));
   cloudSave().catch(e => console.warn('Cloud save (certs) failed:', e));
 }
@@ -3278,6 +3571,7 @@ function openModal(vesselName) {
   const v = allVessels.find(x => x.name === vesselName);
   if (!v) return;
   activeVessel = v;
+  _activeNoteTab = _activeNoteTab || 'operational'; // keep last tab on re-open
 
   const sc = posStatusConfig(v.position);
 
@@ -3307,7 +3601,7 @@ function openModal(vesselName) {
   document.body.style.overflow = 'hidden';
   // Auto-resize all textareas after render
   setTimeout(() => {
-    document.querySelectorAll('#vesselModal .note-row-text').forEach(ta => autoResizeTA(ta));
+    document.querySelectorAll('#vesselModal .nc-text').forEach(ta => autoResizeTA(ta));
   }, 30);
 }
 
@@ -3385,22 +3679,9 @@ function buildModalBody(v) {
       ${buildCertSection(v.name)}
     </div>
 
-    <!-- RIGHT COL: NOTES -->
+    <!-- RIGHT COL: NOTES with inner tabs -->
     <div class="modal-col modal-col-notes">
-      <div class="modal-section-title">Superintendent Notes</div>
-
-      ${noteBlock('operational', 'Operational Notes',  n.operational,  'Operational status, port calls, special instructions...')}
-      ${noteBlock('procurement', 'Procurement Notes',  n.procurement,  'Spare parts, provisions, stores, pending orders...')}
-      ${noteBlock('personnel',   'Personnel Notes',    n.personnel,    'Crew change, certificates, medical, disciplinary...')}
-      ${noteBlock('other',       'Other Notes',        n.other,        'General remarks, follow-up items...')}
-
-      <button class="btn btn-primary" style="width:100%;margin-top:4px;justify-content:center" onclick="saveAllNotes()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Save All Notes
-      </button>
-
-      ${buildTodoSection(vn)}
-      ${buildAntbiSection(vn)}
+      ${buildNotesTabs(v, n, vn)}
     </div>
   `;
 }
@@ -3532,82 +3813,183 @@ function isNoteStale(timeStr) {
 const CAT_LABELS = { operational:'Operational Notes', procurement:'Procurement Notes', personnel:'Personnel Notes', other:'Other Notes' };
 const CAT_PLACEHOLDERS = { operational:'Operational status, port calls, special instructions...', procurement:'Spare parts, provisions, stores, pending orders...', personnel:'Crew change, certificates, medical, disciplinary...', other:'General remarks, follow-up items...' };
 
-function noteBlock(cat, label, data, placeholder) {
-  const items = data?.items || [];
-  // Determine block-level top priority
-  let blockPrio = '';
-  for (const p of ['critical','watch']) {
-    if (items.some(it => it.priority === p && it.text)) { blockPrio = p; break; }
-  }
-  const blockClass = blockPrio ? ` prio-${blockPrio}` : '';
+// ── Inner-tab helper: builds the full tabbed notes column ────
+function buildNotesTabs(v, n, vn) {
+  const CATS = [
+    { id:'operational', icon:'⚙', label:'Operational', color:'#2563eb', data: n.operational,  ph:'Operational status, port calls, special instructions...' },
+    { id:'procurement', icon:'📦', label:'Procurement', color:'#0d9488', data: n.procurement,  ph:'Spare parts, provisions, pending orders...' },
+    { id:'personnel',   icon:'👤', label:'Crew',        color:'#7c3aed', data: n.personnel,    ph:'Crew change, certificates, medical, disciplinary...' },
+    { id:'other',       icon:'📌', label:'Other',       color:'#64748b', data: n.other,        ph:'General remarks, follow-up items...' },
+  ];
 
+  const totalNotes  = CATS.reduce((s,c) => s + (c.data?.items?.length||0), 0);
+  const hasCritical = CATS.some(c => (c.data?.items||[]).some(it => it.priority==='critical' && it.text));
+  const hasWatch    = CATS.some(c => (c.data?.items||[]).some(it => it.priority==='watch' && it.text));
+  const notesDot    = hasCritical ? '<span class="ntab-dot ntab-dot-critical"></span>' : hasWatch ? '<span class="ntab-dot ntab-dot-watch"></span>' : '';
+
+  let todoCount = 0, antbiCount = 0;
+  try { todoCount  = (JSON.parse(localStorage.getItem('yasa_todos_' + vn) || '[]')).filter(i=>!i.done).length; } catch(e){}
+  try { antbiCount = (JSON.parse(localStorage.getItem('yasa_antbi_' + vn) || '[]')).filter(i=>!i.done).length; } catch(e){}
+
+  const tabs = [
+    { id:'notes',    cls:'ntab-notes', icon:'📝', label:'Notes',    badge: totalNotes, dot: notesDot },
+    { id:'findings', cls:'ntab-find',  icon:'⚠️', label:'Findings', badge: antbiCount, dot: antbiCount>0 ? '<span class="ntab-dot ntab-dot-critical"></span>':''},
+    { id:'todo',     cls:'ntab-td',    icon:'✅', label:'To-Do',    badge: todoCount,  dot: todoCount>0  ? '<span class="ntab-dot ntab-dot-watch"></span>':''},
+  ];
+
+  const tabBar = `<div class="ntab-bar">
+    ${tabs.map(t => {
+      const active = (_activeNoteTab === t.id) ? ' active' : '';
+      return `<button class="ntab ${t.cls}${active}" onclick="switchNotesTab('${t.id}',this)">
+        <span class="ntab-icon">${t.icon}</span>
+        <span>${t.label}</span>
+        <span class="ntab-badge">${t.badge}</span>
+        ${t.dot}
+      </button>`;
+    }).join('')}
+  </div>`;
+
+  // ── NOTES pane: all 4 categories stacked ──
+  const notesPaneActive = (_activeNoteTab === 'notes') ? ' active' : '';
+  const notesPane = `<div class="ntab-pane${notesPaneActive}" id="ntab_notes">
+    ${CATS.map(c => `
+      <div class="ncat-section" style="--cat-color:${c.color}">
+        <div class="ncat-header">
+          <span class="ncat-icon">${c.icon}</span>
+          <span class="ncat-label">${c.label}</span>
+          <span class="ncat-count">${(c.data?.items||[]).length}</span>
+        </div>
+        ${noteBlock(c.id, c.data, c.ph)}
+      </div>
+    `).join('')}
+    <div class="ntab-save-row">
+      <button onclick="saveAllNotes()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Notes
+      </button>
+    </div>
+  </div>`;
+
+  const findActive = (_activeNoteTab === 'findings') ? ' active' : '';
+  const todoActive = (_activeNoteTab === 'todo')     ? ' active' : '';
+
+  return `${tabBar}
+    ${notesPane}
+    <div class="ntab-pane${findActive}" id="ntab_findings" style="padding:12px 14px;">${buildAntbiSection(vn)}</div>
+    <div class="ntab-pane${todoActive}"  id="ntab_todo"     style="padding:12px 14px;">${buildTodoSection(vn)}</div>`;
+}
+
+function switchNotesTab(cat, el) {
+  _activeNoteTab = cat;
+  const bar = el ? el.closest('.ntab-bar') : document.querySelector('.ntab-bar');
+  if (bar) bar.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const modal = document.getElementById('vesselModal');
+  if (!modal) return;
+  modal.querySelectorAll('.ntab-pane').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('ntab_' + cat);
+  if (target) {
+    target.classList.add('active');
+    setTimeout(() => {
+      target.querySelectorAll('.nc-text[contenteditable]').forEach(el => el.focus && 0);
+    }, 20);
+  }
+}
+
+function noteBlock(cat, data, placeholder) {
+  const items = data?.items || [];
   const itemsHtml = items.length > 0
     ? items.map((item, idx) => buildNoteItem(cat, idx, item, placeholder)).join('')
-    : `<div style="text-align:center;padding:20px 16px;color:var(--text3);font-size:12px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.05em;">No notes yet — click Add Note</div>`;
-
-  const countHtml = items.length > 0
-    ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);font-weight:400;margin-left:4px;">(${items.length})</span>`
-    : '';
-
-  return `
-    <div class="note-block note-block-${cat}${blockClass}" id="note_block_${cat}">
-      <div class="note-block-header">
-        <div class="note-block-label">${label}${countHtml}</div>
-      </div>
-      <div id="note_items_${cat}">${itemsHtml}</div>
-      <button class="add-note-btn" onclick="addNoteItem('${cat}')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Note
-      </button>
-    </div>`;
+    : `<div class="nc-empty">No notes yet</div>`;
+  return `<div class="note-block" id="note_block_${cat}">
+    <div id="note_items_${cat}">${itemsHtml}</div>
+    <button class="nc-add-btn" onclick="addNoteItem('${cat}')">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Note
+    </button>
+  </div>`;
 }
 
 function buildNoteItem(cat, idx, item, placeholder) {
   const p = item.priority || '';
-  const prioClass = p ? ` prio-${p}` : '';
+  const prioClass  = p ? ` prio-${p}` : '';
   const staleClass = item.text && isNoteStale(item.time) ? ' stale' : '';
   const opts = Object.entries(PRIORITY_LABELS).map(([val, lbl]) =>
     `<option value="${val}"${val === p ? ' selected' : ''}>${lbl}</option>`
   ).join('');
-  return `
-    <div class="note-row${prioClass}${staleClass}" id="note_item_${cat}_${idx}">
-      <div class="note-row-num">${idx + 1}</div>
-      <textarea class="note-row-text" id="modal_note_${cat}_${idx}"
-        placeholder="${placeholder}"
-        oninput="autoResizeTA(this)"
-        onfocus="autoResizeTA(this)">${escHtml(item.text || '')}</textarea>
-      <div class="note-row-meta">
-        <div class="note-row-actions">
-          <select class="note-row-prio${p ? ' prio-'+p : ''}" id="modal_priority_${cat}_${idx}"
-            onchange="updateNoteItemStyle('${cat}',${idx},this.value)">${opts}</select>
-          <button type="button" class="note-row-del" title="Delete note"
-            onclick="deleteNoteItem('${cat}',${idx})">🗑</button>
-        </div>
-        <span class="note-row-time" id="modal_time_${cat}_${idx}">${item.time || ''}</span>
+
+  // Format timestamp: "DD/MM/YYYY, HH:MM" → "DD MMM HH:MM"
+  let timeDisplay = '';
+  if (item.time) {
+    const m = item.time.match(/(\d{2})\/(\d{2})\/(\d{4}),\s*(\d{2}:\d{2})/);
+    if (m) {
+      const months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      timeDisplay = `${+m[1]} ${months[+m[2]]} ${m[4]}`;
+    } else {
+      timeDisplay = item.time;
+    }
+  }
+
+  // Sanitize stored HTML — allow only safe formatting tags
+  function sanitizeHtml(s) {
+    if (!s) return '';
+    return (s + '').replace(/<(?!\/?(?:strong|b|em|i|br)\b)[^>]*>/gi, '');
+  }
+  const displayHtml = sanitizeHtml(item.text || '');
+
+  const numColor = p === 'critical' ? '#dc2626' : p === 'watch' ? '#d97706' : 'var(--accent)';
+
+  return `<div class="nc${prioClass}${staleClass}" id="note_item_${cat}_${idx}">
+    <div class="nc-header">
+      <span class="nc-num" style="background:${numColor}">${idx + 1}</span>
+      <div class="nc-header-right">
+        <button type="button" class="nc-bold-btn" title="Bold (Ctrl+B)"
+          onmousedown="event.preventDefault();document.execCommand('bold')"><b>B</b></button>
+        <button type="button" class="nc-italic-btn" title="Italic (Ctrl+I)"
+          onmousedown="event.preventDefault();document.execCommand('italic')"><i>I</i></button>
+        <select class="nc-prio${p ? ' prio-'+p : ''}" id="modal_priority_${cat}_${idx}"
+          onchange="updateNoteItemStyle('${cat}',${idx},this.value)">${opts}</select>
+        <button type="button" class="nc-del" title="Delete note"
+          onclick="deleteNoteItem('${cat}',${idx})">✕</button>
       </div>
-    </div>`;
+    </div>
+    <div class="nc-text" contenteditable="true"
+      id="modal_note_${cat}_${idx}"
+      spellcheck="true"
+    >${displayHtml}</div>
+    <div class="nc-footer">
+      <span class="nc-time" id="modal_time_${cat}_${idx}">${timeDisplay ? '⏱ ' + timeDisplay : ''}</span>
+    </div>
+  </div>`;
 }
 
+
 function updateNoteItemStyle(cat, idx, val) {
-  const item = document.getElementById(`note_item_${cat}_${idx}`);
+  const card = document.getElementById(`note_item_${cat}_${idx}`);
   const sel  = document.getElementById(`modal_priority_${cat}_${idx}`);
-  if (!item || !sel) return;
-  ['prio-watch','prio-critical'].forEach(c => { item.classList.remove(c); sel.classList.remove(c); });
-  if (val) { item.classList.add(`prio-${val}`); sel.classList.add(`prio-${val}`); }
-  const badge = item.querySelector('.note-row-num');
-  if (badge) badge.style.background = val === 'critical' ? '#dc2626' : val === 'watch' ? '#f59e0b' : '';
-  // Update block-level border
-  const block = document.getElementById(`note_block_${cat}`);
-  if (block) {
-    ['prio-watch','prio-critical'].forEach(c => block.classList.remove(c));
-    const rows = block.querySelectorAll('.note-row');
-    let topP = '';
-    for (const p of ['critical','watch']) {
-      for (const el of rows) { if (el.classList.contains('prio-'+p)) { topP = p; break; } }
-      if (topP) break;
-    }
-    if (topP) block.classList.add('prio-'+topP);
-  }
+  if (!card || !sel) return;
+  ['prio-watch','prio-critical'].forEach(c => { card.classList.remove(c); sel.classList.remove(c); });
+  if (val) { card.classList.add(`prio-${val}`); sel.classList.add(`prio-${val}`); }
+  // Update number badge color
+  const num = card.querySelector('.nc-num');
+  if (num) num.style.background = val === 'critical' ? '#dc2626' : val === 'watch' ? '#d97706' : 'var(--accent)';
+  _refreshTabDot();
+}
+
+// Update the priority dot on the NOTES tab
+function _refreshTabDot() {
+  const bar = document.querySelector('.ntab-bar');
+  if (!bar) return;
+  const btn = bar.querySelector('.ntab.ntab-notes');
+  if (!btn) return;
+  const hasCrit  = !!document.querySelector('#ntab_notes .nc.prio-critical');
+  const hasWatch = !!document.querySelector('#ntab_notes .nc.prio-watch');
+  let dot = btn.querySelector('.ntab-dot');
+  const topP = hasCrit ? 'critical' : hasWatch ? 'watch' : '';
+  if (topP) {
+    if (!dot) { dot = document.createElement('span'); btn.appendChild(dot); }
+    dot.className = `ntab-dot ntab-dot-${topP}`;
+  } else if (dot) { dot.remove(); }
 }
 
 function _collectNotesFromDOM(vn) {
@@ -3616,9 +3998,13 @@ function _collectNotesFromDOM(vn) {
     const items = notes[vn]?.[cat]?.items;
     if (!items) return;
     items.forEach((item, idx) => {
-      const ta  = document.getElementById(`modal_note_${cat}_${idx}`);
+      const el  = document.getElementById(`modal_note_${cat}_${idx}`);
       const sel = document.getElementById(`modal_priority_${cat}_${idx}`);
-      if (ta)  { item.text = ta.value.trim(); if (item.text && !item.time) item.time = now; }
+      if (el) {
+        const raw = (el.innerHTML || '').replace(/<(?!\/?(strong|b|em|i|br)\b)[^>]*>/gi, '').trim();
+        item.text = raw;
+        if (raw && !item.time) item.time = now;
+      }
       if (sel) item.priority = sel.value;
     });
   });
@@ -3634,15 +4020,19 @@ function saveAllNotes() {
   ['operational','procurement','personnel','other'].forEach(cat => {
     const items = notes[vn][cat]?.items || [];
     items.forEach((item, idx) => {
-      const ta  = document.getElementById(`modal_note_${cat}_${idx}`);
+      const el  = document.getElementById(`modal_note_${cat}_${idx}`);
       const sel = document.getElementById(`modal_priority_${cat}_${idx}`);
-      if (!ta) return;
-      const text = ta.value.trim();
-      item.text     = text;
+      if (!el) return;
+      const raw = (el.innerHTML || '').replace(/<(?!\/?(strong|b|em|i|br)\b)[^>]*>/gi, '').trim();
+      item.text     = raw;
       item.priority = sel ? sel.value : (item.priority || '');
-      if (text) item.time = now;
+      if (raw) item.time = now;
       const timeEl = document.getElementById(`modal_time_${cat}_${idx}`);
-      if (timeEl) timeEl.textContent = text ? 'Last saved: ' + now : '';
+      if (timeEl && raw) {
+        const m = now.match(/(\d{2})\/(\d{2})\/(\d{4}),\s*(\d{2}:\d{2})/);
+        const months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        timeEl.textContent = m ? `⏱ ${+m[1]} ${months[+m[2]]} ${m[4]}` : '';
+      }
     });
     // Filter out fully empty (no text) items
     notes[vn][cat].items = items.filter(it => it.text);
@@ -3660,6 +4050,10 @@ function saveAllNotes() {
   // Re-render modal body to update numbering after empty items removed
   if (activeVessel) {
     document.getElementById('modalBody').innerHTML = buildModalBody(activeVessel);
+    setTimeout(() => {
+      const pane = document.getElementById('ntab_' + _activeNoteTab);
+      if (pane) pane.querySelectorAll('.nc-text').forEach(ta => autoResizeTA(ta));
+    }, 30);
   }
 }
 
@@ -3676,14 +4070,14 @@ function addNoteItem(cat) {
   const block = document.getElementById(`note_block_${cat}`);
   if (block) {
     const tmp = document.createElement('div');
-    tmp.innerHTML = noteBlock(cat, CAT_LABELS[cat], notes[vn][cat], CAT_PLACEHOLDERS[cat]);
+    tmp.innerHTML = noteBlock(cat, notes[vn]?.[cat], CAT_PLACEHOLDERS[cat] || '');
     block.replaceWith(tmp.firstElementChild);
   }
   // Focus the new textarea
   const newIdx = items.length - 1;
   setTimeout(() => {
-    const ta = document.getElementById(`modal_note_${cat}_${newIdx}`);
-    if (ta) ta.focus();
+    const el = document.getElementById(`modal_note_${cat}_${newIdx}`);
+    if (el) { el.focus(); const r = document.createRange(); r.selectNodeContents(el); r.collapse(false); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); }
   }, 50);
 }
 
@@ -3704,9 +4098,10 @@ function deleteNoteItem(cat, idx) {
   const block = document.getElementById(`note_block_${cat}`);
   if (block) {
     const tmp = document.createElement('div');
-    tmp.innerHTML = noteBlock(cat, CAT_LABELS[cat], notes[vn][cat], CAT_PLACEHOLDERS[cat]);
+    tmp.innerHTML = noteBlock(cat, notes[vn]?.[cat], CAT_PLACEHOLDERS[cat] || '');
     block.replaceWith(tmp.firstElementChild);
   }
+  _refreshTabDot(cat);
   saveState(); renderStats(); renderVessels(); renderAlertPanel();
   showToast('Note deleted', 'info');
 }
@@ -3731,8 +4126,13 @@ function switchModalTab(tab, el) {
     det.style.display = 'block';
     not.style.display = 'none';
   } else {
-    det.style.display = 'none';
-    not.style.display = 'block';
+    det.style.display = 'flex';
+    not.style.display = 'flex';
+    // Resize textareas in the active note pane
+    setTimeout(() => {
+      const pane = document.getElementById('ntab_' + _activeNoteTab);
+      if (pane) pane.querySelectorAll('.nc-text').forEach(ta => autoResizeTA(ta));
+    }, 20);
   }
 }
 
@@ -4396,6 +4796,7 @@ var _cloudReady        = false;
 var _currentUser       = null;
 var _saveTimer         = null;
 var _isSaving          = false;
+var _pendingSave       = false;
 var _lastCloudStr      = null;
 var _lastSnapshotBytes = 0;
 
@@ -4482,20 +4883,38 @@ async function _writeCloud(data) {
 // ── Save local state to cloud ─────────────────────────────────
 async function cloudSave() {
   if (!_cloudReady) return;
-  if (_isSaving) return; // concurrent save guard — ikinci kayıt başlamadan önce ilki bitsin
+  // Debounce: her yeni çağrı önceki timer'ı sıfırlar.
+  // _isSaving guard'ı KASITLI kaldırıldı — kayıt devam ederken gelen
+  // yeni değişiklikler de debounce sonrası kaydedilmeli.
   if (_saveTimer) clearTimeout(_saveTimer);
-  // Debounce 800ms — hızlı keystrokes API'yi spam etmesin
-  await new Promise(function(resolve) { _saveTimer = setTimeout(resolve, 800); });
+  await new Promise(function(resolve) { _saveTimer = setTimeout(resolve, 500); });
   _saveTimer = null;
-  if (_isSaving) return; // debounce sırasında başka bir save başlamış olabilir
+  if (_isSaving) {
+    // Kayıt bitince tekrar dene — son değer kaybolmasın
+    _pendingSave = true;
+    return;
+  }
   _isSaving = true;
   _setStatus('🔄');
   try {
-    var snapshot = _buildSnapshot();
-    var snapshotJson = JSON.stringify(snapshot);
+    // ── FETCH → MERGE → WRITE ─────────────────────────────────────
+    // Her kayıt öncesi cloud'dan güncel veriyi çek ve merge et.
+    // Bu sayede iki kullanıcı aynı anda değişiklik yapsa bile
+    // birbirlerinin verisini silmez.
+    var cloudData = await _fetchCloud();
+    var local = _buildSnapshot();
+    var toWrite;
+    if (cloudData) {
+      toWrite = _mergeSnapshots(cloudData, local);
+      // Merge'i local'e de uygula (diğer kullanıcının değişiklikleri gelsin)
+      _applySnapshotSilent(toWrite);
+    } else {
+      toWrite = local;
+    }
+    var snapshotJson = JSON.stringify(toWrite);
     _updateStorageLabel(new Blob([snapshotJson]).size);
-    await _writeCloud(snapshot);
-    _lastCloudStr = _deepSortStringify(snapshot);
+    await _writeCloud(toWrite);
+    _lastCloudStr = _deepSortStringify(toWrite);
     _setStatus('☁️', 'Last saved: ' + _nowStr());
   } catch(e) {
     console.warn('cloudSave failed:', e);
@@ -4510,6 +4929,7 @@ async function cloudSave() {
     }
   } finally {
     _isSaving = false;
+    if (_pendingSave) { _pendingSave = false; cloudSave(); }
   }
 }
 
@@ -4675,7 +5095,8 @@ async function cloudInit() {
 
     // 30 saniyede bir değişiklik kontrolü
     setInterval(async function() {
-      if (_isSaving || _saveTimer) return;
+      // Kayıt devam ediyorsa veya bekleyen kayıt varsa poll yapma
+      if (_isSaving || _saveTimer || _pendingSave) return;
       try {
         var cd = await _fetchCloud();
         if (!cd) return;
@@ -4744,6 +5165,15 @@ function _buildSnapshot() {
       VESSELS_ALL.forEach(function(v) {
         var vn = canonicalize(v);
         var raw = localStorage.getItem('yasa_antbi_' + vn);
+        if (raw) { try { a[vn] = JSON.parse(raw); } catch(e) {} }
+      });
+      return a;
+    })(),
+    antbiLists: (function() {
+      var a = {};
+      VESSELS_ALL.forEach(function(v) {
+        var vn = canonicalize(v);
+        var raw = localStorage.getItem('yasa_antbi_lists_' + vn);
         if (raw) { try { a[vn] = JSON.parse(raw); } catch(e) {} }
       });
       return a;
@@ -4915,7 +5345,23 @@ function _mergeSnapshots(cloud, local) {
     CERT_FIELDS.forEach(f => {
       const cloudFieldTs = snapshotTs(cTs[f.key] || cloud.lastModified);
       const localFieldTs = snapshotTs(lTs[f.key] || local.lastModified);
-      if (localFieldTs >= cloudFieldTs) {
+      // Her iki tarafta da _ts varsa: daha yenisi kazanır
+      // Sadece birinde _ts varsa: _ts'si olan kazanır (daha kesin timestamp)
+      // İkisinde de _ts yoksa: değeri olanı koru (boş > dolu geçişi engelle)
+      const hasLocalTs = !!lTs[f.key];
+      const hasCloudTs = !!cTs[f.key];
+      let useLocal;
+      if (hasLocalTs && hasCloudTs) {
+        useLocal = localFieldTs >= cloudFieldTs;
+      } else if (hasLocalTs) {
+        useLocal = true;  // local'in kesin timestamp'i var, cloud'unki yok → local kazanır
+      } else if (hasCloudTs) {
+        useLocal = false; // cloud'un kesin timestamp'i var, local'inki yok → cloud kazanır
+      } else {
+        // İkisinde de _ts yok: değeri olanı koru, yoksa diğerine bak
+        useLocal = !!(lc[f.key]) || localFieldTs >= cloudFieldTs;
+      }
+      if (useLocal) {
         mergedCert[f.key]       = lc[f.key] || '';
         mergedCert._ts[f.key]   = lTs[f.key] || local.lastModified || '';
       } else {
@@ -4979,6 +5425,23 @@ function _mergeSnapshots(cloud, local) {
     if (arr.length) merged.antbi[vn] = arr;
   });
 
+  // Merge antbiLists: per-vessel, per-list last-write-wins by updatedAt
+  const cloudAntbiLists = cloud.antbiLists || {};
+  const localAntbiLists = local.antbiLists || {};
+  const allAntbiListKeys = new Set([...Object.keys(cloudAntbiLists), ...Object.keys(localAntbiLists)]);
+  merged.antbiLists = {};
+  allAntbiListKeys.forEach(vn => {
+    const cArr = cloudAntbiLists[vn] || [];
+    const lArr = localAntbiLists[vn] || [];
+    const map = {};
+    [...cArr, ...lArr].forEach(it => {
+      const ex = map[it.id];
+      if (!ex || new Date(it.updatedAt || it.createdAt || 0) >= new Date(ex.updatedAt || ex.createdAt || 0)) map[it.id] = it;
+    });
+    const arr = Object.values(map).sort((a,b) => (a.createdAt||'').localeCompare(b.createdAt||''));
+    if (arr.length) merged.antbiLists[vn] = arr;
+  });
+
   // Merge meeting tombstones: union, en son silinme zamanı kazanır
   const cloudMtgTombstones = cloud.meetingTombstones || {};
   const localMtgTombstones = local.meetingTombstones || {};
@@ -5036,11 +5499,14 @@ function _safeApplySnapshot(cloudData) {
   const modal = document.getElementById('vesselModal');
   const modalOpen = modal && modal.classList.contains('open') && activeVessel;
 
-  // 1. Modal açıksa, kullanıcının henüz kaydetmediği DOM değerlerini
-  //    notes global'ine aktar — poll sonrası kaybolmasınlar.
+  // 1. Modal açıksa, kullanıcının henüz kaydetmediği DOM değerlerini sakla
   if (modalOpen) {
     const vn = canonicalize(activeVessel.name);
+    // Notes
     _collectNotesFromDOM(vn);
+    // Cert tarihleri — date input'larındaki son değeri localStorage'a yaz
+    // (onCertChange zaten yazıyor, ama kullanıcı henüz kaydetmediyse diye)
+    _collectCertsFromDOM(activeVessel.name);
   }
 
   // 2. Snapshot'ı uygula (notes, certs, vessels vb. güncellenir)
@@ -5053,9 +5519,72 @@ function _safeApplySnapshot(cloudData) {
     try {
       document.getElementById('modalBody').innerHTML = buildModalBody(activeVessel);
       setTimeout(function() {
-        document.querySelectorAll('#vesselModal .note-row-text').forEach(function(ta) { autoResizeTA(ta); });
+        document.querySelectorAll('#vesselModal .nc-text').forEach(function(ta) { autoResizeTA(ta); });
       }, 30);
     } catch(e) { /* modal kapanmış olabilir */ }
+  }
+}
+
+// ── Silent apply: sadece localStorage ve global state, UI render yok ──
+// cloudSave içinden çağrılır — kayıt sırasında UI render'ı tetikleme.
+function _applySnapshotSilent(merged) {
+  // Vessels
+  if (merged.vessels && merged.vessels.length > 0) {
+    allVessels     = merged.vessels;
+    reportFileName = merged.reportFileName || '';
+    reportDate     = merged.reportDate     || '';
+    localStorage.setItem('yasa_dashboard_state', JSON.stringify({ vessels: allVessels, reportFileName, reportDate }));
+  }
+  // Tombstones
+  if (merged.noteTombstones) {
+    noteTombstones = merged.noteTombstones;
+    localStorage.setItem('yasa_note_tombstones', JSON.stringify(noteTombstones));
+  }
+  // Notes
+  notes = {};
+  if (merged.notes) {
+    Object.keys(merged.notes).forEach(function(k) { notes[canonicalize(k)] = migrateNote(merged.notes[k]); });
+  }
+  localStorage.setItem('yasa_supt_notes', JSON.stringify(notes));
+  // Assignments
+  if (merged.assignments) localStorage.setItem('yasa_assignments', JSON.stringify(merged.assignments));
+  // Certs
+  if (merged.certs) {
+    Object.keys(merged.certs).forEach(function(v) { localStorage.setItem(certKey(v), JSON.stringify(merged.certs[v])); });
+  }
+  // LSA
+  if (merged.lsa) {
+    Object.keys(merged.lsa).forEach(function(v) { localStorage.setItem('lsa_v2_' + v, JSON.stringify(merged.lsa[v])); });
+  }
+  // COB
+  if (merged.cob) {
+    Object.keys(merged.cob).forEach(function(v) { localStorage.setItem(cobKey(v), JSON.stringify(merged.cob[v])); });
+  }
+  // Todos
+  if (merged.todos) {
+    Object.keys(merged.todos).forEach(function(vn) { localStorage.setItem('yasa_todos_' + vn, JSON.stringify(merged.todos[vn])); });
+  }
+  // ANTBI
+  if (merged.antbi) {
+    Object.keys(merged.antbi).forEach(function(vn) { localStorage.setItem('yasa_antbi_' + vn, JSON.stringify(merged.antbi[vn])); });
+  }
+  // ANTBI LISTS
+  if (merged.antbiLists) {
+    Object.keys(merged.antbiLists).forEach(function(vn) { localStorage.setItem('yasa_antbi_lists_' + vn, JSON.stringify(merged.antbiLists[vn])); });
+  }
+  // Meetings
+  if (merged.meetingTombstones) {
+    meetingTombstones = merged.meetingTombstones;
+    localStorage.setItem('yasa_meeting_tombstones', JSON.stringify(meetingTombstones));
+  }
+  if (merged.meetings) { localStorage.setItem('yasa_meetings', JSON.stringify(merged.meetings)); }
+  // Gas
+  if (merged.gas) { localStorage.setItem('yasa_gas_detectors', JSON.stringify(merged.gas)); }
+  if (merged.gasOverrides) {
+    if (merged.gasOverrides.total) localStorage.setItem('yasa_gas_total_override', merged.gasOverrides.total);
+    else localStorage.removeItem('yasa_gas_total_override');
+    if (merged.gasOverrides.egemar) localStorage.setItem('yasa_gas_egemar_override', merged.gasOverrides.egemar);
+    else localStorage.removeItem('yasa_gas_egemar_override');
   }
 }
 
@@ -5117,6 +5646,12 @@ function _applySnapshot(cloudData) {
   if (merged.antbi) {
     Object.keys(merged.antbi).forEach(function(vn) {
       localStorage.setItem('yasa_antbi_' + vn, JSON.stringify(merged.antbi[vn]));
+    });
+  }
+  // ANTBI LISTS
+  if (merged.antbiLists) {
+    Object.keys(merged.antbiLists).forEach(function(vn) {
+      localStorage.setItem('yasa_antbi_lists_' + vn, JSON.stringify(merged.antbiLists[vn]));
     });
   }
 
@@ -5304,9 +5839,23 @@ function todoRerender(vn) {
 //  ANTBI — DEFICIENCY LIST (vessel-specific, survives Excel reload)
 // ══════════════════════════════════════════════════════════════════
 
-function antbiKey(vn)   { return 'yasa_antbi_' + vn; }
+var _activeAntbiListId = null; // currently selected inspection list (null = All)
+
+function antbiKey(vn)       { return 'yasa_antbi_' + vn; }
+function antbiListsKey(vn)  { return 'yasa_antbi_lists_' + vn; }
+function antbiListsLoad(vn) { try { return JSON.parse(localStorage.getItem(antbiListsKey(vn)) || '[]'); } catch(e) { return []; } }
+function antbiListsSave(vn, lists) {
+  // Her listeye updatedAt stamp — merge'de last-write-wins doğru çalışsın
+  var now = new Date().toISOString();
+  lists.forEach(function(lst) { if (!lst.updatedAt) lst.updatedAt = now; });
+  localStorage.setItem(antbiListsKey(vn), JSON.stringify(lists));
+  cloudSave().catch(function() {});
+}
 function antbiLoad(vn)  { try { return JSON.parse(localStorage.getItem(antbiKey(vn)) || '[]'); } catch(e) { return []; } }
 function antbiSave(vn, items) {
+  // Merge için her item'da updatedAt olmalı
+  var now = new Date().toISOString();
+  items.forEach(function(it) { if (!it.updatedAt) it.updatedAt = now; });
   localStorage.setItem(antbiKey(vn), JSON.stringify(items));
   cloudSave().catch(function() {});
 }
@@ -5334,42 +5883,60 @@ function antbiDueBadge(dueDate, done) {
 }
 
 function buildAntbiSection(vn) {
+  var lists  = antbiListsLoad(vn);
   var items  = antbiLoad(vn);
-  var open   = items.filter(function(it) { return !it.done; }).length;
-  var closed = items.filter(function(it) { return it.done; }).length;
   var evn    = escAttr(vn);
 
-  var stats = items.length
+  // ── Inspection Lists bar ──
+  var listBarHtml = '<div class="alb-bar" id="albBar_' + vn + '">'
+    + '<button class="alb-tab' + (!_activeAntbiListId ? ' active' : '') + '" onclick="antbiSwitchList(\'' + evn + '\',null)">All Lists</button>';
+  lists.forEach(function(lst) {
+    var dateStr = lst.inspectionDate ? ' <span class="alb-date">(' + lst.inspectionDate.split('-').reverse().join('/') + ')</span>' : '';
+    var cnt = items.filter(function(it) { return it.listId === lst.id && !it.done; }).length;
+    var act = (_activeAntbiListId === lst.id) ? ' active' : '';
+    listBarHtml += '<button class="alb-tab' + act + '" onclick="antbiSwitchList(\'' + evn + '\',\'' + escAttr(lst.id) + '\')">'
+      + escHtml(lst.title || 'Inspection') + dateStr
+      + (cnt ? ' <span class="alb-badge">' + cnt + '</span>' : '')
+      + '</button>';
+  });
+  listBarHtml += '<button class="alb-new-btn" onclick="antbiNewList(\'' + evn + '\')" title="New inspection list">+ New List</button>'
+    + '</div>';
+
+  var filtered = _activeAntbiListId ? items.filter(function(it) { return it.listId === _activeAntbiListId; }) : items;
+  var open   = filtered.filter(function(it) { return !it.done; }).length;
+  var closed = filtered.filter(function(it) { return it.done; }).length;
+
+  var stats = filtered.length
     ? '<div class="antbi-stats">'
         + '<span class="antbi-stat">Open: <b>' + open + '</b></span>'
         + '<span class="antbi-stat">Closed: <b>' + closed + '</b></span>'
-        + '<span class="antbi-stat">Total: <b>' + items.length + '</b></span>'
+        + '<span class="antbi-stat">Total: <b>' + filtered.length + '</b></span>'
         + '</div>'
     : '';
 
-  var openItems = items.filter(function(it) { return !it.done; });
-  var closedItems = items.filter(function(it) { return it.done; });
+  var openItems   = filtered.filter(function(it) { return !it.done; });
+  var closedItems = filtered.filter(function(it) { return it.done; });
+  var openHtml    = openItems.length   ? openItems.map(function(it)   { return _antbiItemHtml(vn, it); }).join('') : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">No open findings.</li>';
+  var closedHtml  = closedItems.length ? closedItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '';
 
-  var openHtml = openItems.length ? openItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">Henüz açık kayıt yok.</li>';
-  var closedHtml = closedItems.length ? closedItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '';
-
-  var listContent = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Open Findings</div>' +
-                 '<ul class="antbi-list" style="margin-bottom:14px;">' + openHtml + '</ul>';
-
+  var listContent = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Open Findings</div>'
+                 + '<ul class="antbi-list" style="margin-bottom:14px;">' + openHtml + '</ul>';
   if (closedItems.length) {
-    listContent += '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Completed Findings</div>' +
-                '<ul class="antbi-list">' + closedHtml + '</ul>';
+    listContent += '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Completed</div>'
+                + '<ul class="antbi-list">' + closedHtml + '</ul>';
   }
 
   return ''
     + '<div class="antbi-section">'
-    +   '<div class="modal-section-title" style="margin-bottom:10px;justify-content:space-between;">'
-    +     '<span>&#9888; Finding List</span>'
+    +   '<div class="modal-section-title" style="margin-bottom:8px;justify-content:space-between;">'
+    +     '<span>⚠️ Findings</span>'
     +     '<div style="display:flex;gap:6px;">'
-    +       '<button type="button" style="background:transparent;border:1px solid rgba(37,99,235,.3);color:#2563eb;border-radius:4px;padding:3px 8px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.background=\'rgba(37,99,235,.1)\';this.style.borderColor=\'var(--accent)\';" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\'rgba(37,99,235,.3)\';" onclick="antbiExportPDF(\'' + evn + '\')" title="PDF İndir">📄 PDF EXPORT</button>'
-    +       '<button type="button" style="background:transparent;border:1px solid rgba(220,38,38,.3);color:#dc2626;border-radius:4px;padding:3px 8px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.background=\'#fef2f2\';this.style.borderColor=\'#fca5a5\';" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\'rgba(220,38,38,.3)\';" onclick="antbiClearAll(\'' + evn + '\')" title="Tüm listeyi sil">🗑 TÜMÜNÜ SİL</button>'
+    +       '<button type="button" style="background:transparent;border:1px solid rgba(37,99,235,.3);color:#2563eb;border-radius:4px;padding:3px 8px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="antbiExportPDF(\'' + evn + '\')">📄 PDF</button>'
+    +       '<button type="button" style="background:transparent;border:1px solid rgba(220,38,38,.3);color:#dc2626;border-radius:4px;padding:3px 8px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="antbiClearAll(\'' + evn + '\')">🗑 Clear</button>'
     +     '</div>'
     +   '</div>'
+
+    + listBarHtml
 
     // ── Paste zone ──
     +   '<div style="background:rgba(245,158,11,.05);border:1.5px dashed rgba(245,158,11,.4);border-radius:10px;padding:14px 16px;margin-bottom:14px;">'
@@ -5449,6 +6016,44 @@ function _antbiItemHtml(vn, it) {
     +           ' onclick="antbiDelete(this.dataset.vn,this.dataset.id)"'
     +           ' title="Sil">&#10005;</button>'
     + '</li>';
+}
+
+// ── Switch inspection list ───────────────────────────────────
+function antbiSwitchList(vn, listId) {
+  _activeAntbiListId = listId || null;
+  antbiRerender(vn);
+}
+
+// ── Create new inspection list ────────────────────────────────
+function antbiNewList(vn) {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:9100;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = [
+    '<div style="background:var(--navy);border:1px solid var(--border2);border-radius:12px;padding:24px 28px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,.3);">',
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:16px;">+ New Inspection List</div>',
+    '<label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);display:block;margin-bottom:5px;">Inspection / Survey Title</label>',
+    '<input id="antbiNewTitle" type="text" placeholder="e.g. PSC Inspection, Class Survey..." style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;font-size:13px;color:var(--text);background:var(--navy2);outline:none;box-sizing:border-box;margin-bottom:12px;">',
+    '<label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);display:block;margin-bottom:5px;">Inspection Date</label>',
+    '<input id="antbiNewDate" type="date" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;font-size:13px;color:var(--text);background:var(--navy2);outline:none;box-sizing:border-box;margin-bottom:18px;">',
+    '<div style="display:flex;gap:8px;justify-content:flex-end;">',
+    '<button id="antbiNewCancel" style="background:transparent;border:1px solid var(--border2);color:var(--text2);padding:7px 18px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;">Cancel</button>',
+    '<button id="antbiNewConfirm" style="background:#f59e0b;color:#fff;border:none;padding:7px 20px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;">Create List</button>',
+    '</div></div>'
+  ].join(''); var inp = document.getElementById('antbiNewTitle');
+  if (inp) inp.focus();
+  document.getElementById('antbiNewCancel').onclick = function() { overlay.remove(); };
+  document.getElementById('antbiNewConfirm').onclick = function() {
+    var title = (document.getElementById('antbiNewTitle')?.value || '').trim() || 'Inspection';
+    var date  = document.getElementById('antbiNewDate')?.value || '';
+    var lists = antbiListsLoad(vn);
+    var newList = { id: 'al_' + Date.now(), title: title, inspectionDate: date, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    lists.push(newList);
+    antbiListsSave(vn, lists);
+    _activeAntbiListId = newList.id;
+    overlay.remove();
+    antbiRerender(vn);
+  };
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
 }
 
 // ── Parse & preview pasted text ──────────────────────────────
@@ -5583,6 +6188,7 @@ function _antbiConfirmImport(vn, parsed, startNum) {
       num:       startNum + i,
       text:      it.text,
       dueDate:   dateEl ? dateEl.value : '',
+      listId:    _activeAntbiListId || null,
       done:      false,
       source:    'paste',
       createdAt: now,
@@ -5615,6 +6221,7 @@ function antbiAdd(vn) {
     num:       antbiNextNum(items),
     text:      text,
     dueDate:   dueEl ? dueEl.value : '',
+    listId:    _activeAntbiListId || null,
     done:      false,
     source:    'manual',
     createdAt: now,
@@ -5733,50 +6340,68 @@ function antbiExportPDF(vn) {
 
 function antbiClearAll(vn) {
   var items = antbiLoad(vn);
-  if (!items.length) {
-    showToast('Liste zaten boş.', 'info');
-    return;
+  var toDelete = _activeAntbiListId ? items.filter(function(it) { return it.listId === _activeAntbiListId; }) : items;
+  if (!toDelete.length) { showToast('Liste zaten boş.', 'info'); return; }
+  var label = _activeAntbiListId ? 'bu listeki' : 'tüm';
+  if (!confirm(toDelete.length + ' adet ' + label + ' kaydı silmek istediğinize emin misiniz?')) return;
+  if (_activeAntbiListId) {
+    antbiSave(vn, items.filter(function(it) { return it.listId !== _activeAntbiListId; }));
+  } else {
+    antbiSave(vn, []);
   }
-  if (!confirm('Tüm Finding List maddelerini (' + items.length + ' adet) silmek istediğinize emin misiniz?\n\nBu işlem kalıcıdır ve geri alınamaz!')) return;
-  antbiSave(vn, []);
   antbiRerender(vn);
-  showToast('Finding List tamamen temizlendi.', 'success');
+  showToast('Findings temizlendi.', 'success');
 }
 
 function antbiRerender(vn) {
   var listContainer = document.getElementById('antbiListContainer_' + vn);
   if (!listContainer) return;
+  var lists  = antbiListsLoad(vn);
   var items  = antbiLoad(vn);
-  var open   = items.filter(function(it) { return !it.done; }).length;
-  var closed = items.filter(function(it) { return it.done; }).length;
+
+  // Update list bar
   var section = listContainer.closest('.antbi-section');
   if (section) {
+    var barEl = section.querySelector('.alb-bar');
+    var barHtml = '<button class="alb-tab' + (!_activeAntbiListId ? ' active' : '') + '" onclick="antbiSwitchList(\'' + escAttr(vn) + '\',null)">All Lists</button>';
+    lists.forEach(function(lst) {
+      var dateStr = lst.inspectionDate ? ' <span class="alb-date">(' + lst.inspectionDate.split('-').reverse().join('/') + ')</span>' : '';
+      var cnt = items.filter(function(it) { return it.listId === lst.id && !it.done; }).length;
+      var active = (_activeAntbiListId === lst.id) ? ' active' : '';
+      barHtml += '<button class="alb-tab' + active + '" onclick="antbiSwitchList(\'' + escAttr(vn) + '\',\'' + escAttr(lst.id) + '\')">'
+        + escHtml(lst.title || 'Inspection') + dateStr
+        + (cnt ? ' <span class="alb-badge">' + cnt + '</span>' : '')
+        + '</button>';
+    });
+    barHtml += '<button class="alb-new-btn" onclick="antbiNewList(\'' + escAttr(vn) + '\')" title="New list">+ New List</button>';
+    if (barEl) barEl.innerHTML = barHtml;
+    // Update stats
+    var filtered = _activeAntbiListId ? items.filter(function(it) { return it.listId === _activeAntbiListId; }) : items;
+    var open   = filtered.filter(function(it) { return !it.done; }).length;
+    var closed = filtered.filter(function(it) { return it.done; }).length;
     var statsEl = section.querySelector('.antbi-stats');
-    var statsHtml = items.length
+    var statsHtml = filtered.length
       ? '<div class="antbi-stats">'
           + '<span class="antbi-stat">Open: <b>' + open + '</b></span>'
           + '<span class="antbi-stat">Closed: <b>' + closed + '</b></span>'
-          + '<span class="antbi-stat">Total: <b>' + items.length + '</b></span>'
+          + '<span class="antbi-stat">Total: <b>' + filtered.length + '</b></span>'
           + '</div>'
       : '';
     if (statsEl) statsEl.outerHTML = statsHtml;
     else if (statsHtml) listContainer.insertAdjacentHTML('beforebegin', statsHtml);
   }
 
-  var openItems = items.filter(function(it) { return !it.done; });
-  var closedItems = items.filter(function(it) { return it.done; });
-
-  var openHtml = openItems.length ? openItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">Henüz açık kayıt yok.</li>';
-  var closedHtml = closedItems.length ? closedItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '';
-
-  var listContent = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Open Findings</div>' +
-                 '<ul class="antbi-list" style="margin-bottom:14px;">' + openHtml + '</ul>';
-
+  var filtered2 = _activeAntbiListId ? items.filter(function(it) { return it.listId === _activeAntbiListId; }) : items;
+  var openItems   = filtered2.filter(function(it) { return !it.done; });
+  var closedItems = filtered2.filter(function(it) { return it.done; });
+  var openHtml    = openItems.length   ? openItems.map(function(it)   { return _antbiItemHtml(vn, it); }).join('') : '<li style="color:var(--text3);font-size:12px;padding:6px 10px;">No open findings.</li>';
+  var closedHtml  = closedItems.length ? closedItems.map(function(it) { return _antbiItemHtml(vn, it); }).join('') : '';
+  var listContent = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Open Findings</div>'
+                 + '<ul class="antbi-list" style="margin-bottom:14px;">' + openHtml + '</ul>';
   if (closedItems.length) {
-    listContent += '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Completed Findings</div>' +
-                '<ul class="antbi-list">' + closedHtml + '</ul>';
+    listContent += '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Completed</div>'
+                + '<ul class="antbi-list">' + closedHtml + '</ul>';
   }
-
   listContainer.innerHTML = listContent;
 }
 
