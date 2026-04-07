@@ -5761,8 +5761,10 @@ async function cloudInit() {
 
     // 30 saniyede bir değişiklik kontrolü
     setInterval(async function() {
-      // Kayıt devam ediyorsa veya bekleyen kayıt varsa poll yapma
+      // Kayıt devam ediyorsa, bekleyen kayıt varsa, veya kullanıcı aktif yazıyorsa poll yapma
       if (_isSaving || _saveTimer || _pendingSave) return;
+      var focused = document.activeElement;
+      if (focused && (focused.classList.contains('nl-ta') || focused.classList.contains('nc-text'))) return;
       try {
         var cd = await _fetchCloud();
         if (!cd) return;
@@ -6256,24 +6258,41 @@ function _safeApplySnapshot(cloudData) {
   // 1. Modal açıksa, kullanıcının henüz kaydetmediği DOM değerlerini sakla
   if (modalOpen) {
     const vn = canonicalize(activeVessel.name);
-    // Notes
+    // Notes (kayıtlı satırları topla)
     _collectNotesFromDOM(vn);
-    // Cert tarihleri — date input'larındaki son değeri localStorage'a yaz
-    // (onCertChange zaten yazıyor, ama kullanıcı henüz kaydetmediyse diye)
+    // Cert tarihleri
     _collectCertsFromDOM(activeVessel.name);
   }
 
   // 2. Snapshot'ı uygula (notes, certs, vessels vb. güncellenir)
   _applySnapshot(cloudData);
 
-  // 3. Modal açıksa modal body'yi yeniden oluştur:
-  //    - Cert input'ları artık localStorage'daki güncel değerleri gösterir
-  //    - Note item sırası notes global'iyle eşleşir
+  // 3. Modal açıksa modal body'yi yeniden oluştur —
+  //    AMA kullanıcı aktif yazıyorsa (nl-ta focused) rebuild etme!
+  //    Yazı kaybolur.
   if (modalOpen) {
+    var focused = document.activeElement;
+    var userTyping = focused && (
+      focused.classList.contains('nl-ta') ||
+      focused.classList.contains('nc-text') ||
+      focused.closest('#vesselModal')
+    );
+    if (userTyping) {
+      // Sadece ncat-count badge'larini güncelle, rebuild yapma
+      try {
+        var vn2 = canonicalize(activeVessel.name);
+        ['operational','procurement','personnel','other'].forEach(function(cat) {
+          var cnt = (notes[vn2] && notes[vn2][cat] && notes[vn2][cat].items) ? notes[vn2][cat].items.length : 0;
+          var header = document.querySelector('#note_block_' + cat + '')?.closest('.ncat-section')?.querySelector('.ncat-count');
+          if (header) header.textContent = cnt;
+        });
+      } catch(e) {}
+      return; // rebuild yapma
+    }
     try {
       document.getElementById('modalBody').innerHTML = buildModalBody(activeVessel);
       setTimeout(function() {
-        document.querySelectorAll('#vesselModal .nc-text').forEach(function(ta) { autoResizeTA(ta); });
+        document.querySelectorAll('#vesselModal .nl-ta').forEach(function(ta) { autoResizeTA(ta); });
       }, 30);
     } catch(e) { /* modal kapanmış olabilir */ }
   }
