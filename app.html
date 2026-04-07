@@ -10936,11 +10936,13 @@ function peCleanupInvalid() {
 </script>
 
 <script>
+// Service Worker — eski cache'i temizle, yeni versiyonu zorla
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('SW registered'))
-      .catch(err => console.log('SW error:', err));
+  window.addEventListener('load', function() {
+    // Önce tüm eski SW'leri unregister et (cache sorununu önler)
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      regs.forEach(function(reg) { reg.unregister(); });
+    });
   });
 }
 </script>
