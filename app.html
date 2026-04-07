@@ -4061,8 +4061,9 @@ function buildModalBody(v) {
 
   const marine = getMarine(v.name);
   const ops = getOps(v.name);
-  const cob    = loadCob(v.name);
-  const sludge = loadSludge(v.name);
+  const cob     = loadCob(v.name);
+  const sludge  = loadSludge(v.name);
+  const garbage = loadGarbage(v.name);
   const sludgeCap    = parseFloat(sludge.cap)    || 0;
   const sludgeActual = parseFloat(sludge.actual) || 0;
   const sludgePct    = sludgeCap > 0 ? Math.min(100, Math.round((sludgeActual / sludgeCap) * 100)) : 0;
@@ -4082,42 +4083,68 @@ function buildModalBody(v) {
       ${robHtml}
       ${voyageHtml}
       ${nextHtml}
-      <div class="cert-section" style="margin-top:12px;padding:10px 12px 12px;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">Sludge Tank</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div class="cert-section" style="margin-top:12px;padding:10px 12px 10px;">
+        <!-- ── SLUDGE ── -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#0d9488;text-transform:uppercase;">🛢 Sludge</span>
+          ${sludge._ts ? `<span style="font-size:9px;color:var(--text3);">saved ${escHtml(new Date(sludge._ts).toLocaleDateString('en-GB'))}</span>` : ''}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
           <div>
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">Capacity (m³)</div>
-            <div style="display:flex;align-items:center;border:1px solid var(--border2);border-radius:6px;overflow:hidden;background:#fff;">
-              <input id="sludge_cap" type="number" min="0" step="0.1" placeholder="0.0"
-                value="${escAttr(sludge.cap)}"
-                oninput="sludgeUpdatePct()"
-                style="border:none;outline:none;background:transparent;padding:7px 10px;font-size:14px;font-weight:600;color:var(--text);font-family:'Barlow',sans-serif;width:100%;">
-              <span style="padding:0 8px;font-size:11px;font-weight:700;color:var(--text3);background:var(--navy2);border-left:1px solid var(--border2);white-space:nowrap;">m³</span>
+            <div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:3px;">Capacity (m³)</div>
+            <div style="display:flex;align-items:center;border:1px solid var(--border2);border-radius:5px;overflow:hidden;background:var(--input-bg);">
+              <input id="sludge_cap" type="number" min="0" step="0.1" placeholder="0.0" value="${escAttr(sludge.cap||'')}" oninput="sludgeUpdatePct()" style="border:none;outline:none;background:transparent;padding:5px 8px;font-size:13px;font-weight:600;color:var(--text);font-family:'Barlow',sans-serif;width:100%;">
+              <span style="padding:0 6px;font-size:10px;font-weight:700;color:var(--text3);background:var(--navy2);border-left:1px solid var(--border2);">m³</span>
             </div>
           </div>
           <div>
-            <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;">Actual (m³)</div>
-            <div style="display:flex;align-items:center;border:1px solid var(--border2);border-radius:6px;overflow:hidden;background:#fff;">
-              <input id="sludge_actual" type="number" min="0" step="0.1" placeholder="0.0"
-                value="${escAttr(sludge.actual)}"
-                oninput="sludgeUpdatePct()"
-                style="border:none;outline:none;background:transparent;padding:7px 10px;font-size:14px;font-weight:600;color:var(--text);font-family:'Barlow',sans-serif;width:100%;">
-              <span style="padding:0 8px;font-size:11px;font-weight:700;color:var(--text3);background:var(--navy2);border-left:1px solid var(--border2);white-space:nowrap;">m³</span>
+            <div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:3px;">Actual (m³)</div>
+            <div style="display:flex;align-items:center;border:1px solid var(--border2);border-radius:5px;overflow:hidden;background:var(--input-bg);">
+              <input id="sludge_actual" type="number" min="0" step="0.1" placeholder="0.0" value="${escAttr(sludge.actual||'')}" oninput="sludgeUpdatePct()" style="border:none;outline:none;background:transparent;padding:5px 8px;font-size:13px;font-weight:600;color:var(--text);font-family:'Barlow',sans-serif;width:100%;">
+              <span style="padding:0 6px;font-size:10px;font-weight:700;color:var(--text3);background:var(--navy2);border-left:1px solid var(--border2);">m³</span>
             </div>
           </div>
         </div>
-        <div style="background:var(--navy2);border-radius:6px;height:8px;overflow:hidden;margin-bottom:8px;">
-          <div id="sludge_bar" style="height:100%;border-radius:6px;transition:width .4s,background .4s;width:${sludgeCap > 0 ? sludgePct : 0}%;background:${sludgeColor};"></div>
+        <div style="background:var(--navy2);border-radius:4px;height:5px;overflow:hidden;margin-bottom:5px;">
+          <div id="sludge_bar" style="height:100%;border-radius:4px;transition:width .4s,background .4s;width:${sludgeCap > 0 ? sludgePct : 0}%;background:${sludgeColor};"></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div id="sludge_pct" style="font-size:12px;color:var(--text3);">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+          <div>
+            <div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:3px;">Last Disposal Date</div>
+            <input id="sludge_disp_date" type="date" value="${escAttr(sludge.dispDate||'')}" style="width:100%;border:1px solid var(--border2);border-radius:5px;padding:5px 7px;font-size:12px;color:var(--text);background:var(--input-bg);outline:none;box-sizing:border-box;">
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:3px;">Disposal Place</div>
+            <input id="sludge_disp_place" type="text" placeholder="Port name..." value="${escAttr(sludge.dispPlace||'')}" style="width:100%;border:1px solid var(--border2);border-radius:5px;padding:5px 7px;font-size:12px;color:var(--text);background:var(--input-bg);outline:none;box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div id="sludge_pct" style="font-size:11px;color:var(--text3);">
             ${sludgeCap > 0 ? `<span style="font-weight:800;color:${sludgeColor};">${sludgePct}%</span> full` : '—'}
           </div>
-          <div style="display:flex;gap:6px;align-items:center;">
-            ${sludge._ts ? `<span style="font-size:10px;color:var(--text3);">⏱ ${escHtml(new Date(sludge._ts).toLocaleDateString('en-GB'))}</span>` : ''}
-            <button onclick="saveSludgeFromModal('${escAttr(v.name)}')"
-              style="background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;cursor:pointer;">Save</button>
+          <button onclick="saveSludgeFromModal('${escAttr(v.name)}')" style="background:var(--accent);color:#fff;border:none;padding:5px 12px;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px;">Save</button>
+        </div>
+
+        <!-- Divider -->
+        <div style="border-top:1px solid var(--border);margin-bottom:8px;"></div>
+
+        <!-- ── GARBAGE ── -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#d97706;text-transform:uppercase;">🗑 Garbage</span>
+          ${garbage._ts ? `<span style="font-size:9px;color:var(--text3);">saved ${escHtml(new Date(garbage._ts).toLocaleDateString('en-GB'))}</span>` : ''}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+          <div>
+            <div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:3px;">Last Disposal Date</div>
+            <input id="garbage_disp_date" type="date" value="${escAttr(garbage.dispDate||'')}" style="width:100%;border:1px solid var(--border2);border-radius:5px;padding:5px 7px;font-size:12px;color:var(--text);background:var(--input-bg);outline:none;box-sizing:border-box;">
           </div>
+          <div>
+            <div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:3px;">Disposal Place</div>
+            <input id="garbage_disp_place" type="text" placeholder="Port name..." value="${escAttr(garbage.dispPlace||'')}" style="width:100%;border:1px solid var(--border2);border-radius:5px;padding:5px 7px;font-size:12px;color:var(--text);background:var(--input-bg);outline:none;box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;">
+          <button onclick="saveGarbageFromModal('${escAttr(v.name)}')" style="background:#d97706;color:#fff;border:none;padding:5px 12px;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px;">Save</button>
         </div>
       </div>
       <div class="cert-section" style="margin-top:8px;padding:14px 16px 16px;">
@@ -4246,11 +4273,18 @@ function saveCertsFromModal(vesselName) {
 function cobKey(vessel)       { return 'yasa_cob_' + canonicalize(vessel); }
 function loadCob(vessel)      { try { return JSON.parse(localStorage.getItem(cobKey(vessel)) || 'null') || { amount: '', _ts: '' }; } catch(e) { return { amount: '', _ts: '' }; } }
 function sludgeKey(vessel)    { return 'yasa_sludge_' + canonicalize(vessel); }
-function loadSludge(vessel)   { try { return JSON.parse(localStorage.getItem(sludgeKey(vessel)) || 'null') || { cap: '', actual: '', _ts: '' }; } catch(e) { return { cap: '', actual: '', _ts: '' }; } }
-function saveSludgeLocal(vessel, cap, actual) {
-  const data = { cap: cap, actual: actual, _ts: new Date().toISOString() };
+function loadSludge(vessel)   { try { return JSON.parse(localStorage.getItem(sludgeKey(vessel)) || 'null') || {}; } catch(e) { return {}; } }
+function saveSludgeLocal(vessel, data) {
+  data._ts = new Date().toISOString();
   localStorage.setItem(sludgeKey(vessel), JSON.stringify(data));
   cloudSave().catch(e => console.warn('Cloud save (sludge) failed:', e));
+}
+function garbageKey(vessel)    { return 'yasa_garbage_' + canonicalize(vessel); }
+function loadGarbage(vessel)   { try { return JSON.parse(localStorage.getItem(garbageKey(vessel)) || 'null') || {}; } catch(e) { return {}; } }
+function saveGarbageLocal(vessel, data) {
+  data._ts = new Date().toISOString();
+  localStorage.setItem(garbageKey(vessel), JSON.stringify(data));
+  cloudSave().catch(e => console.warn('Cloud save (garbage) failed:', e));
 }
 function saveCobLocal(vessel, amount) {
   const data = { amount: String(amount || ''), _ts: new Date().toISOString() };
@@ -4258,13 +4292,25 @@ function saveCobLocal(vessel, amount) {
   cloudSave().catch(e => console.warn('Cloud save (cob) failed:', e));
 }
 window.saveSludgeFromModal = function(vesselName) {
-  const capEl    = document.getElementById('sludge_cap');
-  const actualEl = document.getElementById('sludge_actual');
-  if (!capEl || !actualEl) return;
-  saveSludgeLocal(vesselName, capEl.value.trim(), actualEl.value.trim());
-  // Update percentage display
+  const existing = loadSludge(vesselName);
+  const data = Object.assign({}, existing, {
+    cap:         (document.getElementById('sludge_cap')?.value    || '').trim(),
+    actual:      (document.getElementById('sludge_actual')?.value || '').trim(),
+    dispDate:    (document.getElementById('sludge_disp_date')?.value || '').trim(),
+    dispPlace:   (document.getElementById('sludge_disp_place')?.value|| '').trim(),
+  });
+  saveSludgeLocal(vesselName, data);
   sludgeUpdatePct();
   showToast('Sludge saved!', 'success');
+};
+window.saveGarbageFromModal = function(vesselName) {
+  const existing = loadGarbage(vesselName);
+  const data = Object.assign({}, existing, {
+    dispDate:    (document.getElementById('garbage_disp_date')?.value || '').trim(),
+    dispPlace:   (document.getElementById('garbage_disp_place')?.value|| '').trim(),
+  });
+  saveGarbageLocal(vesselName, data);
+  showToast('Garbage record saved!', 'success');
 };
 window.sludgeUpdatePct = function() {
   const capEl    = document.getElementById('sludge_cap');
@@ -5641,6 +5687,11 @@ function _buildSnapshot() {
     const raw = localStorage.getItem(sludgeKey(v));
     if (raw) { try { sludgeData[v] = JSON.parse(raw); } catch(e) {} }
   });
+  const garbageData = {};
+  VESSELS_ALL.forEach(v => {
+    const raw = localStorage.getItem(garbageKey(v));
+    if (raw) { try { garbageData[v] = JSON.parse(raw); } catch(e) {} }
+  });
   return {
     vessels:        allVessels,
     reportFileName,
@@ -5651,6 +5702,7 @@ function _buildSnapshot() {
     certs:          certData,
     cob:            cobData,
     sludge:         sludgeData,
+    garbage:        garbageData,
     todos:          (function() {
       var t = {};
       VESSELS_ALL.forEach(function(v) {
@@ -5896,6 +5948,17 @@ function _mergeSnapshots(cloud, local) {
     merged.certs[v] = mergedCert;
   });
 
+  // Merge Garbage: per-vessel last-write-wins using _ts
+  const cloudGarbage = cloud.garbage || {};
+  const localGarbage = local.garbage || {};
+  merged.garbage = {};
+  new Set([...Object.keys(cloudGarbage), ...Object.keys(localGarbage)]).forEach(v => {
+    const cg = cloudGarbage[v]; const lg = localGarbage[v];
+    if (!cg) { merged.garbage[v] = lg; return; }
+    if (!lg) { merged.garbage[v] = cg; return; }
+    merged.garbage[v] = new Date(lg._ts||0) >= new Date(cg._ts||0) ? lg : cg;
+  });
+
   // Merge Sludge: per-vessel last-write-wins using _ts
   const cloudSludge = cloud.sludge || {};
   const localSludge = local.sludge || {};
@@ -6124,6 +6187,16 @@ function _applySnapshotSilent(merged) {
   // Sludge
   if (merged.sludge) {
     Object.keys(merged.sludge).forEach(function(v) { localStorage.setItem(sludgeKey(v), JSON.stringify(merged.sludge[v])); });
+  }
+  // Garbage
+  if (merged.garbage) {
+    Object.keys(merged.garbage).forEach(function(v) { localStorage.setItem(garbageKey(v), JSON.stringify(merged.garbage[v])); });
+  }
+    // Garbage
+  if (merged.garbage) {
+    Object.keys(merged.garbage).forEach(function(v) {
+      localStorage.setItem(garbageKey(v), JSON.stringify(merged.garbage[v]));
+    });
   }
   // COB
   if (merged.cob) {
