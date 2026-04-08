@@ -3741,6 +3741,8 @@ function str(v) {
 function renderAll() {
   renderStats();
   renderVessels();
+  // Supabase Storage'dan gemi fotoğraflarını sync et
+  setTimeout(function() { vesselPhotosSyncFromCloud(); }, 2000);
   rebuildDropdowns();
   renderAlertPanel();
   document.getElementById('vesselCountBadge').textContent = allVessels.length;
@@ -5872,6 +5874,7 @@ function _buildSnapshot() {
     cob:            cobData,
     sludge:         sludgeData,
     garbage:        garbageData,
+    // photos: Supabase Storage'da (JSON payload'a dahil değil)
     todos:          (function() {
       var t = {};
       VESSELS_ALL.forEach(function(v) {
@@ -6377,12 +6380,6 @@ function _applySnapshotSilent(merged) {
   // Garbage
   if (merged.garbage) {
     Object.keys(merged.garbage).forEach(function(v) { localStorage.setItem(garbageKey(v), JSON.stringify(merged.garbage[v])); });
-  }
-    // Garbage
-  if (merged.garbage) {
-    Object.keys(merged.garbage).forEach(function(v) {
-      localStorage.setItem(garbageKey(v), JSON.stringify(merged.garbage[v]));
-    });
   }
   // COB
   if (merged.cob) {
@@ -7501,8 +7498,11 @@ function mnCardHTML(m) {
     '</div></div>';
 }
 
-function vesselPhotoKey(name) { return 'yasa_photo_' + canonicalize(name); }
+var PHOTO_BUCKET = 'vessel-photos';
 
+function vesselPhotoKey(name) { return 'yasa_photo_url_' + canonicalize(name); }
+
+// Fotoğraf URL'sini localStorage'dan oku (Supabase Storage URL'si)
 function vesselPhotoLoad(vesselName) {
   try { return localStorage.getItem(vesselPhotoKey(vesselName)) || ''; } catch(e) { return ''; }
 }
@@ -7511,9 +7511,9 @@ function vesselPhotoApply(vesselName) {
   var img = document.getElementById('vesselPhotoImg');
   var ph  = document.getElementById('vesselPhotoPlaceholder');
   if (!img || !ph) return;
-  var data = vesselPhotoLoad(vesselName);
-  if (data) {
-    img.src = data;
+  var url = vesselPhotoLoad(vesselName);
+  if (url) {
+    img.src = url;
     img.style.display = 'block';
     ph.style.display  = 'none';
   } else {
@@ -7521,6 +7521,29 @@ function vesselPhotoApply(vesselName) {
     img.style.display = 'none';
     ph.style.display  = 'flex';
   }
+}
+
+// Supabase Storage'dan tüm gemilerin fotoğraf URL'lerini çek ve localStorage'a yaz
+async function vesselPhotosSyncFromCloud() {
+  try {
+    var listUrl = SUPABASE_URL + '/storage/v1/object/list/' + PHOTO_BUCKET;
+    var resp = await fetch(listUrl, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prefix: '', limit: 200 })
+    });
+    if (!resp.ok) return;
+    var files = await resp.json();
+    (files || []).forEach(function(f) {
+      if (!f.name) return;
+      var publicUrl = SUPABASE_URL + '/storage/v1/object/public/' + PHOTO_BUCKET + '/' + f.name;
+      // Dosya adı = canonicalize(vesselName).jpg
+      var vname = f.name.replace(/\.jpg$/, '');
+      localStorage.setItem('yasa_photo_url_' + vname, publicUrl + '?t=' + (f.updated_at || ''));
+    });
+    // Açık modal varsa güncelle
+    if (activeVessel) vesselPhotoApply(activeVessel.name);
+  } catch(e) { /* sessizce geç */ }
 }
 
 window.vesselPhotoUpload = function() {
@@ -7533,28 +7556,49 @@ window.vesselPhotoChanged = function(inp) {
   var file = inp.files[0];
   var reader = new FileReader();
   reader.onload = function(e) {
-    // Resmi canvas ile küçült (max 400px genişlik, JPEG %70)
-    var img = new Image();
-    img.onload = function() {
+    var imgEl = new Image();
+    imgEl.onload = async function() {
+      // Compress: max 600px, JPEG %75
       var canvas = document.createElement('canvas');
-      var maxW = 400, maxH = 250;
-      var ratio = Math.min(maxW / img.width, maxH / img.height, 1);
-      canvas.width  = Math.round(img.width  * ratio);
-      canvas.height = Math.round(img.height * ratio);
-      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-      var compressed = canvas.toDataURL('image/jpeg', 0.70);
-      try {
-        localStorage.setItem(vesselPhotoKey(activeVessel.name), compressed);
-      } catch(err) {
-        showToast('Photo too large for storage', 'error'); return;
-      }
-      vesselPhotoApply(activeVessel.name);
-      showToast('Vessel photo saved!', 'success');
+      var maxW = 600, maxH = 350;
+      var ratio = Math.min(maxW / imgEl.width, maxH / imgEl.height, 1);
+      canvas.width  = Math.round(imgEl.width  * ratio);
+      canvas.height = Math.round(imgEl.height * ratio);
+      canvas.getContext('2d').drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+
+      // Canvas → Blob
+      canvas.toBlob(async function(blob) {
+        if (!blob) { showToast('Image conversion failed', 'error'); return; }
+        var fileName = canonicalize(activeVessel.name) + '.jpg';
+        var uploadUrl = SUPABASE_URL + '/storage/v1/object/' + PHOTO_BUCKET + '/' + fileName;
+        try {
+          showToast('Uploading photo...', 'info');
+          var resp = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+              'Content-Type': 'image/jpeg',
+              'x-upsert': 'true'
+            },
+            body: blob
+          });
+          if (!resp.ok) { showToast('Upload failed: ' + resp.status, 'error'); return; }
+          // Public URL'yi kaydet
+          var publicUrl = SUPABASE_URL + '/storage/v1/object/public/' + PHOTO_BUCKET + '/' + fileName;
+          var urlWithTs = publicUrl + '?t=' + Date.now();
+          localStorage.setItem(vesselPhotoKey(activeVessel.name), urlWithTs);
+          vesselPhotoApply(activeVessel.name);
+          showToast('Vessel photo uploaded!', 'success');
+        } catch(err) {
+          showToast('Upload error: ' + err.message, 'error');
+        }
+      }, 'image/jpeg', 0.75);
     };
-    img.src = e.target.result;
+    imgEl.src = e.target.result;
   };
   reader.readAsDataURL(file);
-  inp.value = ''; // reset
+  inp.value = '';
 };
 
 function exportVesselPDF() {
