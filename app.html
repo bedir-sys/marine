@@ -275,6 +275,7 @@ body {
   display: flex;
   gap: 0;
   overflow-x: auto;
+  overflow-y: visible;
   box-shadow: 0 2px 6px rgba(37,99,235,0.12);
   position: sticky;
   top: 64px;
@@ -320,6 +321,40 @@ body {
 .tab.active .tab-badge {
   background: rgba(37,99,235,0.12);
   color: var(--accent);
+}
+
+/* WIP / Under Construction tabs */
+.tab.tab-wip {
+  opacity: 0.45;
+  position: relative;
+}
+.tab.tab-wip:hover {
+  opacity: 0.72;
+  color: var(--text2);
+  background: rgba(0,0,0,0.04);
+}
+.tab.tab-wip::after {
+  content: 'Under Construction';
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #334155;
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 250;
+}
+.tab.tab-wip:hover::after {
+  opacity: 1;
 }
 
 /* MAIN CONTENT */
@@ -2459,6 +2494,107 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
 /* ── PAGE VISIBILITY ── */
 .page { display:none; }
 .page.active { display:block; }
+
+/* ══ INSPECTIONS MODULE ══════════════════════════════════════ */
+.insp-toolbar {
+  position: sticky; top: 106px; z-index: 100;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  padding: 14px 20px; display: flex; align-items: center;
+  gap: 14px; flex-wrap: wrap;
+}
+.insp-vessel-sel {
+  padding: 8px 12px; border: 1px solid var(--border2); border-radius: 8px;
+  background: var(--navy2); color: var(--text); font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 600; outline: none; cursor: pointer; min-width: 240px;
+}
+.insp-type-bar {
+  display: flex; gap: 4px; flex-wrap: wrap;
+}
+.insp-type-tab {
+  padding: 7px 14px; border: 1px solid var(--border2); border-radius: 20px;
+  background: var(--navy2); color: var(--text2); font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  white-space: nowrap;
+}
+.insp-type-tab:hover { border-color: var(--accent); color: var(--accent); }
+.insp-type-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.insp-content { padding: 20px; max-width: 1100px; }
+.insp-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  margin-bottom: 10px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.06);
+  transition: box-shadow 0.15s;
+}
+.insp-card:hover { box-shadow: 0 4px 16px rgba(37,99,235,0.12); }
+.insp-card-header {
+  display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+  cursor: pointer; user-select: none;
+}
+.insp-card-left { flex: 1; min-width: 0; }
+.insp-card-title {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700;
+  color: var(--text); margin-bottom: 4px;
+}
+.insp-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.insp-meta-date { font-size: 12px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+.insp-badge {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px; letter-spacing: 0.03em;
+}
+.insp-badge-open     { background: rgba(220,38,38,.1);   color: #dc2626; }
+.insp-badge-closed   { background: rgba(22,163,74,.1);   color: #16a34a; }
+.insp-badge-empty    { background: rgba(100,116,139,.1); color: var(--text3); }
+.insp-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.insp-chevron { font-size: 16px; color: var(--text3); transition: transform 0.2s; }
+.insp-chevron.open { transform: rotate(180deg); }
+.insp-card-body { border-top: 1px solid var(--border); }
+
+/* Findings table */
+.insp-findings-table { width: 100%; }
+.insp-findings-head, .insp-finding-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 130px 140px 70px;
+  align-items: center; gap: 0;
+}
+.insp-findings-head {
+  background: var(--navy3); border-bottom: 1px solid var(--border);
+  padding: 6px 0;
+}
+.insp-findings-head .insp-fcol {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3);
+  padding: 4px 10px;
+}
+.insp-finding-row {
+  border-bottom: 1px solid var(--border); transition: background 0.1s;
+}
+.insp-finding-row:last-child { border-bottom: none; }
+.insp-finding-row:hover { background: rgba(241,245,249,0.7); }
+.insp-finding-row.is-closed { opacity: 0.6; }
+.insp-fcol { padding: 9px 10px; font-size: 13px; color: var(--text); }
+.insp-fcol-num { color: var(--text3); font-family: 'JetBrains Mono', monospace; font-size: 12px; text-align: center; padding: 9px 4px; }
+.insp-fcol-text { line-height: 1.45; word-break: break-word; }
+.insp-date-input {
+  padding: 4px 7px; border: 1px solid var(--border2); border-radius: 6px;
+  font-size: 12px; color: var(--text); background: var(--input-bg);
+  font-family: 'JetBrains Mono', monospace; outline: none; width: 110px;
+}
+.insp-date-input:focus { border-color: var(--accent); }
+.insp-date-input:disabled { opacity: 0.4; cursor: not-allowed; }
+.insp-status-sel {
+  padding: 4px 6px; border: 1px solid var(--border2); border-radius: 6px;
+  font-size: 12px; background: var(--input-bg); color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 600; outline: none; cursor: pointer; width: 100%;
+}
+.insp-sel-open        { border-color: rgba(220,38,38,.4);  color: #dc2626; }
+.insp-sel-in_progress { border-color: rgba(217,119,6,.4);  color: #d97706; }
+.insp-sel-closed      { border-color: rgba(22,163,74,.4);  color: #16a34a; }
+.insp-finding-btn {
+  background: none; border: none; cursor: pointer; padding: 4px 6px;
+  border-radius: 4px; color: var(--text3); font-size: 13px; transition: all 0.1s;
+}
+.insp-finding-btn:hover { background: var(--navy3); color: var(--accent); }
+.insp-del-btn:hover { color: #dc2626 !important; background: rgba(220,38,38,.08) !important; }
 </style>
 </head>
 <body>
@@ -2505,14 +2641,15 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
     Vessel Notes
     <span class="tab-badge" id="vesselCountBadge">0</span>
   </div>
+  <div class="tab" onclick="switchTab('inspections', this)">🔍 Inspections</div>
   <div class="tab" onclick="switchTab('meeting-notes', this)">📝 Meeting Notes
     <span class="tab-badge" id="meetingCountBadge" style="display:none">0</span>
   </div>
-  <div class="tab" onclick="switchTab('lsa-ffe', this)">🛟 LSA &amp; FFE Survey<span class="tab-uc">🚧</span></div>
-  <div class="tab" onclick="switchTab('emission', this)">🌿 Emission Calculation<span class="tab-uc">🚧</span></div>
-  <div class="tab" onclick="switchTab('orders', this)">📋 Order Follow<span class="tab-uc">🚧</span></div>
   <div class="tab" onclick="switchTab('stock', this)">📦 Stock Tracker</div>
   <div class="tab" onclick="peRequestAccess(this)">💰 Port Expenses</div>
+  <div class="tab tab-wip" onclick="switchTab('lsa-ffe', this)">🛟 LSA &amp; FFE Survey</div>
+  <div class="tab tab-wip" onclick="switchTab('emission', this)">🌿 Emission Calculation</div>
+  <div class="tab tab-wip" onclick="switchTab('orders', this)">📋 Order Follow</div>
   <div class="tab" onclick="switchTab('settings', this)" style="margin-left:auto;">⚙ Settings</div>
 </div>
 
@@ -3486,6 +3623,7 @@ function switchTab(id, el) {
   if (id === 'emission') emInit();
   if (id === 'meeting-notes') mnRender();
   if (id === 'orders') ordInit();
+  if (id === 'inspections') inspInit();
   if (id === 'stock')  stockInit();
   if (id === 'port-expenses') peInit();
 }
@@ -4505,14 +4643,16 @@ function buildNotesTabs(v, n, vn) {
   const hasWatch    = CATS.some(c => (c.data?.items||[]).some(it => it.priority==='watch' && it.text));
   const notesDot    = hasCritical ? '<span class="ntab-dot ntab-dot-critical"></span>' : hasWatch ? '<span class="ntab-dot ntab-dot-watch"></span>' : '';
 
-  let todoCount = 0, antbiCount = 0;
-  try { todoCount  = (JSON.parse(localStorage.getItem('yasa_todos_' + vn) || '[]')).filter(i=>!i.done).length; } catch(e){}
-  try { antbiCount = (JSON.parse(localStorage.getItem('yasa_antbi_' + vn) || '[]')).filter(i=>!i.done).length; } catch(e){}
+  let todoCount = 0;
+  try { todoCount = (JSON.parse(localStorage.getItem('yasa_todos_' + vn) || '[]')).filter(i=>!i.done).length; } catch(e){}
+
+  // Findings tab kaldırıldı — veriler Inspections modülüne taşındı
+  // _activeNoteTab 'findings' ise 'notes'e düşür
+  if (_activeNoteTab === 'findings') _activeNoteTab = 'notes';
 
   const tabs = [
-    { id:'notes',    cls:'ntab-notes', icon:'📝', label:'Notes',    badge: totalNotes, dot: notesDot },
-    { id:'findings', cls:'ntab-find',  icon:'⚠️', label:'Findings', badge: antbiCount, dot: antbiCount>0 ? '<span class="ntab-dot ntab-dot-critical"></span>':''},
-    { id:'todo',     cls:'ntab-td',    icon:'✅', label:'To-Do',    badge: todoCount,  dot: todoCount>0  ? '<span class="ntab-dot ntab-dot-watch"></span>':''},
+    { id:'notes', cls:'ntab-notes', icon:'📝', label:'Notes', badge: totalNotes, dot: notesDot },
+    { id:'todo',  cls:'ntab-td',   icon:'✅', label:'To-Do', badge: todoCount,  dot: todoCount>0 ? '<span class="ntab-dot ntab-dot-watch"></span>':''},
   ];
 
   const tabBar = `<div class="ntab-bar">
@@ -4548,13 +4688,11 @@ function buildNotesTabs(v, n, vn) {
     </div>
   </div>`;
 
-  const findActive = (_activeNoteTab === 'findings') ? ' active' : '';
-  const todoActive = (_activeNoteTab === 'todo')     ? ' active' : '';
+  const todoActive = (_activeNoteTab === 'todo') ? ' active' : '';
 
   return `${tabBar}
     ${notesPane}
-    <div class="ntab-pane${findActive}" id="ntab_findings" style="padding:16px 16px 24px;">${buildAntbiSection(vn)}</div>
-    <div class="ntab-pane${todoActive}"  id="ntab_todo"     style="padding:16px 16px 24px;">${buildTodoSection(vn)}</div>`;
+    <div class="ntab-pane${todoActive}" id="ntab_todo" style="padding:16px 16px 24px;">${buildTodoSection(vn)}</div>`;
 }
 
 function switchNotesTab(cat, el) {
@@ -5590,14 +5728,18 @@ async function _writeCloud(data) {
 }
 
 // ── Save local state to cloud ─────────────────────────────────
-async function cloudSave() {
-  if (!_cloudReady) return;
-  // Debounce: her yeni çağrı önceki timer'ı sıfırlar.
-  // _isSaving guard'ı KASITLI kaldırıldı — kayıt devam ederken gelen
-  // yeni değişiklikler de debounce sonrası kaydedilmeli.
+// ── Debounce wrapper (sync, zombie-promise yok) ───────────────
+// Her çağrı timer'ı sıfırlar ve hemen resolved bir Promise döner.
+// Asıl kayıt _doCloudSave() ile yapılır — böylece eski çağrılar
+// asılı await'te beklemez, bellek sızıntısı olmaz.
+function cloudSave() {
+  if (!_cloudReady) return Promise.resolve();
   if (_saveTimer) clearTimeout(_saveTimer);
-  await new Promise(function(resolve) { _saveTimer = setTimeout(resolve, 500); });
-  _saveTimer = null;
+  _saveTimer = setTimeout(function() { _saveTimer = null; _doCloudSave(); }, 500);
+  return Promise.resolve();
+}
+
+async function _doCloudSave() {
   if (_isSaving) {
     // Kayıt bitince tekrar dene — son değer kaybolmasın
     _pendingSave = true;
@@ -5638,7 +5780,8 @@ async function cloudSave() {
     }
   } finally {
     _isSaving = false;
-    if (_pendingSave) { _pendingSave = false; cloudSave(); }
+    // Debounce beklemeden doğrudan tekrar dene (gecikme istemiyoruz)
+    if (_pendingSave) { _pendingSave = false; _doCloudSave(); }
   }
 }
 
@@ -5928,6 +6071,55 @@ function _buildSnapshot() {
       egemar: localStorage.getItem('yasa_gas_egemar_override')
     },
     noteTombstones: noteTombstones,
+    // ── Bug 2 Fix: Port Expenses cloud sync ──────────────────────
+    portExpenses: (function() {
+      return {
+        records: (typeof peRecords === 'function' ? peRecords() : []),
+        opts:    (typeof peOpts    === 'function' ? peOpts()    : {}),
+        seeded:  !!_peLs('yasa_pe_v1')  // seed flag — fresh cihazda re-seed önler
+      };
+    })(),
+    // ── Bug 4 Fix: Orders cloud sync ─────────────────────────────
+    orders: (typeof ordLoad === 'function' ? ordLoad() : []),
+    // ── Bug 4 Fix: Emission data cloud sync ──────────────────────
+    emission: (function() {
+      var em = {};
+      var EM_SYNC_YEARS = [2025, 2026, 2027, 2028, 2029, 2030];
+      VESSELS_ALL.forEach(function(v) {
+        EM_SYNC_YEARS.forEach(function(y) {
+          var dr = null, vr = null;
+          try { dr = JSON.parse(localStorage.getItem(emKey(v, y)) || 'null'); } catch(e) {}
+          try { vr = JSON.parse(localStorage.getItem(voyKey(v, y)) || 'null'); } catch(e) {}
+          if (dr || vr) {
+            var key = canonicalize(v) + '_' + y;
+            em[key] = { data: dr, voyages: vr };
+          }
+        });
+      });
+      return em;
+    })(),
+    // ── Inspections cloud sync ────────────────────────────────────
+    inspections: (function() {
+      var ins = {};
+      var ITYPES = ['company','psc','class','flag','rightship'];
+      VESSELS_ALL.forEach(function(v) {
+        var vn = canonicalize(v);
+        var migrated = !!localStorage.getItem(inspMigKey(vn));
+        var hasData  = false;
+        var vdata    = {};
+        ITYPES.forEach(function(type) {
+          var arr = inspLoad(type, vn);
+          if (arr.length) { vdata[type] = arr; hasData = true; }
+          var tomb = inspTombLoad(type, vn);
+          if (Object.keys(tomb).length) { vdata['_tomb_'+type] = tomb; hasData = true; }
+        });
+        if (hasData || migrated) {
+          if (migrated) vdata._mig = 1;
+          ins[vn] = vdata;
+        }
+      });
+      return ins;
+    })(),
     lastModifiedBy: _currentUser || 'unknown',
     lastModified:   new Date().toISOString()
   };
@@ -6286,6 +6478,86 @@ function _mergeSnapshots(cloud, local) {
     merged.gasOverrides = cloud.gasOverrides || {};
   }
 
+  // ── Bug 2 Fix: Port Expenses merge (per-record LWW by updatedAt) ──
+  const cloudPe = cloud.portExpenses || { records: [], opts: {} };
+  const localPe = local.portExpenses || { records: [], opts: {} };
+  const peMap = {};
+  [...(cloudPe.records || []), ...(localPe.records || [])].forEach(function(r) {
+    if (!r || !r.id) return;
+    const ex = peMap[r.id];
+    // peSave() → addedAt, peSaveEdit() → updatedAt kullanıyor; ikisine de bak
+    const rTs  = new Date(r.updatedAt  || r.addedAt  || r.savedAt  || 0).getTime();
+    const exTs = ex ? new Date(ex.updatedAt || ex.addedAt || ex.savedAt || 0).getTime() : -1;
+    if (!ex || rTs >= exTs) peMap[r.id] = r;
+  });
+  merged.portExpenses = {
+    records: Object.values(peMap),
+    seeded:  !!(cloudPe.seeded || localPe.seeded),  // ya birinde seed yapıldıysa flag aktif
+    opts: {
+      ports:       [...new Set([...(cloudPe.opts && cloudPe.opts.ports       || []), ...(localPe.opts && localPe.opts.ports       || [])])].sort(),
+      countries:   [...new Set([...(cloudPe.opts && cloudPe.opts.countries   || []), ...(localPe.opts && localPe.opts.countries   || [])])].sort(),
+      authorities: [...new Set([...(cloudPe.opts && cloudPe.opts.authorities || []), ...(localPe.opts && localPe.opts.authorities || [])])].sort()
+    }
+  };
+
+  // ── Bug 4 Fix: Orders merge (per-record LWW by savedAt) ──────────
+  const cloudOrd = cloud.orders || [];
+  const localOrd = local.orders || [];
+  const ordMergeMap = {};
+  [...cloudOrd, ...localOrd].forEach(function(r) {
+    if (!r || !r.id) return;
+    const ex = ordMergeMap[r.id];
+    if (!ex || new Date(r.savedAt || 0) >= new Date(ex.savedAt || 0)) ordMergeMap[r.id] = r;
+  });
+  merged.orders = Object.values(ordMergeMap);
+
+  // ── Bug 4 Fix: Emission merge (per vessel+year snapshot-level LWW) ─
+  const cloudEm = cloud.emission || {};
+  const localEm = local.emission || {};
+  merged.emission = {};
+  new Set([...Object.keys(cloudEm), ...Object.keys(localEm)]).forEach(function(key) {
+    const ce = cloudEm[key]; const le = localEm[key];
+    if (!ce) { merged.emission[key] = le; return; }
+    if (!le) { merged.emission[key] = ce; return; }
+    merged.emission[key] = localSnapshotTs >= cloudSnapshotTs ? le : ce;
+  });
+
+  // ── Inspections merge: per-inspection LWW by updatedAt ───────────
+  const cloudIns = cloud.inspections || {};
+  const localIns = local.inspections || {};
+  const ITYPES   = ['company','psc','class','flag','rightship'];
+  merged.inspections = {};
+  new Set([...Object.keys(cloudIns), ...Object.keys(localIns)]).forEach(function(vn) {
+    const cv = cloudIns[vn] || {};
+    const lv = localIns[vn] || {};
+    const vdata = { _mig: cv._mig || lv._mig || 0 };
+    ITYPES.forEach(function(type) {
+      // ── Merge tombstones: union, en büyük timestamp kazanır ──
+      const cTomb = cv['_tomb_'+type] || {};
+      const lTomb = lv['_tomb_'+type] || {};
+      const mergedTomb = {};
+      new Set([...Object.keys(cTomb), ...Object.keys(lTomb)]).forEach(function(id) {
+        mergedTomb[id] = Math.max(cTomb[id]||0, lTomb[id]||0);
+      });
+      if (Object.keys(mergedTomb).length) vdata['_tomb_'+type] = mergedTomb;
+      // ── Merge records: tombstone filtreli LWW ────────────────
+      const cArr = cv[type] || [];
+      const lArr = lv[type] || [];
+      const map  = {};
+      [...cArr, ...lArr].forEach(function(rec) {
+        if (!rec || !rec.id) return;
+        // Tombstone kontrolü: silme zamanı son güncelleme zamanından sonrası ise atla
+        const deletedAt = mergedTomb[rec.id] || 0;
+        if (deletedAt && deletedAt >= new Date(rec.updatedAt||0).getTime()) return;
+        const ex = map[rec.id];
+        if (!ex || new Date(rec.updatedAt||0) >= new Date(ex.updatedAt||0)) map[rec.id] = rec;
+      });
+      const arr = Object.values(map);
+      if (arr.length) vdata[type] = arr;
+    });
+    merged.inspections[vn] = vdata;
+  });
+
   merged.lastModifiedBy = _currentUser || 'unknown';
   merged.lastModified   = new Date().toISOString();
   return merged;
@@ -6423,6 +6695,40 @@ function _applySnapshotSilent(merged) {
     if (merged.gasOverrides.egemar) localStorage.setItem('yasa_gas_egemar_override', merged.gasOverrides.egemar);
     else localStorage.removeItem('yasa_gas_egemar_override');
   }
+  // ── Bug 2 Fix: Port Expenses restore ─────────────────────────
+  if (merged.portExpenses) {
+    if (merged.portExpenses.records) _peSt('yasa_pe', merged.portExpenses.records);
+    if (merged.portExpenses.opts)    _peSt('yasa_pe_opts', merged.portExpenses.opts);
+    // Seed flag: fresh cihazda _peSeed() tekrar çalışıp silinen kayıtları geri getirmesin
+    if (merged.portExpenses.seeded)  _peSt('yasa_pe_v1', 1);
+  }
+  // ── Bug 4 Fix: Orders restore ─────────────────────────────────
+  if (merged.orders) {
+    localStorage.setItem('yasa_orders', JSON.stringify(merged.orders));
+  }
+  // ── Bug 4 Fix: Emission restore ───────────────────────────────
+  if (merged.emission) {
+    Object.keys(merged.emission).forEach(function(key) {
+      var em = merged.emission[key];
+      if (!em) return;
+      if (em.data)    localStorage.setItem('em_data_' + key, JSON.stringify(em.data));
+      if (em.voyages) localStorage.setItem('em_voy_'  + key, JSON.stringify(em.voyages));
+    });
+  }
+  // ── Inspections restore ───────────────────────────────────────
+  if (merged.inspections) {
+    var _itypes = ['company','psc','class','flag','rightship'];
+    Object.keys(merged.inspections).forEach(function(vn) {
+      var vdata = merged.inspections[vn];
+      if (!vdata) return;
+      _itypes.forEach(function(type) {
+        // Tombstone'ları önce yaz — kayıtlar restore edildiğinde silinmişler filtreli kalsın
+        if (vdata['_tomb_'+type]) localStorage.setItem(inspTombKey(type, vn), JSON.stringify(vdata['_tomb_'+type]));
+        if (vdata[type]) localStorage.setItem(inspKey(type, vn), JSON.stringify(vdata[type]));
+      });
+      if (vdata._mig) localStorage.setItem(inspMigKey(vn), '1');
+    });
+  }
 }
 
 // ── Apply snapshot to local state + UI ───────────────────────
@@ -6536,6 +6842,52 @@ function _applySnapshot(cloudData) {
   if (typeof gasRenderList === 'function') {
     gasRenderStats();
     gasRenderList();
+  }
+
+  // ── Bug 2 Fix: Port Expenses restore + UI ────────────────────
+  if (merged.portExpenses) {
+    if (merged.portExpenses.records) _peSt('yasa_pe', merged.portExpenses.records);
+    if (merged.portExpenses.opts)    _peSt('yasa_pe_opts', merged.portExpenses.opts);
+    if (merged.portExpenses.seeded)  _peSt('yasa_pe_v1', 1);
+    // Sadece PE tab açıksa ve kilit yoksa re-render et
+    if (typeof peRender === 'function' && typeof _peUnlocked !== 'undefined' && _peUnlocked) {
+      try { peRender(); } catch(e) {}
+    }
+  }
+
+  // ── Bug 4 Fix: Orders restore + UI ───────────────────────────
+  if (merged.orders) {
+    localStorage.setItem('yasa_orders', JSON.stringify(merged.orders));
+    if (typeof ordRender === 'function') {
+      try { ordRender(); } catch(e) {}
+    }
+  }
+
+  // ── Bug 4 Fix: Emission restore ───────────────────────────────
+  // Emission UI kendi load fonksiyonunu açılışta çağırır;
+  // burada sadece localStorage'ı güncelliyoruz.
+  if (merged.emission) {
+    Object.keys(merged.emission).forEach(function(key) {
+      var em = merged.emission[key];
+      if (!em) return;
+      if (em.data)    localStorage.setItem('em_data_' + key, JSON.stringify(em.data));
+      if (em.voyages) localStorage.setItem('em_voy_'  + key, JSON.stringify(em.voyages));
+    });
+  }
+
+  // ── Inspections restore + UI ──────────────────────────────────
+  if (merged.inspections) {
+    var _itypes = ['company','psc','class','flag','rightship'];
+    Object.keys(merged.inspections).forEach(function(vn) {
+      var vdata = merged.inspections[vn];
+      if (!vdata) return;
+      _itypes.forEach(function(type) {
+        if (vdata['_tomb_'+type]) localStorage.setItem(inspTombKey(type, vn), JSON.stringify(vdata['_tomb_'+type]));
+        if (vdata[type]) localStorage.setItem(inspKey(type, vn), JSON.stringify(vdata[type]));
+      });
+      if (vdata._mig) localStorage.setItem(inspMigKey(vn), '1');
+    });
+    if (typeof inspRender === 'function') { try { inspRender(); } catch(e) {} }
   }
 
   // Re-render everything
@@ -6963,17 +7315,19 @@ function _antbiParseText(raw) {
   var hasNums = false;
 
   // First pass: detect if text has manual numbering
+  // Handles: "1. text", "1) text", "(1) text", "1- text"  ← hyphen added
   lines.forEach(function(l) {
-    if (/^\(?\s*\d+\s*[.)]\s*\S/.test(l.trim())) hasNums = true;
+    if (/^\(?\s*\d+\s*[-.)]\s*\S/.test(l.trim())) hasNums = true;
   });
 
   if (hasNums) {
-    // Numbered mode: merge continuation lines
+    // Numbered mode: merge continuation lines, strip leading number
     var curNum = null;
     lines.forEach(function(line) {
       var trim = line.trim();
       if (!trim) return;
-      var m = trim.match(/^\(?\s*(\d+)\s*[.)]\s*(.*)/);
+      // Match "1. ", "1) ", "(1) ", "1- ", "1 - "  ← hyphen added
+      var m = trim.match(/^\(?\s*(\d+)\s*[-.)]\s*(.*)/);
       if (m) {
         if (curNum !== null && curBuf.length) {
           var t = curBuf.join(' ').replace(/\s+/g, ' ').trim();
@@ -6991,6 +7345,7 @@ function _antbiParseText(raw) {
     }
   } else {
     // Un-numbered mode: each non-empty line = one item
+    // Still strip any leading "N- " or "N. " prefix that slipped through
     lines.forEach(function(line) {
       var trim = line.replace(/\s+/g, ' ').trim();
       if (trim.length > 2) items.push(trim);
@@ -10650,6 +11005,33 @@ body.dark .ord-content-text{background:#181818;}
 
 </div>
 
+<!-- ════════════════════ INSPECTIONS ════════════════════════ -->
+<div id="page-inspections" class="page">
+
+  <!-- Toolbar -->
+  <div class="insp-toolbar">
+    <select id="inspVesselSel" class="insp-vessel-sel" onchange="inspOnVesselChange()">
+      <option value="">— Select Vessel —</option>
+    </select>
+    <div class="insp-type-bar" id="inspTypeBar">
+      <button class="insp-type-tab active" data-type="company"   onclick="inspOnTypeChange('company')">🏢 Company</button>
+      <button class="insp-type-tab"        data-type="psc"       onclick="inspOnTypeChange('psc')">⚓ PSC</button>
+      <button class="insp-type-tab"        data-type="class"     onclick="inspOnTypeChange('class')">🔧 Class</button>
+      <button class="insp-type-tab"        data-type="flag"      onclick="inspOnTypeChange('flag')">🚩 Flag</button>
+      <button class="insp-type-tab"        data-type="rightship" onclick="inspOnTypeChange('rightship')">⭐ Rightship</button>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="inspNewRecord()" style="margin-left:auto;padding:8px 18px;">+ New Inspection</button>
+    <!-- RightShip import — paste-based, her ortamda çalışır (file:// dahil) -->
+    <button id="inspPdfImportBtn" style="display:none;padding:8px 16px;background:linear-gradient(135deg,#e55b20,#c04010);color:#fff;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.04em;" onclick="inspOpenRightShipPaste()">
+      📋 Import RightShip Report
+    </button>
+  </div>
+  <div class="insp-content" id="inspContent">
+    <div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Select a vessel to view inspections</div></div>
+  </div>
+
+</div>
+
 <!-- ════════════════════════ STOCK TRACKER ════════════════════════ -->
 <div id="page-stock" class="page">
 <div style="padding:20px 24px 80px;max-width:1400px;">
@@ -11077,6 +11459,1021 @@ body.dark .pe-modal-footer{background:#181818;}
 
 <script>
 // ══════════════════════════════════════════════════════════════════
+//  INSPECTIONS MODULE
+//  5 inspection types: Company (migrated from ANTBI), PSC, Class,
+//  Flag, Rightship. Each type stores an array of inspection instances
+//  (title + date + findings list) per vessel.
+//  Storage: yasa_insp_{type}_{vn}
+//  Migration: yasa_insp_mig_{vn} (one-time flag per vessel)
+// ══════════════════════════════════════════════════════════════════
+
+const INSP_TYPES = [
+  { id:'company',   label:'Company Inspection',  icon:'🏢', color:'#2563eb' },
+  { id:'psc',       label:'PSC Inspection',       icon:'⚓', color:'#7c3aed' },
+  { id:'class',     label:'Class Inspection',     icon:'🔧', color:'#0d9488' },
+  { id:'flag',      label:'Flag Inspection',       icon:'🚩', color:'#dc2626' },
+  { id:'rightship', label:'Rightship Inspection', icon:'⭐', color:'#d97706' }
+];
+
+let _inspVessel = '';
+let _inspType   = 'company';
+const _inspExpanded = new Set();
+
+// ── Storage helpers ───────────────────────────────────────────
+// ── Finding text display cleaner ─────────────────────────────
+// "1- Funnel plates..."  → "Funnel plates..."   (strip Word list numbers)
+// "NCR-1 MAIN ENGINE..." → "NCR-1 MAIN ENGINE..." (NCR prefix korunur — harf ile başlar)
+// "[3.13] Water..."      → "[3.13] Water..."   (RightShip ref korunur)
+function _cleanFindingText(text) {
+  if (!text) return text;
+  // Sadece saf rakam + separator ile başlayanları temizle
+  // \d+ → bir veya daha fazla rakam (NCR-, harf içerenler tutulur)
+  return text.replace(/^\d+\s*[-.)]\s+/, '').trim();
+}
+
+function inspKey(type, vn)        { return 'yasa_insp_' + type + '_' + vn; }
+function inspMigKey(vn)           { return 'yasa_insp_mig_' + vn; }
+function inspTombKey(type, vn)    { return 'yasa_insp_tomb_' + type + '_' + vn; }
+function inspLoad(type, vn)       { try { return JSON.parse(localStorage.getItem(inspKey(type,vn))||'[]'); } catch(e){ return []; } }
+function inspSave(type, vn, arr)  { localStorage.setItem(inspKey(type,vn), JSON.stringify(arr)); cloudSave().catch(function(){}); }
+function inspTombLoad(type, vn)   { try { return JSON.parse(localStorage.getItem(inspTombKey(type,vn))||'{}'); } catch(e){ return {}; } }
+function inspTombAdd(type, vn, id){ var t=inspTombLoad(type,vn); t[id]=Date.now(); localStorage.setItem(inspTombKey(type,vn), JSON.stringify(t)); }
+
+// ── One-time migration: ANTBI → Company Inspection ───────────
+function inspMigrateCompany(vn) {
+  if (localStorage.getItem(inspMigKey(vn))) return;
+  // Don't overwrite if company data already exists
+  var existing = inspLoad('company', vn);
+  if (existing.length > 0) { localStorage.setItem(inspMigKey(vn), '1'); return; }
+  var lists = antbiListsLoad(vn);   // yasa_antbi_lists_{vn}
+  var items = antbiLoad(vn);        // yasa_antbi_{vn}
+  if (!lists.length && !items.length) {
+    // Cloud henüz yüklenmediyse flag'i set etme — sonraki deneme için bekle.
+    // Cloud hazırsa gerçekten boş, flag set edilebilir.
+    if (!_cloudReady) return;
+    localStorage.setItem(inspMigKey(vn), '1'); return;
+  }
+  var knownIds = new Set(lists.map(function(l){ return l.id; }));
+  // Convert each ANTBI list → inspection instance
+  var migrated = lists.map(function(lst) {
+    var findings = items
+      .filter(function(it){ return it.listId === lst.id; })
+      .map(function(it){ return {
+        id: it.id || ('f_'+Date.now()+'_'+Math.random().toString(36).slice(2,5)),
+        text: it.text || '',
+        status: it.done ? 'closed' : 'open',
+        dueDate: it.dueDate || '',
+        closedAt: it.closedAt || '',
+        createdAt: it.createdAt || '',
+        updatedAt: new Date().toISOString()
+      }; });
+    return {
+      id: lst.id,
+      title: lst.title || 'Company Inspection',
+      date: lst.inspectionDate || '',
+      findings: findings,
+      createdAt: lst.createdAt || '',
+      updatedAt: lst.updatedAt || new Date().toISOString()
+    };
+  });
+  // Orphan items (no listId or listId not in any list)
+  var orphans = items.filter(function(it){ return !it.listId || !knownIds.has(it.listId); });
+  if (orphans.length) {
+    migrated.push({
+      id: 'insp_mig_orphan_' + vn,
+      title: 'General Findings',
+      date: '',
+      findings: orphans.map(function(it){ return {
+        id: it.id || ('f_'+Date.now()+'_'+Math.random().toString(36).slice(2,5)),
+        text: it.text || '',
+        status: it.done ? 'closed' : 'open',
+        dueDate: it.dueDate || '',
+        closedAt: it.closedAt || '',
+        createdAt: '',
+        updatedAt: new Date().toISOString()
+      }; }),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+  }
+  if (migrated.length) inspSave('company', vn, migrated);
+  localStorage.setItem(inspMigKey(vn), '1');
+}
+
+// ── Init (called when tab opens) ──────────────────────────────
+function inspInit() {
+  var sel = document.getElementById('inspVesselSel');
+  if (!sel) return;
+  var cur = _inspVessel;
+  sel.innerHTML = '<option value="">— Select Vessel —</option>'
+    + VESSELS_ALL.map(function(v){
+        return '<option value="'+escAttr(v)+'"'+(v===cur?' selected':'')+'>'+escHtml(v)+'</option>';
+      }).join('');
+  inspRender();
+}
+
+function inspOnVesselChange() {
+  var sel = document.getElementById('inspVesselSel');
+  _inspVessel = sel ? sel.value : '';
+  if (_inspVessel) {
+    var vn = canonicalize(_inspVessel);
+    inspMigrateCompany(vn);
+  }
+  inspRender();
+}
+
+function inspOnTypeChange(type) {
+  _inspType = type;
+  document.querySelectorAll('.insp-type-tab').forEach(function(b){
+    b.classList.toggle('active', b.dataset.type === type);
+  });
+  // PDF import butonu sadece Rightship tipinde görünür
+  var pdfBtn = document.getElementById('inspPdfImportBtn');
+  if (pdfBtn) pdfBtn.style.display = (type === 'rightship') ? '' : 'none';
+  inspRender();
+}
+
+// ── Render ────────────────────────────────────────────────────
+function inspRender() {
+  var el = document.getElementById('inspContent');
+  if (!el) return;
+  if (!_inspVessel) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Select a vessel to view inspections</div></div>';
+    return;
+  }
+  var vn = canonicalize(_inspVessel);
+  var typeInfo = INSP_TYPES.find(function(t){ return t.id===_inspType; }) || INSP_TYPES[0];
+  var records = inspLoad(_inspType, vn);
+  if (!records.length) {
+    var emptyExtra = (_inspType === 'rightship')
+      ? '<div style="margin-top:8px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">'
+        + '<button class="btn btn-primary" onclick="inspNewRecord()" style="padding:10px 22px;">+ Add First Inspection</button>'
+        + '<button style="padding:10px 18px;background:linear-gradient(135deg,#e55b20,#c04010);color:#fff;border:none;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;" onclick="inspOpenRightShipPaste()">📋 Import RightShip Report</button>'
+        + '</div>'
+      : '<div style="margin-top:12px;"><button class="btn btn-primary" onclick="inspNewRecord()" style="padding:10px 22px;">+ Add First Inspection</button></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-icon">'+typeInfo.icon+'</div>'
+      +'<div class="empty-text">No '+escHtml(typeInfo.label)+' records for '+escHtml(_inspVessel)+'</div>'
+      + emptyExtra + '</div>';
+    return;
+  }
+  var sorted = records.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+  el.innerHTML = sorted.map(function(rec){ return _inspCardHtml(vn, rec); }).join('');
+}
+
+function _inspCardHtml(vn, rec) {
+  var openCount   = (rec.findings||[]).filter(function(f){ return f.status !== 'closed'; }).length;
+  var closedCount = (rec.findings||[]).filter(function(f){ return f.status === 'closed'; }).length;
+  var total       = (rec.findings||[]).length;
+  var isExp = _inspExpanded.has(rec.id);
+  var dateStr = rec.date
+    ? new Date(rec.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
+    : '—';
+  var evn = escAttr(vn); var eid = escAttr(rec.id);
+  return '<div class="insp-card" id="inspCard_'+eid+'">'
+    +'<div class="insp-card-header" onclick="inspToggleCard(\''+eid+'\')">'
+    +  '<div class="insp-card-left">'
+    +    '<div class="insp-card-title">'+escHtml(rec.title)+'</div>'
+    +    '<div class="insp-card-meta">'
+    +      '<span class="insp-meta-date">📅 '+dateStr+'</span>'
+    +      (openCount   ? '<span class="insp-badge insp-badge-open">'+openCount+' open</span>'     : '')
+    +      (closedCount ? '<span class="insp-badge insp-badge-closed">'+closedCount+' closed</span>': '')
+    +      (!total      ? '<span class="insp-badge insp-badge-empty">No findings</span>'            : '')
+    +    '</div>'
+    +  '</div>'
+    +  '<div class="insp-card-actions" onclick="event.stopPropagation()">'
+    +    '<button class="btn btn-sm btn-outline" onclick="inspEditRecord(\''+evn+'\',\''+eid+'\')">✎ Edit</button>'
+    +    '<button class="btn btn-sm btn-outline" onclick="inspExportPDF(\''+evn+'\',\''+eid+'\')" title="Export PDF" style="color:#dc2626;border-color:rgba(220,38,38,.4);">⬇ PDF</button>'
+    +    '<button class="btn btn-sm" style="background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.3);" onclick="inspDeleteRecord(\''+evn+'\',\''+eid+'\')">🗑</button>'
+    +  '</div>'
+    +  '<div class="insp-chevron'+(isExp?' open':'')+'">▾</div>'
+    +'</div>'
+    +(isExp
+      ? '<div class="insp-card-body">'
+        + _inspFindingsHtml(evn, eid, rec)
+        + '<div style="padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;">'
+        +   '<button class="btn btn-outline btn-sm" onclick="inspAddFinding(\''+evn+'\',\''+eid+'\')">+ Add Finding</button>'
+        +   '<button style="background:rgba(37,99,235,.07);color:#2563eb;border:1px solid rgba(37,99,235,.25);font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;" onclick="inspPasteFindings(\''+evn+'\',\''+eid+'\')">📋 Paste from Word</button>'
+        + '</div>'
+        +'</div>'
+      : '')
+    +'</div>';
+}
+
+function _inspFindingsHtml(evn, eid, rec) {
+  var findings = (rec.findings||[]).slice().sort(function(a,b){
+    var order = {open:0,in_progress:1,closed:2};
+    return (order[a.status]||0)-(order[b.status]||0);
+  });
+  if (!findings.length) {
+    return '<div style="padding:18px;color:var(--text3);font-size:13px;text-align:center;">No findings recorded. Click "+ Add Finding" to start.</div>';
+  }
+  return '<div class="insp-findings-table">'
+    +'<div class="insp-findings-head">'
+    +  '<div class="insp-fcol insp-fcol-num">#</div>'
+    +  '<div class="insp-fcol insp-fcol-text">Finding</div>'
+    +  '<div class="insp-fcol insp-fcol-due">Target Date</div>'
+    +  '<div class="insp-fcol insp-fcol-status">Status</div>'
+    +  '<div class="insp-fcol insp-fcol-act"></div>'
+    +'</div>'
+    + findings.map(function(f,i){ return _inspFindingRowHtml(evn, eid, f, i+1); }).join('')
+    +'</div>';
+}
+
+function _inspFindingRowHtml(evn, eid, f, num) {
+  var fid = escAttr(f.id);
+  var isClosed = f.status === 'closed';
+  // RightShip findings have a ref (e.g. "2.1") and question stored separately
+  var refBadge = f.ref
+    ? '<span style="display:inline-block;background:rgba(229,91,32,.12);color:#c04010;font-family:\'JetBrains Mono\',monospace;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;margin-right:5px;flex-shrink:0;">'+escHtml(f.ref)+'</span>'
+    : '';
+  var questionTip = f.question
+    ? ' title="'+escAttr(f.question)+'"'
+    : '';
+  // Display-level cleanup: "1- Funnel..." → "Funnel..." (NCR-1, [3.13] dokunulmaz)
+  var displayText = _cleanFindingText(f.text || '');
+  return '<div class="insp-finding-row insp-fstatus-'+(f.status||'open')+(isClosed?' is-closed':'')+'">'
+    +'<div class="insp-fcol insp-fcol-num">'+num+'</div>'
+    +'<div class="insp-fcol insp-fcol-text"'+questionTip+' style="display:flex;align-items:flex-start;gap:4px;">'+refBadge+'<span>'+escHtml(displayText)+'</span></div>'
+    +'<div class="insp-fcol insp-fcol-due">'
+    +  '<input type="date" class="insp-date-input" value="'+escAttr(f.dueDate||'')+'"'
+    +         ' onchange="inspSetDueDate(\''+evn+'\',\''+eid+'\',\''+fid+'\',this.value)"'
+    +         (isClosed?' disabled':'')+' style="width:110px;">'
+    +'</div>'
+    +'<div class="insp-fcol insp-fcol-status">'
+    +  '<select class="insp-status-sel insp-sel-'+(f.status||'open')+'"'
+    +          ' onchange="inspSetStatus(\''+evn+'\',\''+eid+'\',\''+fid+'\',this.value)">'
+    +    '<option value="open"'       +(f.status==='open'?        ' selected':'')+'>🔴 Open</option>'
+    +    '<option value="in_progress"'+(f.status==='in_progress'? ' selected':'')+'>🟡 In Progress</option>'
+    +    '<option value="closed"'     +(f.status==='closed'?      ' selected':'')+'>🟢 Closed</option>'
+    +  '</select>'
+    +'</div>'
+    +'<div class="insp-fcol insp-fcol-act">'
+    +  '<button class="insp-finding-btn" onclick="inspEditFinding(\''+evn+'\',\''+eid+'\',\''+fid+'\')" title="Edit">✎</button>'
+    +  '<button class="insp-finding-btn insp-del-btn" onclick="inspDeleteFinding(\''+evn+'\',\''+eid+'\',\''+fid+'\')" title="Delete">✕</button>'
+    +'</div>'
+    +'</div>';
+}
+
+function inspToggleCard(id) {
+  if (_inspExpanded.has(id)) _inspExpanded.delete(id);
+  else _inspExpanded.add(id);
+  inspRender();
+}
+
+// ── Inspection CRUD ───────────────────────────────────────────
+function inspNewRecord() {
+  if (!_inspVessel) { showToast('Select a vessel first', 'error'); return; }
+  _inspShowRecordModal(null, null, null);
+}
+
+function inspEditRecord(vn, id) {
+  var rec = inspLoad(_inspType, vn).find(function(r){ return r.id===id; });
+  if (!rec) return;
+  _inspShowRecordModal(vn, id, rec);
+}
+
+function _inspShowRecordModal(vn, id, rec) {
+  var isEdit = !!rec;
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.65);z-index:9200;display:flex;align-items:center;justify-content:center;padding:20px;';
+  var typeInfo = INSP_TYPES.find(function(t){ return t.id===_inspType; }) || INSP_TYPES[0];
+  overlay.innerHTML = [
+    '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:28px 32px;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(0,0,0,.25);">',
+    '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:800;color:#1e293b;margin-bottom:6px;">',
+    (isEdit?'✎ Edit Inspection':'+ New '+typeInfo.label),
+    '</div>',
+    '<div style="font-size:12px;color:#64748b;margin-bottom:20px;">'+escHtml(_inspVessel)+'</div>',
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:5px;">Title</div>',
+    '<input id="inspModalTitle" type="text" value="'+escAttr(rec?rec.title:'')+'"',
+    ' placeholder="e.g. Q2 2025 Inspection"',
+    ' style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;color:#1e293b;background:#f8fafc;outline:none;margin-bottom:14px;">',
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:5px;">Inspection Date</div>',
+    '<input id="inspModalDate" type="date" value="'+escAttr(rec?rec.date:'')+'"',
+    ' style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;color:#1e293b;background:#f8fafc;outline:none;margin-bottom:20px;">',
+    '<div style="display:flex;gap:10px;justify-content:flex-end;">',
+    '<button id="inspModalCancel" style="padding:9px 20px;background:transparent;border:1px solid #e2e8f0;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;color:#64748b;cursor:pointer;">Cancel</button>',
+    '<button id="inspModalSave" style="padding:9px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">'+(isEdit?'Save Changes':'Create')+'</button>',
+    '</div></div>'
+  ].join('');
+  document.body.appendChild(overlay);
+  setTimeout(function(){ var t=overlay.querySelector('#inspModalTitle'); if(t) t.focus(); }, 40);
+  overlay.querySelector('#inspModalCancel').onclick = function(){ overlay.remove(); };
+  overlay.querySelector('#inspModalSave').onclick = function() {
+    var title = (overlay.querySelector('#inspModalTitle').value||'').trim();
+    var date  = overlay.querySelector('#inspModalDate').value;
+    if (!title) { showToast('Title required','error'); return; }
+    var activeVn  = canonicalize(_inspVessel);
+    var records   = inspLoad(_inspType, activeVn);
+    if (isEdit) {
+      var idx = records.findIndex(function(r){ return r.id===id; });
+      if (idx>=0) { records[idx].title=title; records[idx].date=date; records[idx].updatedAt=new Date().toISOString(); }
+    } else {
+      var newRec = {
+        id: 'insp_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        title: title, date: date, findings: [],
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+      };
+      records.push(newRec);
+      _inspExpanded.add(newRec.id);
+    }
+    inspSave(_inspType, activeVn, records);
+    overlay.remove();
+    inspRender();
+    showToast(isEdit?'Inspection updated':'Inspection created','success');
+  };
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+}
+
+function inspDeleteRecord(vn, id) {
+  if (!confirm('Delete this inspection and all its findings?')) return;
+  inspTombAdd(_inspType, vn, id);                                          // tombstone — merge'de geri gelmez
+  var records = inspLoad(_inspType, vn).filter(function(r){ return r.id!==id; });
+  inspSave(_inspType, vn, records);
+  _inspExpanded.delete(id);
+  inspRender();
+  showToast('Inspection deleted','info');
+}
+
+// ── Finding CRUD ──────────────────────────────────────────────
+function inspAddFinding(vn, inspId) { _inspShowFindingModal(vn, inspId, null, null); }
+
+function inspEditFinding(vn, inspId, findId) {
+  var records = inspLoad(_inspType, vn);
+  var rec = records.find(function(r){ return r.id===inspId; });
+  if (!rec) return;
+  var finding = (rec.findings||[]).find(function(f){ return f.id===findId; });
+  if (!finding) return;
+  _inspShowFindingModal(vn, inspId, findId, finding);
+}
+
+function _inspShowFindingModal(vn, inspId, findId, finding) {
+  var isEdit = !!finding;
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.65);z-index:9300;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = [
+    '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:28px 32px;width:100%;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,.25);">',
+    '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:800;color:#1e293b;margin-bottom:18px;">',
+    (isEdit?'✎ Edit Finding':'+ Add Finding'),
+    '</div>',
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:5px;">Finding Description</div>',
+    '<textarea id="inspFindText" rows="4" placeholder="Describe the finding..."',
+    ' style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;color:#1e293b;background:#f8fafc;outline:none;resize:vertical;margin-bottom:14px;font-family:\'Barlow\',sans-serif;">'+escHtml(finding?finding.text:'')+'</textarea>',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">',
+    '<div>',
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:5px;">Target Date</div>',
+    '<input id="inspFindDue" type="date" value="'+escAttr(finding?finding.dueDate||'':'')+'"',
+    ' style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;color:#1e293b;background:#f8fafc;outline:none;">',
+    '</div><div>',
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:5px;">Status</div>',
+    '<select id="inspFindStatus" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;color:#1e293b;background:#f8fafc;outline:none;">',
+    '<option value="open"'        +((finding?finding.status:'open')==='open'?        ' selected':'')+'>🔴 Open</option>',
+    '<option value="in_progress"' +((finding?finding.status:'')==='in_progress'?     ' selected':'')+'>🟡 In Progress</option>',
+    '<option value="closed"'      +((finding?finding.status:'')==='closed'?          ' selected':'')+'>🟢 Closed</option>',
+    '</select></div></div>',
+    '<div style="display:flex;gap:10px;justify-content:flex-end;">',
+    '<button id="inspFindCancel" style="padding:9px 20px;background:transparent;border:1px solid #e2e8f0;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;color:#64748b;cursor:pointer;">Cancel</button>',
+    '<button id="inspFindSave" style="padding:9px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">'+(isEdit?'Save':'Add Finding')+'</button>',
+    '</div></div>'
+  ].join('');
+  document.body.appendChild(overlay);
+  setTimeout(function(){ var ta=overlay.querySelector('#inspFindText'); if(ta) ta.focus(); }, 40);
+  overlay.querySelector('#inspFindCancel').onclick = function(){ overlay.remove(); };
+  overlay.querySelector('#inspFindSave').onclick = function() {
+    var text   = (overlay.querySelector('#inspFindText').value||'').trim();
+    var due    = overlay.querySelector('#inspFindDue').value;
+    var status = overlay.querySelector('#inspFindStatus').value;
+    if (!text) { showToast('Finding description required','error'); return; }
+    var records = inspLoad(_inspType, vn);
+    var recIdx  = records.findIndex(function(r){ return r.id===inspId; });
+    if (recIdx < 0) return;
+    var findings = records[recIdx].findings || [];
+    if (isEdit) {
+      var fIdx = findings.findIndex(function(f){ return f.id===findId; });
+      if (fIdx>=0) {
+        findings[fIdx].text    = text;
+        findings[fIdx].dueDate = due;
+        findings[fIdx].status  = status;
+        findings[fIdx].updatedAt = new Date().toISOString();
+        if (status==='closed' && !findings[fIdx].closedAt) findings[fIdx].closedAt = new Date().toISOString();
+      }
+    } else {
+      findings.push({
+        id: 'f_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        text: text, dueDate: due, status: status,
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+      });
+    }
+    records[recIdx].findings  = findings;
+    records[recIdx].updatedAt = new Date().toISOString();
+    inspSave(_inspType, vn, records);
+    overlay.remove();
+    _inspExpanded.add(inspId);
+    inspRender();
+    showToast(isEdit?'Finding updated':'Finding added','success');
+  };
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+}
+
+function inspSetStatus(vn, inspId, findId, status) {
+  var records = inspLoad(_inspType, vn);
+  var rec = records.find(function(r){ return r.id===inspId; });
+  if (!rec) return;
+  var f = (rec.findings||[]).find(function(f){ return f.id===findId; });
+  if (!f) return;
+  f.status = status;
+  f.updatedAt = new Date().toISOString();
+  if (status==='closed' && !f.closedAt) f.closedAt = new Date().toISOString();
+  rec.updatedAt = new Date().toISOString();
+  inspSave(_inspType, vn, records);
+  _inspExpanded.add(inspId);
+  inspRender();
+}
+
+function inspSetDueDate(vn, inspId, findId, date) {
+  var records = inspLoad(_inspType, vn);
+  var rec = records.find(function(r){ return r.id===inspId; });
+  if (!rec) return;
+  var f = (rec.findings||[]).find(function(f){ return f.id===findId; });
+  if (!f) return;
+  f.dueDate   = date;
+  f.updatedAt = new Date().toISOString();
+  rec.updatedAt = new Date().toISOString();
+  inspSave(_inspType, vn, records);
+}
+
+function inspDeleteFinding(vn, inspId, findId) {
+  if (!confirm('Delete this finding?')) return;
+  var records = inspLoad(_inspType, vn);
+  var rec = records.find(function(r){ return r.id===inspId; });
+  if (!rec) return;
+  rec.findings  = (rec.findings||[]).filter(function(f){ return f.id!==findId; });
+  rec.updatedAt = new Date().toISOString();
+  inspSave(_inspType, vn, records);
+  _inspExpanded.add(inspId);
+  inspRender();
+  showToast('Finding deleted','info');
+}
+
+// ── RightShip Report Import (paste-based) ────────────────────
+// PDF dosyası yükleme yerine metin yapıştırma yöntemi:
+// Kullanıcı RightShip PDF'ini tarayıcıda açar, Ctrl+A → Ctrl+C,
+// buraya yapıştırır. file:// protokolünde de %100 çalışır.
+
+function inspOpenRightShipPaste() {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = [
+    '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:0;width:100%;max-width:640px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.3);">',
+
+    // Header
+    '<div style="padding:18px 26px;border-bottom:1px solid #e2e8f0;background:linear-gradient(135deg,#e55b20,#c04010);border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:space-between;">',
+    '<div>',
+    '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:19px;font-weight:800;color:#fff;">⭐ RightShip Report Import</div>',
+    '<div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:2px;">Findings listesini PDF\'den kopyalayıp yapıştırın</div>',
+    '</div>',
+    '<button id="rsCloseBtn" style="background:none;border:none;color:rgba(255,255,255,.8);font-size:20px;cursor:pointer;padding:4px 8px;">✕</button>',
+    '</div>',
+
+    // Instructions
+    '<div style="padding:14px 26px;background:#fff8f5;border-bottom:1px solid #e2e8f0;">',
+    '<div style="font-size:12px;color:#7c3a10;line-height:1.6;">',
+    '<b>Nasıl yapılır:</b> RightShip PDF\'ini Chrome/Edge\'de açın &nbsp;→&nbsp; <kbd style="background:#fff;border:1px solid #ddd;padding:1px 5px;border-radius:3px;font-size:11px;">Ctrl+A</kbd> ile tümünü seçin &nbsp;→&nbsp; <kbd style="background:#fff;border:1px solid #ddd;padding:1px 5px;border-radius:3px;font-size:11px;">Ctrl+C</kbd> ile kopyalayın &nbsp;→&nbsp; aşağıya yapıştırın',
+    '</div>',
+    '</div>',
+
+    // Textarea
+    '<div style="flex:1;overflow:auto;padding:16px 26px;">',
+    '<textarea id="rsImportTA" rows="12" placeholder="RightShip PDF metnini buraya yapıştırın (Ctrl+V)..." ',
+    'style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#1e293b;background:#f8fafc;outline:none;resize:vertical;font-family:\'Courier New\',monospace;line-height:1.5;"></textarea>',
+    '</div>',
+
+    // Footer
+    '<div style="padding:14px 26px;border-top:1px solid #e2e8f0;display:flex;gap:10px;justify-content:flex-end;">',
+    '<button id="rsCancelBtn" style="padding:9px 20px;background:transparent;border:1px solid #e2e8f0;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;color:#64748b;cursor:pointer;">İptal</button>',
+    '<button id="rsParseBtn" style="padding:9px 22px;background:linear-gradient(135deg,#e55b20,#c04010);color:#fff;border:none;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Parse & Önizle →</button>',
+    '</div>',
+    '</div>'
+  ].join('');
+
+  document.body.appendChild(overlay);
+  setTimeout(function(){ var ta = overlay.querySelector('#rsImportTA'); if(ta) ta.focus(); }, 50);
+
+  overlay.querySelector('#rsCloseBtn').onclick  = function(){ overlay.remove(); };
+  overlay.querySelector('#rsCancelBtn').onclick = function(){ overlay.remove(); };
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+
+  overlay.querySelector('#rsParseBtn').onclick = function() {
+    var raw = (overlay.querySelector('#rsImportTA').value || '').trim();
+    if (!raw) { showToast('Lütfen PDF metnini yapıştırın', 'error'); return; }
+    var parsed = _parseRightShipText(raw);
+    if (!parsed.findings.length) {
+      showToast('Finding bulunamadı — Tam PDF metni yapıştırıldı mı? (Sec. 2.1, 3.7 gibi numaralı maddeler aranıyor)', 'error');
+      return;
+    }
+    overlay.remove();
+    _inspShowRightShipPreview(parsed, 'Pasted text');
+  };
+}
+
+// ── Parse RightShip PDF text ──────────────────────────────────
+function _parseRightShipText(text) {
+  // Normalize whitespace
+  text = text.replace(/\s{2,}/g, ' ').replace(/\s*\n\s*/g, '\n').trim();
+
+  // ── Metadata extraction ──────────────────────────────────────
+  var meta = {};
+  var fields = {
+    vesselName: /Vessel\s*Name[:\s]+([A-Z][A-Z0-9 ]+?)(?=\s*IMO|\s*DOC|\s*Place|\n)/i,
+    imoNumber:  /IMO\s*Number[:\s]+(\d{7,})/i,
+    inspector:  /Name\s*of\s*Inspector[:\s]+([A-Za-z ]+?)(?=\s*Inspection\s*Completion|\n)/i,
+    date:       /Inspection\s*Completion\s*Date[:\s]+([\d\/: AMP]+?)(?=\s*Operational|\n)/i,
+    place:      /Place\s*of\s*Inspection[:\s]+(.+?)(?=\s*Name\s*of\s*Inspector|\n)/i,
+    reportNo:   /Ship\s*Inspection\s*Report\s*[-–]\s*(\d+)/i
+  };
+  Object.keys(fields).forEach(function(k) {
+    var m = text.match(fields[k]);
+    meta[k] = m ? m[1].trim() : '';
+  });
+
+  // ── Parse date to YYYY-MM-DD ─────────────────────────────────
+  meta.dateISO = _rsParseDate(meta.date);
+
+  // ── Try to auto-match vessel ──────────────────────────────────
+  meta.vesselMatched = '';
+  if (meta.vesselName) {
+    var vClean = meta.vesselName.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    meta.vesselMatched = VESSELS_ALL.find(function(v) {
+      return v.toUpperCase().replace(/[^A-Z0-9]/g,'') === vClean;
+    }) || VESSELS_ALL.find(function(v) {
+      var vc = v.toUpperCase().replace(/^M\/V\s*/i,'').replace(/[^A-Z0-9]/g,'');
+      return vc.includes(vClean) || vClean.includes(vc);
+    }) || '';
+  }
+
+  // ── Find findings section ────────────────────────────────────
+  var startIdx = text.search(/Number\s*of\s*Findings\s*:\s*\d+/i);
+  if (startIdx === -1) startIdx = text.search(/Section\s+\d+:/i);
+  var findingSection = startIdx >= 0 ? text.slice(startIdx) : text;
+
+  // Trim at signature page
+  var endMarkers = ["Vessel's Master Name", "Vessel's Master Signature", "Inspector Name", "CONTACT US"];
+  endMarkers.forEach(function(marker) {
+    var idx = findingSection.indexOf(marker);
+    if (idx > 20) findingSection = findingSection.slice(0, idx);
+  });
+
+  // ── Parse individual findings ─────────────────────────────────
+  // Each finding: "X.Y [question text] (M|V)" → "Findings: [text]"
+  var findings = [];
+
+  // Split into lines for processing
+  // Lookbehind pattern updated to handle alphanumeric refs like 9A.1
+  var lines = findingSection.split('\n');
+  var state = 'idle'; // idle | question | findings
+  var curRef = '', curQuestion = '', curFinding = '';
+
+  // ── FIX: regexes updated to handle alphanumeric refs (9A.1, 9A.11 etc.) ──
+  // QSTART: matches "3.13 ...", "9A.1 ...", "9A.11 ...", "14.4 ..." etc.
+  var QSTART  = /^(\d+[A-Za-z]?\.\d+[A-Za-z]?)\s+(.+)/;
+  // SECTION: matches "Section 3:", "Section 9A:", "Section 14:" etc.
+  var SECTION = /^Section\s+\d+[A-Za-z]*:/i;
+  var FLINE   = /^Findings?[:\s]+(.+)/i;
+  var PAGE_FTR= /Findings\s*Report|RightShip\s*-\s*All\s*rights|Page\s+\d+\s+of/i;
+
+  function pushFinding() {
+    if (curRef && curFinding.trim().length > 5) {
+      findings.push({
+        ref:      curRef,
+        // FIX: strip (V), (M), (V & M), (V & M) variants from question end
+        question: curQuestion.replace(/\s+/g,' ').trim()
+                             .replace(/\s*\([VM&\s]+\)\s*$/, '').trim(),
+        text:     curFinding.replace(/\s+/g,' ').trim()
+      });
+    }
+    curRef = ''; curQuestion = ''; curFinding = '';
+  }
+
+  lines.forEach(function(raw) {
+    var line = raw.trim();
+    if (!line || PAGE_FTR.test(line)) return;
+    if (SECTION.test(line)) {
+      // Section header resets state — push any pending finding first
+      if (state === 'findings') pushFinding();
+      else if (state === 'question' && curRef && curQuestion) {
+        // Section header appeared before "Findings:" — rare edge case, discard partial
+        curRef = ''; curQuestion = ''; curFinding = '';
+      }
+      state = 'idle'; return;
+    }
+
+    var qm = line.match(QSTART);
+    var fm = line.match(FLINE);
+
+    if (qm) {
+      // New question ref found — push previous finding if any
+      if (state === 'findings') pushFinding();
+      else if (state === 'question' && curRef) {
+        // Previous question had no "Findings:" line before next question — discard
+        curRef = ''; curQuestion = ''; curFinding = '';
+      }
+      state = 'question';
+      curRef = qm[1]; curQuestion = qm[2]; curFinding = '';
+    } else if (fm && state === 'question') {
+      // "Findings:" marker after question — transition to findings
+      state = 'findings';
+      curFinding = fm[1];
+    } else if (fm && state === 'findings') {
+      // "Findings:" appearing while already in findings state means a new
+      // sub-finding block without a question header (PDF merge artifact).
+      // Append a separator rather than starting a new finding.
+      curFinding += ' — ' + fm[1];
+    } else if (state === 'question') {
+      curQuestion += ' ' + line;
+    } else if (state === 'findings') {
+      curFinding += ' ' + line;
+    }
+  });
+  if (state === 'findings') pushFinding();
+
+  // Post-process: ensure question ends with (M) or (V) if present in text
+  findings.forEach(function(f) {
+    var m = f.text.match(/^(.*?)(\s*\(\s*[MV]\s*\))\s+(.*)/);
+    if (m) {
+      // (M) or (V) is in the finding text — likely belongs to question
+      f.question += ' ' + m[2].trim();
+      f.text = m[3];
+    }
+  });
+
+  return { meta: meta, findings: findings };
+}
+
+function _rsParseDate(dateStr) {
+  if (!dateStr) return '';
+  // "12/15/2025 12:00:00 AM" → "2025-12-15"
+  var m = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!m) return '';
+  return m[3] + '-' + m[1].padStart(2,'0') + '-' + m[2].padStart(2,'0');
+}
+
+// ── RightShip preview modal ───────────────────────────────────
+function _inspShowRightShipPreview(parsed, fileName) {
+  var meta     = parsed.meta;
+  var findings = parsed.findings;
+  var overlay  = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;';
+
+  // Vessel selector options
+  var vesselOptions = '<option value="">— Select Vessel —</option>'
+    + VESSELS_ALL.map(function(v) {
+        var sel = (v === meta.vesselMatched) ? ' selected' : '';
+        return '<option value="'+escAttr(v)+'"'+sel+'>'+escHtml(v)+'</option>';
+      }).join('');
+
+  // Inspection title suggestion
+  var titleSugg = 'RightShip Inspection'
+    + (meta.place ? ' – ' + meta.place : '')
+    + (meta.reportNo ? ' (#' + meta.reportNo + ')' : '');
+
+  var rowsHtml = findings.map(function(f, i) {
+    return '<tr style="border-bottom:1px solid #e2e8f0;">'
+      + '<td style="padding:7px 8px;font-family:\'JetBrains Mono\',monospace;font-size:11px;color:#2563eb;text-align:center;white-space:nowrap;width:36px;">' + escHtml(f.ref) + '</td>'
+      + '<td style="padding:7px 8px;font-size:12px;color:#64748b;max-width:180px;">' + escHtml(f.question.length>80 ? f.question.slice(0,80)+'…' : f.question) + '</td>'
+      + '<td style="padding:7px 8px;font-size:13px;color:#1e293b;">' + escHtml(f.text) + '</td>'
+      + '</tr>';
+  }).join('');
+
+  overlay.innerHTML = [
+    '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:0;width:100%;max-width:900px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.3);">',
+
+    // Header
+    '<div style="padding:18px 28px;border-bottom:1px solid #e2e8f0;background:linear-gradient(135deg,#e55b20,#c04010);border-radius:14px 14px 0 0;">',
+    '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:3px;">⭐ RightShip PDF Import — '+findings.length+' Findings</div>',
+    '<div style="font-size:12px;color:rgba(255,255,255,.8);">'+escHtml(fileName)+(meta.vesselName?' &nbsp;·&nbsp; '+escHtml(meta.vesselName):'')+(meta.date?' &nbsp;·&nbsp; '+escHtml(meta.date):'')+'</div>',
+    '</div>',
+
+    // Config row
+    '<div style="padding:14px 28px;border-bottom:1px solid #e2e8f0;background:#f8fafc;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">',
+
+    '<div>',
+    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:4px;">Vessel</div>',
+    '<select id="rsPrevVessel" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;color:#1e293b;background:#fff;outline:none;">'+vesselOptions+'</select>',
+    '</div>',
+
+    '<div>',
+    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:4px;">Inspection Title</div>',
+    '<input id="rsPrevTitle" type="text" value="'+escAttr(titleSugg)+'" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;color:#1e293b;background:#fff;outline:none;">',
+    '</div>',
+
+    '<div>',
+    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:4px;">Inspection Date</div>',
+    '<input id="rsPrevDate" type="date" value="'+escAttr(meta.dateISO||'')+'" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;color:#1e293b;background:#fff;outline:none;">',
+    '</div>',
+
+    '</div>',
+
+    // Findings table
+    '<div style="overflow-y:auto;flex:1;">',
+    '<table style="width:100%;border-collapse:collapse;">',
+    '<thead><tr style="background:#f1f5f9;position:sticky;top:0;">',
+    '<th style="padding:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;text-align:center;width:48px;">Ref</th>',
+    '<th style="padding:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;text-align:left;width:200px;">Question</th>',
+    '<th style="padding:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;text-align:left;">Finding Text</th>',
+    '</tr></thead>',
+    '<tbody>' + rowsHtml + '</tbody>',
+    '</table>',
+    '</div>',
+
+    // Footer
+    '<div style="padding:14px 28px;border-top:1px solid #e2e8f0;display:flex;gap:10px;justify-content:flex-end;align-items:center;">',
+    '<span style="flex:1;font-size:12px;color:#64748b;">'+findings.length+' finding(s) parsed'+(meta.inspector?' — Inspector: '+escHtml(meta.inspector):'')+'</span>',
+    '<button id="rsPrevCancel" style="padding:9px 20px;background:transparent;border:1px solid #e2e8f0;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;color:#64748b;cursor:pointer;">Cancel</button>',
+    '<button id="rsPrevConfirm" style="padding:9px 22px;background:linear-gradient(135deg,#e55b20,#c04010);color:#fff;border:none;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">✓ Create Inspection & Add '+findings.length+' Findings</button>',
+    '</div>',
+
+    '</div>'
+  ].join('');
+
+  document.body.appendChild(overlay);
+  overlay.querySelector('#rsPrevCancel').onclick  = function(){ overlay.remove(); };
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+
+  overlay.querySelector('#rsPrevConfirm').onclick = function() {
+    var vessel = overlay.querySelector('#rsPrevVessel').value;
+    var title  = (overlay.querySelector('#rsPrevTitle').value||'').trim();
+    var date   = overlay.querySelector('#rsPrevDate').value;
+
+    if (!vessel) { showToast('Please select a vessel', 'error'); return; }
+    if (!title)  { showToast('Inspection title required', 'error'); return; }
+
+    // Switch to rightship type + selected vessel
+    _inspType    = 'rightship';
+    _inspVessel  = vessel;
+    document.querySelectorAll('.insp-type-tab').forEach(function(b){
+      b.classList.toggle('active', b.dataset.type === 'rightship');
+    });
+    var vSel = document.getElementById('inspVesselSel');
+    if (vSel) vSel.value = vessel;
+    var pdfBtn = document.getElementById('inspPdfImportBtn');
+    if (pdfBtn) pdfBtn.style.display = '';
+    inspMigrateCompany(canonicalize(vessel));
+
+    var vn  = canonicalize(vessel);
+    var now = new Date().toISOString();
+    var newInsp = {
+      id: 'insp_rs_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+      title:    title,
+      date:     date,
+      source:   'rightship_pdf',
+      inspector: meta.inspector || '',
+      place:    meta.place || '',
+      reportNo: meta.reportNo || '',
+      findings: findings.map(function(f) {
+        return {
+          id:        'f_rs_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+          text:      '['+f.ref+'] '+f.text,
+          ref:       f.ref,
+          question:  f.question,
+          dueDate:   '',
+          status:    'open',
+          createdAt: now,
+          updatedAt: now
+        };
+      }),
+      createdAt: now,
+      updatedAt: now
+    };
+
+    var records = inspLoad('rightship', vn);
+    records.push(newInsp);
+    inspSave('rightship', vn, records);
+    _inspExpanded.add(newInsp.id);
+
+    overlay.remove();
+    inspRender();
+    showToast('✓ RightShip inspection created with '+findings.length+' findings', 'success');
+  };
+}
+function inspPasteFindings(vn, inspId) {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.65);z-index:9400;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = [
+    '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:28px 32px;width:100%;max-width:580px;box-shadow:0 24px 64px rgba(0,0,0,.25);">',
+    '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:800;color:#1e293b;margin-bottom:6px;">📋 Paste from Word / Text</div>',
+    '<div style="font-size:12px;color:#64748b;margin-bottom:14px;">Numbered list (1., 1-, (1)) veya düz satır formatını destekler. Numaralar otomatik çıkarılır.</div>',
+    '<textarea id="inspPasteTA" rows="10" placeholder="Word\'den kopyaladığınız metni buraya yapıştırın..."',
+    ' style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;color:#1e293b;background:#f8fafc;outline:none;resize:vertical;font-family:\'Barlow\',sans-serif;margin-bottom:16px;"></textarea>',
+    '<div style="display:flex;gap:10px;justify-content:flex-end;">',
+    '<button id="inspPasteCancel" style="padding:9px 20px;background:transparent;border:1px solid #e2e8f0;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;color:#64748b;cursor:pointer;">Cancel</button>',
+    '<button id="inspPasteParse" style="padding:9px 22px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Parse & Preview →</button>',
+    '</div></div>'
+  ].join('');
+  document.body.appendChild(overlay);
+  setTimeout(function(){ var ta=overlay.querySelector('#inspPasteTA'); if(ta) ta.focus(); }, 40);
+  overlay.querySelector('#inspPasteCancel').onclick = function(){ overlay.remove(); };
+  overlay.querySelector('#inspPasteParse').onclick = function() {
+    var raw = (overlay.querySelector('#inspPasteTA').value||'').trim();
+    if (!raw) { showToast('Metin yapıştırın', 'error'); return; }
+    // Reuse ANTBI parser — already strips leading numbers
+    var parsed = _antbiParseText(raw);
+    if (!parsed.length) { showToast('Madde bulunamadı', 'error'); return; }
+    overlay.remove();
+    _inspShowPastePreview(vn, inspId, parsed);
+  };
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+}
+
+function _inspShowPastePreview(vn, inspId, parsed) {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.65);z-index:9400;display:flex;align-items:center;justify-content:center;padding:20px;';
+  var rowsHtml = parsed.map(function(it, i) {
+    return '<tr>'
+      + '<td style="padding:6px 8px;font-family:\'JetBrains Mono\',monospace;font-size:11px;color:#2563eb;text-align:center;white-space:nowrap;">' + (i+1) + '</td>'
+      + '<td style="padding:6px 8px;font-size:13px;color:#1e293b;">' + escHtml(it.text) + '</td>'
+      + '<td style="padding:6px 8px;white-space:nowrap;"><input type="date" id="inspPasteDate_'+i+'" style="padding:4px 7px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#1e293b;background:#f8fafc;" /></td>'
+      + '</tr>';
+  }).join('');
+  overlay.innerHTML = [
+    '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:0;width:100%;max-width:680px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.25);">',
+    '<div style="padding:20px 28px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;">',
+    '<div>',
+    '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:800;color:#1e293b;">'+parsed.length+' Finding Tespit Edildi</div>',
+    '<div style="font-size:12px;color:#64748b;margin-top:3px;">İstenmeyen satırlar için target date boş bırakılabilir — hepsi eklenir.</div>',
+    '</div>',
+    '<button id="inspPreviewClose" style="background:none;border:none;font-size:18px;cursor:pointer;color:#64748b;padding:4px 8px;">✕</button>',
+    '</div>',
+    '<div style="overflow-y:auto;flex:1;">',
+    '<table style="width:100%;border-collapse:collapse;">',
+    '<thead><tr style="background:#f1f5f9;"><th style="padding:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;text-align:center;width:36px;">#</th><th style="padding:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;text-align:left;">Finding</th><th style="padding:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;width:136px;">Target Date</th></tr></thead>',
+    '<tbody>' + rowsHtml + '</tbody>',
+    '</table>',
+    '</div>',
+    '<div style="padding:16px 28px;border-top:1px solid #e2e8f0;display:flex;gap:10px;justify-content:flex-end;">',
+    '<button id="inspPreviewCancel" style="padding:9px 20px;background:transparent;border:1px solid #e2e8f0;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;color:#64748b;cursor:pointer;">Cancel</button>',
+    '<button id="inspPreviewConfirm" style="padding:9px 22px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">✓ Add '+parsed.length+' Findings</button>',
+    '</div></div>'
+  ].join('');
+  document.body.appendChild(overlay);
+  overlay.querySelector('#inspPreviewClose').onclick  = function(){ overlay.remove(); };
+  overlay.querySelector('#inspPreviewCancel').onclick = function(){ overlay.remove(); };
+  overlay.querySelector('#inspPreviewConfirm').onclick = function() {
+    var records = inspLoad(_inspType, vn);
+    var recIdx  = records.findIndex(function(r){ return r.id===inspId; });
+    if (recIdx < 0) { overlay.remove(); return; }
+    var findings = records[recIdx].findings || [];
+    var now = new Date().toISOString();
+    parsed.forEach(function(it, i) {
+      var due = (overlay.querySelector('#inspPasteDate_'+i)||{}).value || '';
+      findings.push({
+        id: 'f_'+Date.now()+'_'+Math.random().toString(36).slice(2,5)+'_'+i,
+        text: it.text,
+        dueDate: due,
+        status: 'open',
+        createdAt: now,
+        updatedAt: now
+      });
+    });
+    records[recIdx].findings  = findings;
+    records[recIdx].updatedAt = now;
+    inspSave(_inspType, vn, records);
+    overlay.remove();
+    _inspExpanded.add(inspId);
+    inspRender();
+    showToast('✓ ' + parsed.length + ' finding eklendi', 'success');
+  };
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+}
+
+// ── Export PDF ────────────────────────────────────────────────
+function inspExportPDF(vn, inspId) {
+  var records = inspLoad(_inspType, vn);
+  var rec = records.find(function(r){ return r.id===inspId; });
+  if (!rec) return;
+  var findings = rec.findings || [];
+  if (!findings.length) { showToast('No findings to export', 'info'); return; }
+
+  var tr = function(s) {
+    return (s||'').replace(/[ğĞ]/g,function(c){return c==='ğ'?'g':'G'})
+                  .replace(/[şŞ]/g,function(c){return c==='ş'?'s':'S'})
+                  .replace(/[ıİ]/g,function(c){return c==='ı'?'i':'I'})
+                  .replace(/[öÖ]/g,function(c){return c==='ö'?'o':'O'})
+                  .replace(/[çÇ]/g,function(c){return c==='ç'?'c':'C'})
+                  .replace(/[üÜ]/g,function(c){return c==='ü'?'u':'U'})
+                  .replace(/<[^>]*>/g,'');
+  };
+
+  var jsPDF    = window.jspdf.jsPDF;
+  var doc      = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  var pageW    = doc.internal.pageSize.getWidth();
+  var margin   = 14;
+  var typeInfo = INSP_TYPES.find(function(t){ return t.id===_inspType; }) || INSP_TYPES[0];
+  var vessel   = allVessels.find(function(v){ return canonicalize(v.name)===vn; }) || {};
+  var marine   = getMarine(vessel.name||vn) || '—';
+  var ops      = getOps(vessel.name||vn)    || '—';
+  var dateStr  = rec.date ? new Date(rec.date+'T00:00:00').toLocaleDateString('en-GB') : '—';
+
+  // ── Header banner ───────────────────────────────────────────
+  doc.setFillColor(30, 58, 138);
+  doc.roundedRect(margin, 10, pageW-margin*2, 22, 3, 3, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(15); doc.setFont('helvetica','bold');
+  doc.text(tr(typeInfo.label.toUpperCase())+' REPORT', margin+4, 22);
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text(tr(vessel.name||vn), margin+4, 28);
+  doc.text('Generated: '+new Date().toLocaleDateString('en-GB'), pageW-margin-2, 28, {align:'right'});
+
+  // ── Inspection info bar ──────────────────────────────────────
+  var y = 38;
+  doc.setFillColor(241,245,249);
+  doc.rect(margin, y, pageW-margin*2, 20, 'F');
+  doc.setTextColor(71,85,105); doc.setFontSize(8);
+  doc.setFont('helvetica','bold');
+  doc.text('Inspection:', margin+2, y+6); doc.setFont('helvetica','normal'); doc.text(tr(rec.title), margin+24, y+6);
+  doc.setFont('helvetica','bold');
+  doc.text('Date:', margin+2, y+13); doc.setFont('helvetica','normal'); doc.text(dateStr, margin+16, y+13);
+  doc.setFont('helvetica','bold');
+  doc.text('Marine Supt:', margin+70, y+6); doc.setFont('helvetica','normal'); doc.text(tr(marine), margin+93, y+6);
+  doc.setFont('helvetica','bold');
+  doc.text('Operator:', margin+70, y+13); doc.setFont('helvetica','normal'); doc.text(tr(ops), margin+88, y+13);
+
+  // ── Stats ───────────────────────────────────────────────────
+  y += 25;
+  var openFindings   = findings.filter(function(f){ return f.status!=='closed'; });
+  var closedFindings = findings.filter(function(f){ return f.status==='closed'; });
+  var inProg         = findings.filter(function(f){ return f.status==='in_progress'; });
+  var statW = (pageW-margin*2)/3;
+  [
+    { label:'TOTAL',       val:findings.length,      bg:[37,99,235],  fg:[255,255,255] },
+    { label:'OPEN',        val:openFindings.length,  bg:[220,38,38],  fg:[255,255,255] },
+    { label:'CLOSED',      val:closedFindings.length,bg:[5,150,105],  fg:[255,255,255] }
+  ].forEach(function(s,i) {
+    doc.setFillColor(s.bg[0],s.bg[1],s.bg[2]);
+    doc.roundedRect(margin+i*statW, y, statW-2, 10, 2, 2, 'F');
+    doc.setTextColor(s.fg[0],s.fg[1],s.fg[2]);
+    doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text(s.label+': '+s.val, margin+i*statW+(statW-2)/2, y+6.5, {align:'center'});
+  });
+
+  var footer = function(data) {
+    doc.setFontSize(7); doc.setTextColor(148,163,184); doc.setFont('helvetica','normal');
+    doc.text('YASA Shipping — Superintendent Dashboard', margin, doc.internal.pageSize.getHeight()-6);
+    doc.text('Page '+data.pageNumber, pageW-margin, doc.internal.pageSize.getHeight()-6, {align:'right'});
+  };
+
+  // ── Open / In-Progress findings table ───────────────────────
+  y += 14;
+  if (openFindings.length) {
+    doc.setTextColor(220,38,38); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text('OPEN / IN PROGRESS', margin, y+4); y += 6;
+    doc.autoTable({
+      startY: y,
+      head: [['#','Finding Description','Target Date','Status']],
+      body: openFindings.map(function(f,i){ return [
+        (i+1).toString(), tr(_cleanFindingText(f.text||'')),
+        f.dueDate ? new Date(f.dueDate+'T00:00:00').toLocaleDateString('en-GB') : '—',
+        f.status==='in_progress' ? 'In Progress' : 'Open'
+      ]; }),
+      theme:'grid',
+      headStyles:{ fillColor:[220,38,38], textColor:[255,255,255], fontStyle:'bold', fontSize:8, cellPadding:3 },
+      bodyStyles:{ fontSize:8, cellPadding:2.5, textColor:[30,41,59] },
+      columnStyles:{ 0:{cellWidth:10,halign:'center',fontStyle:'bold'}, 1:{cellWidth:'auto'}, 2:{cellWidth:24,halign:'center'}, 3:{cellWidth:22,halign:'center'} },
+      alternateRowStyles:{ fillColor:[255,245,245] },
+      margin:{ left:margin, right:margin },
+      didDrawPage: footer
+    });
+    y = doc.lastAutoTable.finalY + 6;
+  }
+
+  // ── Closed findings table ────────────────────────────────────
+  if (closedFindings.length) {
+    doc.setTextColor(5,150,105); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text('CLOSED / RECTIFIED', margin, y+4); y += 6;
+    doc.autoTable({
+      startY: y,
+      head: [['#','Finding Description','Closed Date']],
+      body: closedFindings.map(function(f,i){ return [
+        (i+1).toString(), tr(_cleanFindingText(f.text||'')),
+        f.closedAt ? new Date(f.closedAt).toLocaleDateString('en-GB') : '—'
+      ]; }),
+      theme:'grid',
+      headStyles:{ fillColor:[5,150,105], textColor:[255,255,255], fontStyle:'bold', fontSize:8, cellPadding:3 },
+      bodyStyles:{ fontSize:8, cellPadding:2.5, textColor:[30,41,59] },
+      columnStyles:{ 0:{cellWidth:10,halign:'center',fontStyle:'bold'}, 1:{cellWidth:'auto'}, 2:{cellWidth:28,halign:'center'} },
+      alternateRowStyles:{ fillColor:[240,253,244] },
+      margin:{ left:margin, right:margin },
+      didDrawPage: footer
+    });
+  }
+
+  var vesselShort = tr(vessel.name||vn).replace(/\s+/g,'_').replace(/[^A-Za-z0-9_]/g,'');
+  var titleShort  = tr(rec.title).replace(/\s+/g,'_').replace(/[^A-Za-z0-9_]/g,'').slice(0,30);
+  doc.save('INSP_'+vesselShort+'_'+titleShort+'_'+new Date().toLocaleDateString('en-GB').replace(/\//g,'')+'.pdf');
+  showToast('PDF exported', 'success');
+}
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
 //  PORT EXPENSES MODULE
 //  Seed data: 479 records from Excel (Apr 2023 – Mar 2026)
 // ══════════════════════════════════════════════════════════════════
@@ -11344,7 +12741,7 @@ function peSave() {
     addedAt: new Date().toISOString()
   });
   _peSt('yasa_pe', recs);
-  try { cloudSave(); } catch(e) {}
+  cloudSave().catch(function(){});
 
   // Update option lists
   var opts = peOpts();
@@ -11446,7 +12843,7 @@ function peSaveEdit() {
     updatedAt: new Date().toISOString()
   };
   _peSt('yasa_pe', recs);
-  try { cloudSave(); } catch(e) {}
+  cloudSave().catch(function(){});
   
   // Update option lists
   var opts = peOpts();
@@ -11473,7 +12870,7 @@ function peDeleteRecord() {
   var vsl = recs[idx].vessel;
   recs.splice(idx, 1);
   _peSt('yasa_pe', recs);
-  try { cloudSave(); } catch(e) {}
+  cloudSave().catch(function(){});
   
   peCloseEdit();
   _peFillDropdowns();
@@ -11505,7 +12902,7 @@ function peCleanupInvalid() {
   
   var cleaned = recs.filter(function(r){ return !invalidIds.includes(r.id); });
   _peSt('yasa_pe', cleaned);
-  try { cloudSave(); } catch(e) {}
+  cloudSave().catch(function(){});
   
   _peFillDropdowns();
   peRender();
