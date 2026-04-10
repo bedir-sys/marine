@@ -178,8 +178,94 @@ body.dark .tab.active                 { color: #e8f0fe; border-bottom-color: #93
 body.dark .tab:hover                  { color: #e8f0fe; background: rgba(255,255,255,.07); }
 body.dark .modal-section-title        { color: #d0d0d0; border-bottom-color: rgba(200,200,200,.25); }
 body.dark .modal-section-title::before { background: #d0d0d0; }
-body.dark .data-key                   { color: #c0c0c0; }
+body.dark .data-key                   { color: #b0b8d0; }
+body.dark .data-val                   { color: #e8e8e8; }
+body.dark .data-row                   { border-bottom-color: #2e2e2e; }
 body.dark .modal-overlay              { background: rgba(0,0,0,.7); }
+
+/* Stat cards */
+body.dark .stat-label                 { color: #888; }
+
+/* ROB / Voyage sections */
+body.dark .rob-title                  { color: #a0a0a0; }
+body.dark .rob-item-label             { color: #888; }
+body.dark .rob-item-value             { color: #d0d0d0; }
+body.dark .rob-item-unit              { color: #606060; }
+body.dark .voyage-tag                 { color: #c0c0c0; }
+
+/* Certificate section */
+body.dark .cert-label                 { color: #c0c0c0; }
+body.dark .cert-item                  { background: #252525; border-color: #3a3a3a; }
+body.dark .cert-item:has(.cert-input.cert-warn)    .cert-label { color: #fbbf24; }
+body.dark .cert-item:has(.cert-input.cert-overdue) .cert-label { color: #f87171; }
+body.dark .cert-days-badge.cert-days-ok   { background: rgba(22,163,74,.18); color: #4ade80; }
+body.dark .cert-days-badge.cert-days-warn { background: rgba(217,119,6,.18); color: #fbbf24; }
+body.dark .cert-days-badge.cert-days-overdue { background: rgba(220,38,38,.2); color: #f87171; }
+
+/* Buttons — comprehensive */
+body.dark .btn-primary                { background: #3b5bdb; color: #fff; border: none; }
+body.dark .btn-primary:hover          { background: #4c6ef5; }
+body.dark .btn-outline                { background: #2a2a2a; border-color: #4a4a4a; color: #d0d0d0; }
+body.dark .btn-outline:hover          { background: #333; border-color: #888; color: #f0f0f0; }
+body.dark .btn-sm.btn-outline         { background: #252525; border-color: #444; color: #c0c0c0; }
+
+/* Module tabs (notes/findings/todo) */
+body.dark .ntab-notes.active .ntab-badge { background: #3b5bdb; color: #fff; }
+body.dark .ntab-find.active .ntab-badge  { background: #b91c1c; color: #fff; }
+body.dark .ntab-td.active .ntab-badge    { background: #b45309; color: #fff; }
+
+/* Sludge/Garbage section labels — fix hardcoded teal/amber */
+body.dark .cert-section span[style*="color:#0d9488"] { color: #2dd4bf !important; }
+body.dark .cert-section span[style*="color:#d97706"] { color: #fbbf24 !important; }
+
+/* User menu dropdown */
+body.dark #userMenu                   { background: #1e1e1e; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+body.dark #userMenuName               { color: #909090; border-bottom-color: #2a2a2a; }
+
+/* Upload / inspection paste zones */
+body.dark textarea                    { background: #222; border-color: #404040; color: #e0e0e0; }
+body.dark textarea::placeholder       { color: #505050; }
+body.dark select                      { background: var(--navy2); color: var(--text); border-color: var(--border2); }
+
+/* Cargo table in vessel notes */
+body.dark .cargo-section-placeholder table tr { border-bottom-color: #333; }
+body.dark .cargo-section-placeholder th       { background: #1e1e1e; color: #888; }
+
+/* LSA NA badge */
+body.dark #lsaStatNa                  { background: rgba(100,116,139,.2) !important; color: #94a3b8 !important; }
+
+/* Modal panels & overlays launched from buttons remain white (intentional) */
+
+/* ── DARK MODE: Inspection Module ── */
+body.dark .insp-toolbar               { background: #1a1a1a; border-bottom-color: #333; }
+body.dark .insp-vessel-sel            { background: #2a2a2a; border-color: #404040; color: #f0f0f0; }
+body.dark .insp-type-tab              { background: #2a2a2a; border-color: #404040; color: #b0b0b0; }
+body.dark .insp-type-tab:hover        { border-color: #d0d0d0; color: #f0f0f0; }
+body.dark .insp-type-tab.active       { background: #d0d0d0; color: #111; border-color: #d0d0d0; }
+body.dark .insp-card                  { background: #252525; border-color: #363636; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+body.dark .insp-card:hover            { border-color: #555; box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+body.dark .insp-card-title            { color: #f0f0f0; }
+body.dark .insp-card-body             { border-top-color: #363636; }
+body.dark .insp-card-header           { background: #252525; }
+body.dark .insp-findings-head         { background: #1e1e1e; border-bottom-color: #363636; }
+body.dark .insp-findings-head .insp-fcol { color: #909090; }
+body.dark .insp-finding-row           { border-bottom-color: #333; }
+body.dark .insp-finding-row:hover     { background: #2e2e2e; }
+body.dark .insp-fcol                  { color: #e0e0e0; }
+body.dark .insp-fcol-num              { color: #888; }
+body.dark .insp-meta-date             { color: #888; }
+body.dark .insp-chevron               { color: #888; }
+body.dark .insp-badge-open            { background: rgba(220,38,38,.18);   color: #f87171; }
+body.dark .insp-badge-closed          { background: rgba(22,163,74,.18);   color: #4ade80; }
+body.dark .insp-badge-empty           { background: rgba(100,116,139,.18); color: #94a3b8; }
+body.dark .insp-date-input            { background: #2a2a2a; border-color: #404040; color: #e0e0e0; }
+body.dark .insp-status-sel            { background: #2a2a2a; border-color: #404040; color: #e0e0e0; }
+body.dark .insp-sel-open              { border-color: rgba(220,38,38,.5); color: #f87171; }
+body.dark .insp-sel-in_progress       { border-color: rgba(217,119,6,.5); color: #fbbf24; }
+body.dark .insp-sel-closed            { border-color: rgba(22,163,74,.5); color: #4ade80; }
+body.dark .insp-finding-btn           { color: #707070; }
+body.dark .insp-finding-btn:hover     { background: #333; color: #d0d0d0; }
+body.dark .insp-del-btn:hover         { color: #f87171 !important; background: rgba(220,38,38,.12) !important; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -537,7 +623,7 @@ body {
 .stat-pip-orange { background: var(--orange); }
 .stat-pip-accent { background: var(--accent); opacity: 0.55; }
 .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text2); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; }
-.stat-value { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: #0f172a; }
+.stat-value { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: var(--text); }
 
 /* FILTER DOT */
 .fdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; }
@@ -904,7 +990,7 @@ body {
   align-items: flex-start;
   gap: 10px;
   padding: 4px 0;
-  border-bottom: 1px solid rgba(203,213,225,0.9);
+  border-bottom: 1px solid var(--border);
 }
 
 .data-row:last-of-type { border-bottom: none; }
@@ -925,7 +1011,7 @@ body {
 .data-val {
   font-size: 13px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
   line-height: 1.4;
   font-family: 'Barlow', sans-serif;
 }
@@ -936,7 +1022,7 @@ body {
 .rob-section {
   margin: 8px 0;
   padding: 8px 12px;
-  background: rgba(241,245,249,0.9);
+  background: var(--navy2);
   border-radius: 8px;
   border: 2px solid var(--border2);
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
@@ -989,7 +1075,7 @@ body {
 .voyage-section {
   margin-top: 8px;
   padding: 8px 12px;
-  background: rgba(241,245,249,0.9);
+  background: var(--navy2);
   border-radius: 8px;
   border: 2px solid var(--border2);
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
@@ -1105,7 +1191,7 @@ body {
 .ntab-pane::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
 /* note-block: transparent wrapper, kept for JS compatibility */
-.note-block { background: #fff; border: none; margin: 0; border-radius: 0 0 7px 7px; overflow: hidden; }
+.note-block { background: var(--navy2); border: none; margin: 0; border-radius: 0 0 7px 7px; overflow: hidden; }
 
 /* Save row at bottom of each notes pane */
 .ntab-save-row {
@@ -1798,7 +1884,7 @@ body.dark .nc-bold-btn:hover, body.dark .nc-italic-btn:hover { background: rgba(
   gap: 6px;
 }
 .cert-input {
-  background: #ffffff;
+  background: var(--input-bg);
   border: 1px solid var(--border2);
   border-radius: 4px;
   padding: 3px 5px;
@@ -1998,7 +2084,7 @@ body.dark .todo-item:hover { background:#2e2e2e; }
 body.dark .todo-item.done { background:#1e1e1e; }
 
 /* ══════════════════════════════════════════════════════
-   URGENT NOTES PAGE
+   CAUTION NOTES PAGE
    ══════════════════════════════════════════════════════ */
 
 /* Vessel block */
@@ -2498,7 +2584,7 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
 /* ══ INSPECTIONS MODULE ══════════════════════════════════════ */
 .insp-toolbar {
   position: sticky; top: 106px; z-index: 100;
-  background: var(--bg); border-bottom: 1px solid var(--border);
+  background: var(--navy); border-bottom: 1px solid var(--border);
   padding: 14px 20px; display: flex; align-items: center;
   gap: 14px; flex-wrap: wrap;
 }
@@ -2519,8 +2605,14 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
 .insp-type-tab:hover { border-color: var(--accent); color: var(--accent); }
 .insp-type-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .insp-content { padding: 20px; max-width: 1100px; }
+@media (max-width: 900px) {
+  .insp-content > div[style*="grid-template-columns:1fr 290px"] {
+    grid-template-columns: 1fr !important;
+  }
+  #inspStatsPanel { position: static !important; }
+}
 .insp-card {
-  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--navy2); border: 1px solid var(--border); border-radius: 10px;
   margin-bottom: 10px; overflow: hidden;
   box-shadow: 0 2px 8px rgba(37,99,235,0.06);
   transition: box-shadow 0.15s;
@@ -2569,7 +2661,7 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
   border-bottom: 1px solid var(--border); transition: background 0.1s;
 }
 .insp-finding-row:last-child { border-bottom: none; }
-.insp-finding-row:hover { background: rgba(241,245,249,0.7); }
+.insp-finding-row:hover { background: var(--navy3); }
 .insp-finding-row.is-closed { opacity: 0.6; }
 .insp-fcol { padding: 9px 10px; font-size: 13px; color: var(--text); }
 .insp-fcol-num { color: var(--text3); font-family: 'JetBrains Mono', monospace; font-size: 12px; text-align: center; padding: 9px 4px; }
@@ -2680,7 +2772,7 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
       <button class="filter-btn" id="filterNotes" onclick="setFilter('notes')">Has Notes</button>
       <button class="filter-btn filter-btn-urgent" id="filterUrgent" onclick="openUrgentPanel()">
         <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#dc2626;margin-right:4px;vertical-align:middle;"></span>
-        Urgent Notes
+        Caution Notes
       </button>
     </div>
     <div style="display:flex;gap:8px">
@@ -2724,7 +2816,7 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
   <!-- ALERT PANEL -->
   <div id="alertPanel" style="display:none;"></div>
 
-  <!-- URGENT NOTES MODAL -->
+  <!-- CAUTION NOTES MODAL -->
   <div id="urgentOverlay" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(15,23,42,.5);align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeUrgentPanel()">
     <div id="urgentPanel" style="background:var(--bg);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);width:100%;max-width:960px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;transform:scale(.97) translateY(10px);transition:transform .2s;">
 
@@ -2732,7 +2824,7 @@ body.dark .mn-critical-banner { background:#2d1515; border-color:#7f1d1d; }
       <div style="background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-radius:16px 16px 0 0;">
         <div style="display:flex;align-items:center;gap:12px;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <span style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:.05em;text-transform:uppercase;">Urgent Notes</span>
+          <span style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:.05em;text-transform:uppercase;">Caution Notes</span>
           <span id="urgentCount" style="font-family:JetBrains Mono,monospace;font-size:10px;font-weight:700;background:rgba(0,0,0,.3);color:#fff;border-radius:20px;padding:2px 10px;"></span>
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
@@ -3421,6 +3513,9 @@ const CERT_FIELDS = [
   { key: 'gasDetector2',      label: 'Gas Detector #2'           },
   { key: 'alcoMeter',         label: 'Alcometer'                 },
   { key: 'sbmAgreement',      label: 'SBM Agreement'             },
+  // noExpiry=true → sadece tarih gösterilir, expire/warn badge çıkmaz
+  { key: 'gyroRenewal1',      label: 'Last Gyrosphere No.1 Renewal', noExpiry: true },
+  { key: 'gyroRenewal2',      label: 'Last Gyrosphere No.2 Renewal', noExpiry: true },
 ];
 
 function certKey(vessel)       { return 'yasa_certs_' + canonicalize(vessel); }
@@ -4020,7 +4115,7 @@ function openUrgentPanel() {
     body.innerHTML =
       '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px;">'
     + '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
-    + '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:700;color:#22c55e;letter-spacing:.04em;">All Clear — No Urgent Notes</div>'
+    + '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:700;color:#22c55e;letter-spacing:.04em;">All Clear — No Caution Notes</div>'
     + '<div style="font-size:13px;color:var(--text3);">No critical or watch priority notes across the fleet.</div>'
     + '</div>';
   } else {
@@ -4426,8 +4521,8 @@ function buildModalBody(v) {
       <div class="cert-section" style="margin-top:8px;padding:14px 16px 16px;">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">Cash on Board</div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <div style="display:flex;align-items:center;flex:1;border:1px solid var(--border2);border-radius:6px;overflow:hidden;background:#fff;">
-            <span style="padding:0 8px;font-size:13px;font-weight:700;color:var(--text3);background:var(--navy2);border-right:1px solid var(--border2);height:100%;display:flex;align-items:center;">USD</span>
+          <div style="display:flex;align-items:center;flex:1;border:1px solid var(--border2);border-radius:6px;overflow:hidden;background:var(--input-bg);">
+            <span style="padding:0 8px;font-size:13px;font-weight:700;color:var(--text2);background:var(--navy3);border-right:1px solid var(--border2);height:100%;display:flex;align-items:center;">USD</span>
             <input id="cob_amount" type="number" min="0" step="100" placeholder="0"
               value="${escAttr(cob.amount)}"
               style="border:none;outline:none;background:transparent;padding:7px 10px;font-size:14px;font-weight:600;color:var(--text);font-family:'Barlow',sans-serif;width:100%;">
@@ -4438,6 +4533,7 @@ function buildModalBody(v) {
         ${cob._ts ? `<div style="font-size:10px;color:var(--text3);margin-top:5px;">Last saved: ${escHtml(new Date(cob._ts).toLocaleString('en-GB'))}</div>` : ''}
       </div>
       ${buildCertSection(v.name)}
+      ${buildCargoSection(v.name)}
     </div>
 
     <!-- RIGHT COL: NOTES with inner tabs -->
@@ -4457,8 +4553,8 @@ function buildCertSection(vesselName) {
   const data = loadCerts(vesselName);
   const items = CERT_FIELDS.map(f => {
     const val  = data[f.key] || '';
-    const st   = certStatus(val);
-    const days = certDaysLeft(val);
+    const st   = f.noExpiry ? '' : certStatus(val);
+    const days = f.noExpiry ? null : certDaysLeft(val);
     const inputClass = st === 'overdue' ? 'cert-overdue' : st === 'warn' ? 'cert-warn' : '';
     let badgeHtml = '';
     if (days !== null) {
@@ -4466,12 +4562,14 @@ function buildCertSection(vesselName) {
       const bdgTxt = st === 'overdue' ? `OVRD ${Math.abs(days)}d` : `${days}d`;
       badgeHtml = `<span class="cert-days-badge ${bdgCls}">${bdgTxt}</span>`;
     }
+    // noExpiry alanlar için hafif italic stil — "last date" olduğu anlaşılsın
+    const labelStyle = f.noExpiry ? 'font-style:italic;opacity:.85;' : '';
     return `<div class="cert-item">
-      <span class="cert-label" title="${escAttr(f.label)}">${escHtml(f.label)}</span>
+      <span class="cert-label" title="${escAttr(f.label)}" style="${labelStyle}">${escHtml(f.label)}</span>
       <div class="cert-input-row">
         <input type="date" class="cert-input ${inputClass}" id="cert_${f.key}"
           value="${escAttr(toDateInputVal(val))}"
-          onchange="onCertChange(this,'${f.key}','${escAttr(vesselName)}')">
+          onchange="onCertChange(this,'${f.key}','${escAttr(vesselName)}',${f.noExpiry?'true':'false'})">
         ${badgeHtml}
       </div>
     </div>`;
@@ -4489,29 +4587,158 @@ function buildCertSection(vesselName) {
     </div>`;
 }
 
+// ─── LAST 5 CARGOES SECTION ──────────────────────────────────────────────────
+function buildCargoSection(vesselName) {
+  const cargoes = cargoLoad(vesselName);
+  const evn = escAttr(vesselName);
+
+  const rowsHtml = cargoes.length
+    ? cargoes.map(function(c, i) {
+        return `<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:6px 8px;font-size:12px;color:var(--text);font-weight:600;">${escHtml(c.loadPort||'—')}</td>
+          <td style="padding:6px 8px;font-size:12px;color:var(--text);">${escHtml(c.dischargePort||'—')}</td>
+          <td style="padding:6px 8px;font-size:12px;color:var(--accent);font-weight:600;">${escHtml(c.cargoName||'—')}</td>
+          <td style="padding:6px 8px;font-size:12px;color:var(--text);text-align:right;white-space:nowrap;">${c.quantity ? Number(c.quantity).toLocaleString()+' MT' : '—'}</td>
+          <td style="padding:4px 6px;text-align:center;">
+            <button onclick="cargoDelete('${evn}',${i})" title="Delete"
+              style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;padding:2px 4px;opacity:.7;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">✕</button>
+          </td>
+        </tr>`;
+      }).join('')
+    : `<tr><td colspan="5" style="padding:12px;text-align:center;color:var(--text3);font-size:12px;font-style:italic;">No cargo records yet</td></tr>`;
+
+  return `
+    <div class="cert-section" style="margin-top:8px;padding:14px 16px 16px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
+        <span>⚓ Last 5 Cargoes</span>
+        <button onclick="cargoOpenAdd('${evn}')"
+          style="background:var(--accent);color:#fff;border:none;padding:3px 10px;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px;">+ Add</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-family:'Barlow',sans-serif;">
+          <thead>
+            <tr style="background:var(--navy2);border-bottom:2px solid var(--border);">
+              <th style="padding:5px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);text-align:left;">Load Port</th>
+              <th style="padding:5px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);text-align:left;">Discharge</th>
+              <th style="padding:5px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);text-align:left;">Cargo</th>
+              <th style="padding:5px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);text-align:right;">Qty</th>
+              <th style="width:28px;"></th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function cargoOpenAdd(vesselName) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:9300;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = `
+    <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px 28px;width:100%;max-width:420px;box-shadow:0 20px 50px rgba(0,0,0,.25);">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#1e293b;margin-bottom:16px;">⚓ Add Cargo Record</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:4px;">Load Port *</div>
+          <input id="cg_load" type="text" placeholder="e.g. Richards Bay"
+            style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;color:#1e293b;outline:none;">
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:4px;">Discharge Port *</div>
+          <input id="cg_disch" type="text" placeholder="e.g. Paradip"
+            style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;color:#1e293b;outline:none;">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:4px;">Cargo Name *</div>
+          <input id="cg_name" type="text" placeholder="e.g. Coal"
+            style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;color:#1e293b;outline:none;">
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:4px;">Quantity (MT)</div>
+          <input id="cg_qty" type="number" min="0" step="100" placeholder="e.g. 75000"
+            style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;color:#1e293b;outline:none;">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button id="cg_cancel" style="padding:8px 18px;background:transparent;border:1px solid #e2e8f0;border-radius:7px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#64748b;cursor:pointer;">Cancel</button>
+        <button id="cg_save" style="padding:8px 20px;background:#2563eb;color:#fff;border:none;border-radius:7px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Save</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(function(){ const el=overlay.querySelector('#cg_load'); if(el) el.focus(); }, 40);
+  overlay.querySelector('#cg_cancel').onclick = function(){ overlay.remove(); };
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  overlay.querySelector('#cg_save').onclick = function() {
+    const load  = (overlay.querySelector('#cg_load').value||'').trim();
+    const disch = (overlay.querySelector('#cg_disch').value||'').trim();
+    const name  = (overlay.querySelector('#cg_name').value||'').trim();
+    const qty   = (overlay.querySelector('#cg_qty').value||'').trim();
+    if (!load || !disch || !name) { showToast('Load port, discharge port ve cargo adı gereklidir', 'error'); return; }
+    const cargoes = cargoLoad(vesselName);
+    cargoes.unshift({ loadPort: load, dischargePort: disch, cargoName: name, quantity: qty ? parseFloat(qty) : '', addedAt: new Date().toISOString() });
+    cargoSave(vesselName, cargoes);
+    overlay.remove();
+    // Sol paneli yeniden render et
+    const panel = document.querySelector('.modal-col:not(.modal-col-notes)');
+    if (panel) {
+      const sec = panel.querySelector('.cargo-section-placeholder');
+      if (sec) sec.outerHTML = buildCargoSection(vesselName);
+      else { // fallback: tam modal yenile
+        const v = allVessels.find(function(v){ return v.name === vesselName; });
+        if (v) { const modal = document.getElementById('modal-' + canonicalize(vesselName)); if(modal) modal.innerHTML = buildModalContent(v); }
+      }
+    }
+    // En kolay yol: sayfayı yeniden render edip modal koru
+    _cargoRefresh(vesselName);
+    showToast('Cargo kaydedildi', 'success');
+  };
+}
+
+function cargoDelete(vesselName, idx) {
+  if (!confirm('Bu cargo kaydı silinsin mi?')) return;
+  const cargoes = cargoLoad(vesselName);
+  cargoes.splice(idx, 1);
+  cargoSave(vesselName, cargoes);
+  _cargoRefresh(vesselName);
+}
+
+function _cargoRefresh(vesselName) {
+  // Açık modal'daki cargo section'ı DOM'da in-place güncelle
+  const tables = document.querySelectorAll('.modal-col:not(.modal-col-notes) .cert-section');
+  tables.forEach(function(sec) {
+    if (sec.innerHTML.indexOf('Last 5 Cargoes') > -1) {
+      sec.outerHTML = buildCargoSection(vesselName);
+    }
+  });
+}
+
 // Auto-save when date picker value changes and update styling live
-function onCertChange(el, key, vesselName) {
+function onCertChange(el, key, vesselName, noExpiry) {
   const raw = el.value; // YYYY-MM-DD or ''
-  const st = certStatus(raw);
-  el.className = 'cert-input' + (st === 'overdue' ? ' cert-overdue' : st === 'warn' ? ' cert-warn' : '');
-  // Update days badge next to input
-  const inputRow = el.closest('.cert-input-row');
-  if (inputRow) {
-    let badge = inputRow.querySelector('.cert-days-badge');
-    const days = certDaysLeft(raw);
-    if (days !== null) {
-      const bdgCls = st === 'overdue' ? 'cert-days-overdue' : st === 'warn' ? 'cert-days-warn' : 'cert-days-ok';
-      const bdgTxt = st === 'overdue' ? `OVRD ${Math.abs(days)}d` : `${days}d`;
-      if (badge) { badge.className = `cert-days-badge ${bdgCls}`; badge.textContent = bdgTxt; }
-      else { badge = document.createElement('span'); badge.className = `cert-days-badge ${bdgCls}`; badge.textContent = bdgTxt; inputRow.appendChild(badge); }
-    } else if (badge) { badge.remove(); }
-    // Also update parent cert-item border/bg
-    const item = inputRow.closest('.cert-item');
-    if (item) {
-      item.style.borderColor = st === 'overdue' ? 'rgba(220,38,38,0.4)' : st === 'warn' ? 'rgba(245,158,11,0.45)' : '';
-      item.style.background  = st === 'overdue' ? '#fff8f8' : st === 'warn' ? '#fffdf5' : '#fff';
-      const lbl = item.querySelector('.cert-label');
-      if (lbl) lbl.style.color = st === 'overdue' ? '#991b1b' : st === 'warn' ? '#92400e' : '';
+  if (!noExpiry) {
+    const st = certStatus(raw);
+    el.className = 'cert-input' + (st === 'overdue' ? ' cert-overdue' : st === 'warn' ? ' cert-warn' : '');
+    // Update days badge next to input
+    const inputRow = el.closest('.cert-input-row');
+    if (inputRow) {
+      let badge = inputRow.querySelector('.cert-days-badge');
+      const days = certDaysLeft(raw);
+      if (days !== null) {
+        const bdgCls = st === 'overdue' ? 'cert-days-overdue' : st === 'warn' ? 'cert-days-warn' : 'cert-days-ok';
+        const bdgTxt = st === 'overdue' ? `OVRD ${Math.abs(days)}d` : `${days}d`;
+        if (badge) { badge.className = `cert-days-badge ${bdgCls}`; badge.textContent = bdgTxt; }
+        else { badge = document.createElement('span'); badge.className = `cert-days-badge ${bdgCls}`; badge.textContent = bdgTxt; inputRow.appendChild(badge); }
+      } else if (badge) { badge.remove(); }
+      // Also update parent cert-item border/bg
+      const item = inputRow.closest('.cert-item');
+      if (item) {
+        item.style.borderColor = st === 'overdue' ? 'rgba(220,38,38,0.4)' : st === 'warn' ? 'rgba(245,158,11,0.45)' : '';
+        item.style.background  = st === 'overdue' ? '#fff8f8' : st === 'warn' ? '#fffdf5' : '#fff';
+        const lbl = item.querySelector('.cert-label');
+        if (lbl) lbl.style.color = st === 'overdue' ? '#991b1b' : st === 'warn' ? '#92400e' : '';
+      }
     }
   }
   // Auto-save with per-field timestamp for fine-grained cloud merge
@@ -4548,6 +4775,15 @@ function saveCertsFromModal(vesselName) {
 // ─── CASH ON BOARD ──────────────────────────────────────────────────────────
 function cobKey(vessel)       { return 'yasa_cob_' + canonicalize(vessel); }
 function loadCob(vessel)      { try { return JSON.parse(localStorage.getItem(cobKey(vessel)) || 'null') || { amount: '', _ts: '' }; } catch(e) { return { amount: '', _ts: '' }; } }
+
+// ── Last 5 Cargoes ───────────────────────────────────────────
+function cargoKey(vessel)  { return 'yasa_cargo_' + canonicalize(vessel); }
+function cargoLoad(vessel) { try { return JSON.parse(localStorage.getItem(cargoKey(vessel)) || '[]'); } catch(e){ return []; } }
+function cargoSave(vessel, arr) {
+  arr = arr.slice(0, 5); // max 5 kayıt
+  localStorage.setItem(cargoKey(vessel), JSON.stringify(arr));
+  cloudSave().catch(function(){});
+}
 function sludgeKey(vessel)    { return 'yasa_sludge_' + canonicalize(vessel); }
 function loadSludge(vessel)   { try { return JSON.parse(localStorage.getItem(sludgeKey(vessel)) || 'null') || {}; } catch(e) { return {}; } }
 function saveSludgeLocal(vessel, data) {
@@ -5030,7 +5266,7 @@ function renderAlertPanel() {
   panel.innerHTML = `
     <div class="alert-panel-header" onclick="toggleAlertPanel()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.5" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span class="alert-panel-title">Critical &amp; Urgent Notes</span>
+      <span class="alert-panel-title">Critical &amp; Caution Notes</span>
       <span class="alert-count-badge">${alertRows.length}</span>
       <div style="flex:1"></div>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2" style="transform:rotate(${chevronRot});transition:transform .2s;flex-shrink:0"><polyline points="18 15 12 9 6 15"/></svg>
@@ -5996,6 +6232,11 @@ function _buildSnapshot() {
     const raw = localStorage.getItem(cobKey(v));
     if (raw) { try { cobData[v] = JSON.parse(raw); } catch(e) {} }
   });
+  const cargoData = {};
+  VESSELS_ALL.forEach(function(v) {
+    var arr = cargoLoad(v);
+    if (arr.length) cargoData[canonicalize(v)] = arr;
+  });
   const sludgeData = {};
   VESSELS_ALL.forEach(v => {
     const raw = localStorage.getItem(sludgeKey(v));
@@ -6015,9 +6256,23 @@ function _buildSnapshot() {
     lsa:            lsaData,
     certs:          certData,
     cob:            cobData,
+    cargo:          cargoData,
     sludge:         sludgeData,
     garbage:        garbageData,
-    // photos: Supabase Storage'da (JSON payload'a dahil değil)
+    // photos: base64 data URLs, stored per vessel canonicalized name
+    photos: (function() {
+      var p = {};
+      VESSELS_ALL.forEach(function(v) {
+        var raw = localStorage.getItem(vesselPhotoKey(v));
+        if (raw) {
+          try {
+            var d = raw.startsWith('{') ? JSON.parse(raw) : { url: raw, ts: '2000-01-01T00:00:00Z' };
+            if (d.url) p[canonicalize(v)] = d;
+          } catch(e) {}
+        }
+      });
+      return p;
+    })(),
     todos:          (function() {
       var t = {};
       VESSELS_ALL.forEach(function(v) {
@@ -6347,6 +6602,30 @@ function _mergeSnapshots(cloud, local) {
     merged.cob[v] = new Date(lc._ts || 0) >= new Date(cc._ts || 0) ? lc : cc;
   });
 
+  // Merge cargo: local wins (newest addedAt entry wins per vessel)
+  const cloudCargo = cloud.cargo || {};
+  const localCargo = local.cargo || {};
+  merged.cargo = {};
+  new Set([...Object.keys(cloudCargo), ...Object.keys(localCargo)]).forEach(function(vn) {
+    var cArr = cloudCargo[vn] || [];
+    var lArr = localCargo[vn] || [];
+    var cTime = cArr.length ? new Date(cArr[0].addedAt || 0) : new Date(0);
+    var lTime = lArr.length ? new Date(lArr[0].addedAt || 0) : new Date(0);
+    merged.cargo[vn] = lTime >= cTime ? lArr : cArr;
+  });
+
+  // Merge photos: LWW by ts — newer upload wins
+  const cloudPhotos = cloud.photos || {};
+  const localPhotos = local.photos || {};
+  merged.photos = {};
+  new Set([...Object.keys(cloudPhotos), ...Object.keys(localPhotos)]).forEach(function(vn) {
+    var cp = cloudPhotos[vn];
+    var lp = localPhotos[vn];
+    if (!cp) { merged.photos[vn] = lp; return; }
+    if (!lp) { merged.photos[vn] = cp; return; }
+    merged.photos[vn] = new Date(lp.ts || 0) >= new Date(cp.ts || 0) ? lp : cp;
+  });
+
   // Merge todo tombstones: union, max timestamp wins
   const cloudTodoTombs = cloud.todoTombstones || {};
   const localTodoTombs = local.todoTombstones || {};
@@ -6657,7 +6936,17 @@ function _applySnapshotSilent(merged) {
   if (merged.cob) {
     Object.keys(merged.cob).forEach(function(v) { localStorage.setItem(cobKey(v), JSON.stringify(merged.cob[v])); });
   }
-  // Todo Tombstones
+  // Cargo
+  if (merged.cargo) {
+    Object.keys(merged.cargo).forEach(function(vn) { localStorage.setItem(cargoKey(vn), JSON.stringify(merged.cargo[vn])); });
+  }
+  // Photos — base64 stored per canonicalized vessel name
+  if (merged.photos) {
+    Object.keys(merged.photos).forEach(function(vn) {
+      var d = merged.photos[vn];
+      if (d && d.url) localStorage.setItem('yasa_photo_url_' + vn, JSON.stringify(d));
+    });
+  }
   if (merged.todoTombstones) {
     Object.keys(merged.todoTombstones).forEach(function(vn) {
       localStorage.setItem(todoTombKey(vn), JSON.stringify(merged.todoTombstones[vn]));
@@ -6777,7 +7066,19 @@ function _applySnapshot(cloudData) {
   if (merged.cob) {
     Object.keys(merged.cob).forEach(v => localStorage.setItem(cobKey(v), JSON.stringify(merged.cob[v])));
   }
-  // Sludge
+  // Cargo
+  if (merged.cargo) {
+    Object.keys(merged.cargo).forEach(function(vn) { localStorage.setItem(cargoKey(vn), JSON.stringify(merged.cargo[vn])); });
+  }
+  // Photos — base64 in main table
+  if (merged.photos) {
+    Object.keys(merged.photos).forEach(function(vn) {
+      var d = merged.photos[vn];
+      if (d && d.url) localStorage.setItem('yasa_photo_url_' + vn, JSON.stringify(d));
+    });
+    // Refresh photo in currently open modal
+    if (activeVessel) vesselPhotoApply(activeVessel.name);
+  }
   if (merged.sludge) {
     Object.keys(merged.sludge).forEach(v => localStorage.setItem(sludgeKey(v), JSON.stringify(merged.sludge[v])));
   }
@@ -7861,13 +8162,22 @@ function mnCardHTML(m) {
     '</div></div>';
 }
 
-var PHOTO_BUCKET = 'vessel-photos';
+var PHOTO_BUCKET = 'vessel-photos'; // kept for reference, no longer used for storage
 
 function vesselPhotoKey(name) { return 'yasa_photo_url_' + canonicalize(name); }
 
-// Fotoğraf URL'sini localStorage'dan oku (Supabase Storage URL'si)
+// Photo data stored as {url: 'data:image/jpeg;base64,...', ts: ISO_string}
 function vesselPhotoLoad(vesselName) {
-  try { return localStorage.getItem(vesselPhotoKey(vesselName)) || ''; } catch(e) { return ''; }
+  try {
+    var raw = localStorage.getItem(vesselPhotoKey(vesselName));
+    if (!raw) return '';
+    // Support both old format (plain URL string) and new format ({url, ts})
+    if (raw.startsWith('{')) {
+      var d = JSON.parse(raw);
+      return d.url || '';
+    }
+    return raw; // legacy plain URL
+  } catch(e) { return ''; }
 }
 
 function vesselPhotoApply(vesselName) {
@@ -7886,28 +8196,8 @@ function vesselPhotoApply(vesselName) {
   }
 }
 
-// Supabase Storage'dan tüm gemilerin fotoğraf URL'lerini çek ve localStorage'a yaz
-async function vesselPhotosSyncFromCloud() {
-  try {
-    var listUrl = SUPABASE_URL + '/storage/v1/object/list/' + PHOTO_BUCKET;
-    var resp = await fetch(listUrl, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prefix: '', limit: 200 })
-    });
-    if (!resp.ok) return;
-    var files = await resp.json();
-    (files || []).forEach(function(f) {
-      if (!f.name) return;
-      var publicUrl = SUPABASE_URL + '/storage/v1/object/public/' + PHOTO_BUCKET + '/' + f.name;
-      // Dosya adı = canonicalize(vesselName).jpg
-      var vname = f.name.replace(/\.jpg$/, '');
-      localStorage.setItem('yasa_photo_url_' + vname, publicUrl + '?t=' + (f.updated_at || ''));
-    });
-    // Açık modal varsa güncelle
-    if (activeVessel) vesselPhotoApply(activeVessel.name);
-  } catch(e) { /* sessizce geç */ }
-}
+// No longer needed — photos now travel with the main dashboard_data JSON
+async function vesselPhotosSyncFromCloud() { /* photos synced via main cloudSave/cloudLoad */ }
 
 window.vesselPhotoUpload = function() {
   var inp = document.getElementById('vesselPhotoInput');
@@ -7920,43 +8210,27 @@ window.vesselPhotoChanged = function(inp) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var imgEl = new Image();
-    imgEl.onload = async function() {
-      // Compress: max 600px, JPEG %75
+    imgEl.onload = function() {
+      // Compress: max 480px wide, JPEG 72% — keeps base64 small (~15-25 KB per vessel)
       var canvas = document.createElement('canvas');
-      var maxW = 600, maxH = 350;
+      var maxW = 480, maxH = 280;
       var ratio = Math.min(maxW / imgEl.width, maxH / imgEl.height, 1);
       canvas.width  = Math.round(imgEl.width  * ratio);
       canvas.height = Math.round(imgEl.height * ratio);
       canvas.getContext('2d').drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.72);
 
-      // Canvas → Blob
-      canvas.toBlob(async function(blob) {
-        if (!blob) { showToast('Image conversion failed', 'error'); return; }
-        var fileName = canonicalize(activeVessel.name) + '.jpg';
-        var uploadUrl = SUPABASE_URL + '/storage/v1/object/' + PHOTO_BUCKET + '/' + fileName;
-        try {
-          showToast('Uploading photo...', 'info');
-          var resp = await fetch(uploadUrl, {
-            method: 'PUT',
-            headers: {
-              'apikey': SUPABASE_ANON_KEY,
-              'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-              'Content-Type': 'image/jpeg',
-              'x-upsert': 'true'
-            },
-            body: blob
-          });
-          if (!resp.ok) { showToast('Upload failed: ' + resp.status, 'error'); return; }
-          // Public URL'yi kaydet
-          var publicUrl = SUPABASE_URL + '/storage/v1/object/public/' + PHOTO_BUCKET + '/' + fileName;
-          var urlWithTs = publicUrl + '?t=' + Date.now();
-          localStorage.setItem(vesselPhotoKey(activeVessel.name), urlWithTs);
-          vesselPhotoApply(activeVessel.name);
-          showToast('Vessel photo uploaded!', 'success');
-        } catch(err) {
-          showToast('Upload error: ' + err.message, 'error');
-        }
-      }, 'image/jpeg', 0.75);
+      // Store locally with timestamp for LWW merge
+      var record = JSON.stringify({ url: dataUrl, ts: new Date().toISOString() });
+      localStorage.setItem(vesselPhotoKey(activeVessel.name), record);
+      vesselPhotoApply(activeVessel.name);
+
+      // Push to cloud immediately so teammates see it
+      cloudSave().then(function() {
+        showToast('Vessel photo saved & synced! Others will see it shortly.', 'success');
+      }).catch(function() {
+        showToast('Photo saved locally. Will sync on next cloud save.', 'info');
+      });
     };
     imgEl.src = e.target.result;
   };
@@ -8099,6 +8373,9 @@ function exportVesselPDF() {
     certEntries.push({ label: f.label, date: dateStr, suffix: suffix, st: st });
   });
 
+  // ── SAĞ SÜTUN başlangıç y değeri — cert loop'ta da kullanılır ─
+  var yR = bodyTop;
+
   // 2 sütun yan yana: her entry yaklaşık 4.5mm yüksekliği kaplar
   var halfCol = (colL - 4) / 2;
   for (var ci = 0; ci < certEntries.length; ci++) {
@@ -8137,7 +8414,7 @@ function exportVesselPDF() {
   doc.setDrawColor(220,228,245); doc.setLineWidth(0.3);
   doc.line(colRx - 3, bodyTop, colRx - 3, PH - 14);
 
-  var yR = bodyTop;
+  yR = bodyTop; // reset for right column
   function secTitleR(label, color) {
     color = color || [37,99,235];
     doc.setFillColor(color[0],color[1],color[2]);
@@ -11010,9 +11287,31 @@ body.dark .ord-content-text{background:#181818;}
 
   <!-- Toolbar -->
   <div class="insp-toolbar">
-    <select id="inspVesselSel" class="insp-vessel-sel" onchange="inspOnVesselChange()">
-      <option value="">— Select Vessel —</option>
-    </select>
+    <!-- Custom multi-vessel selector -->
+    <div style="position:relative;" id="inspVesselWrapper">
+      <button id="inspVesselBtn" onclick="inspToggleVesselPanel()"
+        style="min-width:220px;padding:8px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--navy2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;outline:none;">
+        <span id="inspVesselLabel" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">— Select Vessels —</span>
+        <span style="font-size:10px;opacity:.6;flex-shrink:0;">▾</span>
+      </button>
+      <!-- Dropdown panel -->
+      <div id="inspVesselPanel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:600;background:var(--navy2);border:1px solid var(--border2);border-radius:10px;width:300px;box-shadow:0 8px 28px rgba(0,0,0,.25);overflow:hidden;">
+        <!-- Search -->
+        <div style="padding:10px 12px;border-bottom:1px solid var(--border);">
+          <input type="text" id="inspVesselSearch" placeholder="🔍  Search vessel..."
+            oninput="inspFilterVesselList(this.value)"
+            style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border2);border-radius:6px;background:var(--input-bg);color:var(--text);font-size:13px;outline:none;font-family:'Barlow Condensed',sans-serif;">
+        </div>
+        <!-- All / None buttons -->
+        <div style="padding:8px 12px;display:flex;gap:6px;border-bottom:1px solid var(--border);">
+          <button onclick="inspSelectAllVessels()" style="flex:1;padding:5px;background:var(--navy3);border:1px solid var(--border2);border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;">Select All</button>
+          <button onclick="inspClearVessels()" style="flex:1;padding:5px;background:var(--navy3);border:1px solid var(--border2);border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;">Clear</button>
+        </div>
+        <!-- Vessel list -->
+        <div id="inspVesselListItems" style="max-height:300px;overflow-y:auto;padding:6px 0;"></div>
+      </div>
+    </div>
+
     <div class="insp-type-bar" id="inspTypeBar">
       <button class="insp-type-tab active" data-type="company"   onclick="inspOnTypeChange('company')">🏢 Company</button>
       <button class="insp-type-tab"        data-type="psc"       onclick="inspOnTypeChange('psc')">⚓ PSC</button>
@@ -11020,14 +11319,14 @@ body.dark .ord-content-text{background:#181818;}
       <button class="insp-type-tab"        data-type="flag"      onclick="inspOnTypeChange('flag')">🚩 Flag</button>
       <button class="insp-type-tab"        data-type="rightship" onclick="inspOnTypeChange('rightship')">⭐ Rightship</button>
     </div>
-    <button class="btn btn-primary btn-sm" onclick="inspNewRecord()" style="margin-left:auto;padding:8px 18px;">+ New Inspection</button>
+    <button id="inspNewBtn" class="btn btn-primary btn-sm" onclick="inspNewRecord()" style="margin-left:auto;padding:8px 18px;">+ New Inspection</button>
     <!-- RightShip import — paste-based, her ortamda çalışır (file:// dahil) -->
     <button id="inspPdfImportBtn" style="display:none;padding:8px 16px;background:linear-gradient(135deg,#e55b20,#c04010);color:#fff;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.04em;" onclick="inspOpenRightShipPaste()">
       📋 Import RightShip Report
     </button>
   </div>
   <div class="insp-content" id="inspContent">
-    <div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Select a vessel to view inspections</div></div>
+    <div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Select vessels to view inspections</div></div>
   </div>
 
 </div>
@@ -11475,9 +11774,126 @@ const INSP_TYPES = [
   { id:'rightship', label:'Rightship Inspection', icon:'⭐', color:'#d97706' }
 ];
 
-let _inspVessel = '';
+let _inspVessel = '';            // for CRUD context (single vessel)
+var _inspSelectedVessels = [];   // multi-select array of vessel names
 let _inspType   = 'company';
+let _inspYearFilter  = null;
+let _inspInspector   = null;
 const _inspExpanded = new Set();
+
+// ── Multi-vessel selector ─────────────────────────────────────
+function inspInit() {
+  _inspBuildVesselList('');
+  _inspRunTextCleanup();
+  inspRender();
+  // Close panel when clicking outside
+  document.addEventListener('click', function(e) {
+    var wrapper = document.getElementById('inspVesselWrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      var panel = document.getElementById('inspVesselPanel');
+      if (panel) panel.style.display = 'none';
+    }
+  });
+}
+
+function inspToggleVesselPanel() {
+  var panel = document.getElementById('inspVesselPanel');
+  if (!panel) return;
+  var isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    var search = document.getElementById('inspVesselSearch');
+    if (search) { search.value = ''; inspFilterVesselList(''); search.focus(); }
+  }
+}
+
+function _inspBuildVesselList(filter) {
+  var list = document.getElementById('inspVesselListItems');
+  if (!list) return;
+  var f = (filter||'').toLowerCase();
+  var vessels = VESSELS_ALL.filter(function(v){ return !f || v.toLowerCase().includes(f); });
+  list.innerHTML = vessels.map(function(v) {
+    var checked = _inspSelectedVessels.includes(v);
+    var ev = escAttr(v);
+    return '<label style="display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;transition:background .1s;" '
+      + 'onmouseover="this.style.background=\'var(--navy3)\'" onmouseout="this.style.background=\'transparent\'">'
+      + '<input type="checkbox" '+(checked?'checked':'')
+      + ' onchange="inspVesselCheckboxChange(\''+ev+'\',this.checked)"'
+      + ' style="cursor:pointer;accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;">'
+      + '<span style="font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(v)+'</span>'
+      + '</label>';
+  }).join('');
+}
+
+function inspFilterVesselList(query) {
+  _inspBuildVesselList(query);
+}
+
+function inspVesselCheckboxChange(vessel, checked) {
+  if (checked) {
+    if (!_inspSelectedVessels.includes(vessel)) _inspSelectedVessels.push(vessel);
+    // migrate on first select
+    var vn = canonicalize(vessel);
+    inspMigrateCompany(vn);
+  } else {
+    _inspSelectedVessels = _inspSelectedVessels.filter(function(v){ return v !== vessel; });
+  }
+  // single-vessel context
+  _inspVessel = _inspSelectedVessels.length === 1 ? _inspSelectedVessels[0] : '';
+  _inspYearFilter = null;
+  _inspUpdateVesselLabel();
+  _inspUpdateCrudButtons();
+  inspRender();
+}
+
+function inspSelectAllVessels() {
+  _inspSelectedVessels = VESSELS_ALL.slice();
+  _inspVessel = '';
+  _inspYearFilter = null;
+  _inspBuildVesselList(document.getElementById('inspVesselSearch')?.value||'');
+  _inspUpdateVesselLabel();
+  _inspUpdateCrudButtons();
+  inspRender();
+}
+
+function inspClearVessels() {
+  _inspSelectedVessels = [];
+  _inspVessel = '';
+  _inspYearFilter = null;
+  _inspBuildVesselList(document.getElementById('inspVesselSearch')?.value||'');
+  _inspUpdateVesselLabel();
+  _inspUpdateCrudButtons();
+  inspRender();
+}
+
+function _inspUpdateVesselLabel() {
+  var lbl = document.getElementById('inspVesselLabel');
+  if (!lbl) return;
+  var n = _inspSelectedVessels.length;
+  if (n === 0) lbl.textContent = '— Select Vessels —';
+  else if (n === 1) lbl.textContent = _inspSelectedVessels[0];
+  else if (n === VESSELS_ALL.length) lbl.textContent = '🌐 All Vessels ('+n+')';
+  else lbl.textContent = n + ' vessels selected';
+}
+
+function _inspUpdateCrudButtons() {
+  var single = _inspSelectedVessels.length === 1;
+  var newBtn = document.getElementById('inspNewBtn');
+  var pdfBtn = document.getElementById('inspPdfImportBtn');
+  if (newBtn) { newBtn.style.opacity = single ? '1' : '0.4'; newBtn.title = single ? '' : 'Select a single vessel to add inspection'; }
+  if (pdfBtn) { pdfBtn.style.display = (single && _inspType === 'rightship') ? '' : 'none'; }
+}
+
+function inspSetYear(year) {
+  _inspYearFilter = year;
+  inspRender();
+}
+
+function inspSetInspector(name) {
+  _inspInspector = name;
+  _inspYearFilter = null;
+  inspRender();
+}
 
 // ── Storage helpers ───────────────────────────────────────────
 // ── Finding text display cleaner ─────────────────────────────
@@ -11486,9 +11902,10 @@ const _inspExpanded = new Set();
 // "[3.13] Water..."      → "[3.13] Water..."   (RightShip ref korunur)
 function _cleanFindingText(text) {
   if (!text) return text;
-  // Sadece saf rakam + separator ile başlayanları temizle
-  // \d+ → bir veya daha fazla rakam (NCR-, harf içerenler tutulur)
-  return text.replace(/^\d+\s*[-.)]\s+/, '').trim();
+  // Saf rakam + separator ile başlayanları temizle:
+  // "1- ", "1-", "2. ", "3) ", "1 - ", "1–", "1—" vb.
+  // NCR-1, [3.13], 9A.1 gibi prefixler korunur (rakamla başlamaz)
+  return text.replace(/^\d+\s*[-–—.)]\s*/, '').trim();
 }
 
 function inspKey(type, vn)        { return 'yasa_insp_' + type + '_' + vn; }
@@ -11561,24 +11978,44 @@ function inspMigrateCompany(vn) {
 }
 
 // ── Init (called when tab opens) ──────────────────────────────
-function inspInit() {
-  var sel = document.getElementById('inspVesselSel');
-  if (!sel) return;
-  var cur = _inspVessel;
-  sel.innerHTML = '<option value="">— Select Vessel —</option>'
-    + VESSELS_ALL.map(function(v){
-        return '<option value="'+escAttr(v)+'"'+(v===cur?' selected':'')+'>'+escHtml(v)+'</option>';
-      }).join('');
+// ── One-time cleanup: mevcut finding metinlerinden baştaki numaraları sil ──
+// Sadece bir kez çalışır (yasa_insp_clean_v1 flag'i ile kontrol edilir).
+function _inspRunTextCleanup() {
+  if (localStorage.getItem('yasa_insp_clean_v1')) return;
+  var ITYPES = ['company','psc','class','flag','rightship'];
+  var changed = false;
+  VESSELS_ALL.forEach(function(v) {
+    var vn = canonicalize(v);
+    ITYPES.forEach(function(type) {
+      var records = inspLoad(type, vn);
+      if (!records.length) return;
+      var dirty = false;
+      records.forEach(function(rec) {
+        (rec.findings || []).forEach(function(f) {
+          var cleaned = _cleanFindingText(f.text || '');
+          if (cleaned !== f.text) { f.text = cleaned; dirty = true; }
+        });
+      });
+      if (dirty) {
+        localStorage.setItem(inspKey(type, vn), JSON.stringify(records));
+        changed = true;
+      }
+    });
+  });
+  localStorage.setItem('yasa_insp_clean_v1', '1');
+  if (changed) cloudSave().catch(function(){});
+}
+
+// ── One-time cleanup (called from inspInit above) ────────────
+
+function inspSetYear(year) {
+  _inspYearFilter = year;
   inspRender();
 }
 
-function inspOnVesselChange() {
-  var sel = document.getElementById('inspVesselSel');
-  _inspVessel = sel ? sel.value : '';
-  if (_inspVessel) {
-    var vn = canonicalize(_inspVessel);
-    inspMigrateCompany(vn);
-  }
+function inspSetInspector(name) {
+  _inspInspector = name;
+  _inspYearFilter = null; // reset year when switching inspector
   inspRender();
 }
 
@@ -11587,9 +12024,7 @@ function inspOnTypeChange(type) {
   document.querySelectorAll('.insp-type-tab').forEach(function(b){
     b.classList.toggle('active', b.dataset.type === type);
   });
-  // PDF import butonu sadece Rightship tipinde görünür
-  var pdfBtn = document.getElementById('inspPdfImportBtn');
-  if (pdfBtn) pdfBtn.style.display = (type === 'rightship') ? '' : 'none';
+  _inspUpdateCrudButtons();
   inspRender();
 }
 
@@ -11597,30 +12032,264 @@ function inspOnTypeChange(type) {
 function inspRender() {
   var el = document.getElementById('inspContent');
   if (!el) return;
-  if (!_inspVessel) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Select a vessel to view inspections</div></div>';
+
+  // No vessels selected
+  if (!_inspSelectedVessels.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Select one or more vessels to view inspections</div></div>';
     return;
   }
-  var vn = canonicalize(_inspVessel);
+
   var typeInfo = INSP_TYPES.find(function(t){ return t.id===_inspType; }) || INSP_TYPES[0];
-  var records = inspLoad(_inspType, vn);
-  if (!records.length) {
-    var emptyExtra = (_inspType === 'rightship')
+  var showVesselBadge = _inspSelectedVessels.length > 1;
+
+  // ── Collect inspections from all selected vessels ─────────────
+  var allItems = [];
+  _inspSelectedVessels.forEach(function(v) {
+    var vn = canonicalize(v);
+    inspLoad(_inspType, vn).forEach(function(rec) {
+      allItems.push({ vn: vn, vesselName: v, rec: rec });
+    });
+  });
+
+  // Apply year filter
+  var filtered = _inspYearFilter
+    ? allItems.filter(function(item){ return item.rec.date && item.rec.date.startsWith(String(_inspYearFilter)); })
+    : allItems;
+
+  // Sort newest first
+  filtered.sort(function(a,b){ return (b.rec.date||'').localeCompare(a.rec.date||''); });
+
+  // ── Year filter bar ───────────────────────────────────────────
+  var yearBar = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">'
+    + '<button onclick="inspSetYear(null)" style="'+_inspYearBtnStyle(!_inspYearFilter)+'">All Years</button>'
+    + _INSP_YEARS.map(function(y){
+        var count = allItems.filter(function(i){ return i.rec.date && i.rec.date.startsWith(String(y)); }).length;
+        if (!count) return '';
+        return '<button onclick="inspSetYear('+y+')" style="'+_inspYearBtnStyle(_inspYearFilter===y)+'">'
+          + y + ' <span style="opacity:.7;font-size:10px;">('+count+')</span></button>';
+      }).join('')
+    + '</div>';
+
+  // ── Stats ─────────────────────────────────────────────────────
+  var statsHtml = _inspBuildStats(filtered, allItems, typeInfo, null);
+
+  // ── Cards ─────────────────────────────────────────────────────
+  var cardsHtml;
+  if (!allItems.length) {
+    var emptyExtra = (_inspSelectedVessels.length === 1 && _inspType === 'rightship')
       ? '<div style="margin-top:8px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">'
         + '<button class="btn btn-primary" onclick="inspNewRecord()" style="padding:10px 22px;">+ Add First Inspection</button>'
         + '<button style="padding:10px 18px;background:linear-gradient(135deg,#e55b20,#c04010);color:#fff;border:none;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;" onclick="inspOpenRightShipPaste()">📋 Import RightShip Report</button>'
         + '</div>'
       : '<div style="margin-top:12px;"><button class="btn btn-primary" onclick="inspNewRecord()" style="padding:10px 22px;">+ Add First Inspection</button></div>';
-    el.innerHTML = '<div class="empty"><div class="empty-icon">'+typeInfo.icon+'</div>'
-      +'<div class="empty-text">No '+escHtml(typeInfo.label)+' records for '+escHtml(_inspVessel)+'</div>'
+    cardsHtml = '<div class="empty"><div class="empty-icon">'+typeInfo.icon+'</div>'
+      + '<div class="empty-text">No '+escHtml(typeInfo.label)+' records for selected vessel(s)</div>'
       + emptyExtra + '</div>';
-    return;
+  } else if (!filtered.length) {
+    cardsHtml = '<div class="empty" style="padding:30px;"><div class="empty-icon">📅</div>'
+      + '<div class="empty-text">No inspections found for '+_inspYearFilter+'</div></div>';
+  } else {
+    cardsHtml = filtered.map(function(item){
+      return _inspCardHtml(item.vn, item.rec, showVesselBadge ? item.vesselName : null);
+    }).join('');
   }
-  var sorted = records.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
-  el.innerHTML = sorted.map(function(rec){ return _inspCardHtml(vn, rec); }).join('');
+
+  // ── 2-column layout (cards + stats) ──────────────────────────
+  el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 290px;gap:20px;align-items:start;padding:20px;">'
+    + '<div>' + (allItems.length ? yearBar : '') + cardsHtml + '</div>'
+    + '<div style="position:sticky;top:120px;">' + statsHtml + '</div>'
+    + '</div>';
 }
 
-function _inspCardHtml(vn, rec) {
+// ── All Vessels mode ──────────────────────────────────────────
+var _INSP_YEARS = [2026,2025,2024,2023,2022];
+
+function _inspRenderAllVessels(el) {
+  var typeInfo = INSP_TYPES.find(function(t){ return t.id===_inspType; }) || INSP_TYPES[0];
+
+  // ── Collect all inspections across all vessels ───────────────
+  var allItems = []; // {vn, vesselName, rec, inspector}
+  VESSELS_ALL.forEach(function(v) {
+    var vn = canonicalize(v);
+    var marine = getMarine(v) || '';
+    inspLoad(_inspType, vn).forEach(function(rec) {
+      allItems.push({ vn: vn, vesselName: v, rec: rec, inspector: marine });
+    });
+  });
+
+  // ── Build unique inspector list ──────────────────────────────
+  var inspectorSet = {};
+  allItems.forEach(function(item) {
+    if (item.inspector) inspectorSet[item.inspector] = (inspectorSet[item.inspector]||0)+1;
+  });
+  var inspectorList = Object.keys(inspectorSet).sort();
+
+  // ── Apply inspector filter ───────────────────────────────────
+  var afterInspFilter = _inspInspector
+    ? allItems.filter(function(item){ return item.inspector === _inspInspector; })
+    : allItems;
+
+  // ── Apply year filter ────────────────────────────────────────
+  var filtered = _inspYearFilter
+    ? afterInspFilter.filter(function(item) {
+        return item.rec.date && item.rec.date.startsWith(String(_inspYearFilter));
+      })
+    : afterInspFilter;
+
+  // Sort newest first
+  filtered.sort(function(a,b){ return (b.rec.date||'').localeCompare(a.rec.date||''); });
+
+  // ── Inspector filter bar ─────────────────────────────────────
+  var inspBtn = function(label, val, active) {
+    var count = val === null
+      ? allItems.length
+      : allItems.filter(function(i){ return i.inspector === val; }).length;
+    return '<button onclick="inspSetInspector('+(val===null?'null':"'"+val.replace(/'/g,"\\'")+"'")+') " style="'
+      + _inspYearBtnStyle(active) + '">'
+      + escHtml(label)
+      + '<span style="margin-left:5px;opacity:.65;font-size:10px;">('+count+')</span></button>';
+  };
+
+  var inspBar = '';
+  if (inspectorList.length > 1) {
+    inspBar = '<div style="margin-bottom:10px;">'
+      + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:6px;">👤 Inspector / Superintendent</div>'
+      + '<div style="display:flex;gap:5px;flex-wrap:wrap;">'
+      + inspBtn('All', null, !_inspInspector)
+      + inspectorList.map(function(name){
+          // Short name: last word or first+last
+          var parts = name.trim().split(/\s+/);
+          var short = parts.length > 1 ? parts[0][0]+'. '+parts[parts.length-1] : name;
+          return inspBtn(short, name, _inspInspector===name);
+        }).join('')
+      + '</div></div>';
+  }
+
+  // ── Year filter bar ──────────────────────────────────────────
+  var yearBar = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">'
+    + '<button onclick="inspSetYear(null)" style="'+_inspYearBtnStyle(!_inspYearFilter)+'">All Years</button>'
+    + _INSP_YEARS.map(function(y){
+        var count = afterInspFilter.filter(function(i){ return i.rec.date && i.rec.date.startsWith(String(y)); }).length;
+        if (!count) return '';
+        return '<button onclick="inspSetYear('+y+')" style="'+_inspYearBtnStyle(_inspYearFilter===y)+'">'
+          + y + ' <span style="opacity:.7;font-size:10px;">('+count+')</span></button>';
+      }).join('')
+    + '</div>';
+
+  // ── Stats panel ───────────────────────────────────────────────
+  var statsHtml = _inspBuildStats(filtered, afterInspFilter, typeInfo, _inspInspector);
+
+  // ── Cards list ────────────────────────────────────────────────
+  var cardsHtml = filtered.length
+    ? filtered.map(function(item){ return _inspCardHtml(item.vn, item.rec, item.vesselName); }).join('')
+    : '<div class="empty" style="padding:40px;"><div class="empty-icon">'+typeInfo.icon+'</div>'
+      + '<div class="empty-text">No '+escHtml(typeInfo.label)+' inspections found'
+      + (_inspInspector ? ' for '+escHtml(_inspInspector) : '')
+      + (_inspYearFilter ? ' in '+_inspYearFilter : '')+'</div></div>';
+
+  // ── Final layout ──────────────────────────────────────────────
+  el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 290px;gap:20px;align-items:start;padding:20px;">'
+    + '<div>' + inspBar + yearBar + cardsHtml + '</div>'
+    + '<div id="inspStatsPanel" style="position:sticky;top:120px;">' + statsHtml + '</div>'
+    + '</div>';
+}
+
+function _inspYearBtnStyle(active) {
+  return active
+    ? 'padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:16px;font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;'
+    : 'padding:6px 14px;background:var(--navy2);color:var(--text2);border:1px solid var(--border2);border-radius:16px;font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;';
+}
+
+function _inspBuildStats(filtered, allItems, typeInfo, inspectorName) {
+  var totalInsp     = filtered.length;
+  var allFindings   = filtered.reduce(function(s,i){ return s + (i.rec.findings||[]).length; }, 0);
+  var openFindings  = filtered.reduce(function(s,i){ return s + (i.rec.findings||[]).filter(function(f){ return f.status!=='closed'; }).length; }, 0);
+  var closedFindings= filtered.reduce(function(s,i){ return s + (i.rec.findings||[]).filter(function(f){ return f.status==='closed'; }).length; }, 0);
+  var avgFindings   = totalInsp ? (allFindings / totalInsp).toFixed(1) : '0';
+  var closureRate   = allFindings ? Math.round(closedFindings/allFindings*100) : 0;
+
+  // Unique vessels in filtered
+  var vesselSet = {};
+  filtered.forEach(function(i){ vesselSet[i.vn] = (vesselSet[i.vn]||0) + 1; });
+  var uniqueVessels = Object.keys(vesselSet).length;
+
+  // Most inspected vessel
+  var topVessel = '';
+  var topCount = 0;
+  Object.keys(vesselSet).forEach(function(vn){
+    if (vesselSet[vn] > topCount) { topCount = vesselSet[vn]; topVessel = vn; }
+  });
+  // Convert vn back to display name
+  var topVesselName = '';
+  VESSELS_ALL.forEach(function(v){ if (canonicalize(v)===topVessel) topVesselName=v; });
+
+  // Most recent inspection
+  var mostRecent = filtered.length ? filtered[0].rec.date : '';
+  var mostRecentStr = mostRecent ? new Date(mostRecent+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+
+  // Vessel with most findings
+  var findingsByVessel = {};
+  filtered.forEach(function(i){
+    findingsByVessel[i.vn] = (findingsByVessel[i.vn]||0) + (i.rec.findings||[]).length;
+  });
+  var topFindingVn = Object.keys(findingsByVessel).sort(function(a,b){ return findingsByVessel[b]-findingsByVessel[a]; })[0] || '';
+  var topFindingName = '';
+  VESSELS_ALL.forEach(function(v){ if (canonicalize(v)===topFindingVn) topFindingName=v; });
+  var topFindingCount = findingsByVessel[topFindingVn] || 0;
+
+  // Year breakdown (for "all years" only)
+  var yearBreakdown = '';
+  if (!_inspYearFilter) {
+    var yCounts = {};
+    allItems.forEach(function(i){
+      if (!i.rec.date) return;
+      var y = i.rec.date.slice(0,4);
+      yCounts[y] = (yCounts[y]||0) + 1;
+    });
+    var years = Object.keys(yCounts).sort(function(a,b){ return b-a; }).slice(0,6);
+    if (years.length) {
+      yearBreakdown = '<div style="margin-top:12px;">'
+        + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:8px;">By Year</div>'
+        + years.map(function(y){
+            var cnt = yCounts[y] || 0;
+            var pct = Math.round(cnt / allItems.length * 100);
+            return '<div style="margin-bottom:5px;">'
+              + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:2px;">'
+              + '<span>'+y+'</span><span>'+cnt+'</span></div>'
+              + '<div style="height:4px;background:var(--border);border-radius:2px;">'
+              + '<div style="height:4px;background:var(--accent);border-radius:2px;width:'+pct+'%;"></div>'
+              + '</div></div>';
+          }).join('')
+        + '</div>';
+    }
+  }
+
+  function statRow(icon, label, value, sub, color) {
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">'
+      + '<div style="width:36px;height:36px;border-radius:8px;background:'+(color||'var(--navy3)')+';display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">'+icon+'</div>'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="font-size:18px;font-weight:800;font-family:\'Barlow Condensed\',sans-serif;color:var(--text);line-height:1.1;">'+value+'</div>'
+      + '<div style="font-size:11px;color:var(--text3);">'+label+(sub?'<span style="margin-left:4px;opacity:.7;">'+sub+'</span>':'')+'</div>'
+      + '</div></div>';
+  }
+
+  return '<div style="background:var(--navy2);border:1px solid var(--border);border-radius:12px;padding:16px;">'
+    + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">📊 '+escHtml(typeInfo.label)+' Stats</div>'
+    + '<div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5;">'
+    + (_inspYearFilter ? String(_inspYearFilter) : 'All time') + ' · '
+    + escHtml(typeInfo.label)
+    + (inspectorName ? '<br><span style="color:var(--accent);">👤 '+escHtml(inspectorName)+'</span>' : '')
+    + '</div>'
+    + statRow('🔍', 'Total Inspections', totalInsp, '(' + uniqueVessels + ' vessels)', 'rgba(37,99,235,.15)')
+    + statRow('📋', 'Total Findings', allFindings, 'avg '+avgFindings+'/inspection', 'rgba(124,58,237,.15)')
+    + statRow('🔴', 'Open Findings', openFindings, '', 'rgba(220,38,38,.12)')
+    + statRow('🟢', 'Closed Findings', closedFindings, closureRate+'% closure rate', 'rgba(22,163,74,.12)')
+    + statRow('📅', 'Latest Inspection', mostRecentStr, '', 'rgba(100,116,139,.12)')
+    + yearBreakdown
+    + '</div>';
+}
+
+function _inspCardHtml(vn, rec, vesselLabel) {
   var openCount   = (rec.findings||[]).filter(function(f){ return f.status !== 'closed'; }).length;
   var closedCount = (rec.findings||[]).filter(function(f){ return f.status === 'closed'; }).length;
   var total       = (rec.findings||[]).length;
@@ -11629,11 +12298,15 @@ function _inspCardHtml(vn, rec) {
     ? new Date(rec.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
     : '—';
   var evn = escAttr(vn); var eid = escAttr(rec.id);
+  var vesselBadge = vesselLabel
+    ? '<span style="display:inline-block;background:rgba(37,99,235,.12);color:var(--accent);font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.03em;margin-right:4px;">🚢 '+escHtml(vesselLabel)+'</span>'
+    : '';
   return '<div class="insp-card" id="inspCard_'+eid+'">'
     +'<div class="insp-card-header" onclick="inspToggleCard(\''+eid+'\')">'
     +  '<div class="insp-card-left">'
     +    '<div class="insp-card-title">'+escHtml(rec.title)+'</div>'
     +    '<div class="insp-card-meta">'
+    +      vesselBadge
     +      '<span class="insp-meta-date">📅 '+dateStr+'</span>'
     +      (openCount   ? '<span class="insp-badge insp-badge-open">'+openCount+' open</span>'     : '')
     +      (closedCount ? '<span class="insp-badge insp-badge-closed">'+closedCount+' closed</span>': '')
@@ -11722,7 +12395,9 @@ function inspToggleCard(id) {
 
 // ── Inspection CRUD ───────────────────────────────────────────
 function inspNewRecord() {
-  if (!_inspVessel) { showToast('Select a vessel first', 'error'); return; }
+  if (_inspSelectedVessels.length === 0) { showToast('Select a vessel first', 'error'); return; }
+  if (_inspSelectedVessels.length > 1) { showToast('Select a single vessel to add an inspection', 'info'); return; }
+  _inspVessel = _inspSelectedVessels[0]; // ensure context is set
   _inspShowRecordModal(null, null, null);
 }
 
@@ -12209,13 +12884,13 @@ function _inspShowRightShipPreview(parsed, fileName) {
     // Switch to rightship type + selected vessel
     _inspType    = 'rightship';
     _inspVessel  = vessel;
+    _inspSelectedVessels = [vessel];
     document.querySelectorAll('.insp-type-tab').forEach(function(b){
       b.classList.toggle('active', b.dataset.type === 'rightship');
     });
-    var vSel = document.getElementById('inspVesselSel');
-    if (vSel) vSel.value = vessel;
-    var pdfBtn = document.getElementById('inspPdfImportBtn');
-    if (pdfBtn) pdfBtn.style.display = '';
+    _inspUpdateVesselLabel();
+    _inspUpdateCrudButtons();
+    _inspBuildVesselList('');
     inspMigrateCompany(canonicalize(vessel));
 
     var vn  = canonicalize(vessel);
@@ -12369,7 +13044,6 @@ function inspExportPDF(vn, inspId) {
   var typeInfo = INSP_TYPES.find(function(t){ return t.id===_inspType; }) || INSP_TYPES[0];
   var vessel   = allVessels.find(function(v){ return canonicalize(v.name)===vn; }) || {};
   var marine   = getMarine(vessel.name||vn) || '—';
-  var ops      = getOps(vessel.name||vn)    || '—';
   var dateStr  = rec.date ? new Date(rec.date+'T00:00:00').toLocaleDateString('en-GB') : '—';
 
   // ── Header banner ───────────────────────────────────────────
@@ -12384,20 +13058,46 @@ function inspExportPDF(vn, inspId) {
 
   // ── Inspection info bar ──────────────────────────────────────
   var y = 38;
+  var contentW = pageW - margin*2;
+
+  // Önce title'ı ölç — kaç satır gerektiğini hesapla
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  var titleMaxW = contentW - 26; // "Inspection: " label'ından sonra kalan alan
+  var titleLines = doc.splitTextToSize(tr(rec.title), titleMaxW);
+  var barH = 10 + titleLines.length * 5 + 8; // top padding + title + date row
+
   doc.setFillColor(241,245,249);
-  doc.rect(margin, y, pageW-margin*2, 20, 'F');
-  doc.setTextColor(71,85,105); doc.setFontSize(8);
+  doc.rect(margin, y, contentW, barH, 'F');
+  doc.setTextColor(71,85,105);
+
+  // Satır 1: Inspection title (tam genişlik, wrap)
+  doc.setFontSize(8); doc.setFont('helvetica','bold');
+  doc.text('Inspection:', margin+2, y+7);
+  doc.setFont('helvetica','normal');
+  doc.text(titleLines, margin+24, y+7);
+
+  // Satır 2: Date (sol) | Marine Supt (sağ) — alt satır, üstüne binme yok
+  var row2Y = y + 7 + titleLines.length * 5;
   doc.setFont('helvetica','bold');
-  doc.text('Inspection:', margin+2, y+6); doc.setFont('helvetica','normal'); doc.text(tr(rec.title), margin+24, y+6);
+  doc.text('Date:', margin+2, row2Y);
+  doc.setFont('helvetica','normal');
+  doc.text(dateStr, margin+15, row2Y);
+
   doc.setFont('helvetica','bold');
-  doc.text('Date:', margin+2, y+13); doc.setFont('helvetica','normal'); doc.text(dateStr, margin+16, y+13);
-  doc.setFont('helvetica','bold');
-  doc.text('Marine Supt:', margin+70, y+6); doc.setFont('helvetica','normal'); doc.text(tr(marine), margin+93, y+6);
-  doc.setFont('helvetica','bold');
-  doc.text('Operator:', margin+70, y+13); doc.setFont('helvetica','normal'); doc.text(tr(ops), margin+88, y+13);
+  doc.text('Marine Supt:', margin + contentW/2, row2Y);
+  doc.setFont('helvetica','normal');
+  var marineX = margin + contentW/2 + 24;
+  var marineMaxW = contentW/2 - 26;
+  var marineText = tr(marine);
+  // Truncate marine name if too long
+  if (doc.getTextWidth(marineText) > marineMaxW) {
+    while (marineText.length > 1 && doc.getTextWidth(marineText+'…') > marineMaxW) marineText = marineText.slice(0,-1);
+    marineText += '…';
+  }
+  doc.text(marineText, marineX, row2Y);
 
   // ── Stats ───────────────────────────────────────────────────
-  y += 25;
+  y += barH + 5;
   var openFindings   = findings.filter(function(f){ return f.status!=='closed'; });
   var closedFindings = findings.filter(function(f){ return f.status==='closed'; });
   var inProg         = findings.filter(function(f){ return f.status==='in_progress'; });
