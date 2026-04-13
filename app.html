@@ -6390,7 +6390,7 @@ async function _writeCloud(rowId, data) {
 function cloudSave() {
   if (!_cloudReady) return Promise.resolve();
   if (_saveTimer) clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(function() { _saveTimer = null; _doCloudSave(); }, 4000); // 4s debounce — reduce Disk IO
+  _saveTimer = setTimeout(function() { _saveTimer = null; _doCloudSave(); }, 500); // 500ms debounce (Pro plan)
   return Promise.resolve();
 }
 
@@ -6631,7 +6631,7 @@ function cloudSave(type, key) {
     GLOBAL_MODULES.forEach(function(m){ _dirtyGlobals.add(m); });
   }
   if (_saveTimer) clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(function() { _saveTimer = null; _doCloudSave(); }, 4000);
+  _saveTimer = setTimeout(function() { _saveTimer = null; _doCloudSave(); }, 500);
   return Promise.resolve();
 }
 
@@ -6720,9 +6720,6 @@ async function _doCloudSave() {
 // ── Manuel sync butonu ────────────────────────────────────────
 window.manualSync = async function() {
   if (!_cloudReady) return;
-  _setStatus('🔄', 'Bağlanıyor...');
-  await _wakeUpSupabase();
-  await new Promise(function(r){ setTimeout(r, 300); });
   _setStatus('🔄', 'Syncing...');
   try {
     var cloudData = await _fetchCloud();
@@ -6948,46 +6945,30 @@ async function cloudInit() {
         _applyGlobalData('core', coreRow);
         _lastRowStr['yasa_global_core']  = _deepSortStringify(coreRow);
       }
-      // ── Önce Supabase'i uyandır (cold start) ─────────────────
-      _setStatus('🔄', 'Supabase bağlanıyor...');
-      await _wakeUpSupabase();
-      await new Promise(function(r){ setTimeout(r, 500); });
-
-      // ── Gemileri 8'li gruplar halinde sırayla yükle ────────────
-      // Promise.all(38 vessel) yerine gruplu → thundering herd önlenir
-      var BATCH = 8;
-      var loaded = 0;
-      for (var bi = 0; bi < VESSELS_ALL.length; bi += BATCH) {
-        var batch = VESSELS_ALL.slice(bi, bi + BATCH);
-        _setStatus('🔄', 'Yükleniyor ' + Math.min(bi + BATCH, VESSELS_ALL.length) + '/' + VESSELS_ALL.length + '...');
-        var batchPromises = batch.map(function(vname) {
-          var vn    = canonicalize(vname);
-          var rowId = vesselRowId(vn);
-          return _fetchCloud(rowId).then(function(cd) {
-            loaded++;
-            if (cd) {
-              _applyVesselData(vn, cd);
-              _lastRowStr[rowId] = _deepSortStringify(cd);
-            } else {
-              var vdata = _buildVesselData(vn);
-              var hasContent = vdata && Object.values(vdata).some(function(val){
-                return val!=null&&(Array.isArray(val)?val.length>0:typeof val==='object'?Object.keys(val).length>0:!!val);
-              });
-              if (hasContent) {
-                return _writeCloud(rowId, vdata).then(function(){
-                  _lastRowStr[rowId]  = _deepSortStringify(vdata);
-                  _lastWriteTs[rowId] = Date.now();
-                }).catch(function(){});
-              }
+      // ── Tüm gemileri paralel yükle (Pro plan — limit yok) ────────
+      _setStatus('🔄', 'Yükleniyor...');
+      var vesselPromises = VESSELS_ALL.map(function(vname) {
+        var vn    = canonicalize(vname);
+        var rowId = vesselRowId(vn);
+        return _fetchCloud(rowId).then(function(cd) {
+          if (cd) {
+            _applyVesselData(vn, cd);
+            _lastRowStr[rowId] = _deepSortStringify(cd);
+          } else {
+            var vdata = _buildVesselData(vn);
+            var hasContent = vdata && Object.values(vdata).some(function(val){
+              return val!=null&&(Array.isArray(val)?val.length>0:typeof val==='object'?Object.keys(val).length>0:!!val);
+            });
+            if (hasContent) {
+              return _writeCloud(rowId, vdata).then(function(){
+                _lastRowStr[rowId]  = _deepSortStringify(vdata);
+                _lastWriteTs[rowId] = Date.now();
+              }).catch(function(){});
             }
-          }).catch(function(e){ console.warn('[CloudInit] vessel', vn, e.message); });
-        });
-        await Promise.all(batchPromises);
-        // Gruplar arası kısa bekleme — Supabase'e nefes ver
-        if (bi + BATCH < VESSELS_ALL.length) {
-          await new Promise(function(r){ setTimeout(r, 150); });
-        }
-      }
+          }
+        }).catch(function(e){ console.warn('[CloudInit] vessel', vn, e.message); });
+      });
+      await Promise.all(vesselPromises);
 
       // Diğer global'leri yükle
       for (var gj=0; gj<GLOBAL_MODULES.length; gj++) {
@@ -7070,7 +7051,7 @@ async function cloudInit() {
         _setStatus('☁️', 'Güncellendi — ' + _nowStr());
 
       } catch(e) { /* polling hatası sessiz */ }
-    }, 3000); // 3 saniyede bir — sadece 2KB index sorgusu
+    }, 1000); // 1 saniyede bir — sadece 2KB index sorgusu (Pro plan)
 
   } catch(e) {
     console.warn('cloudInit failed:', e);
