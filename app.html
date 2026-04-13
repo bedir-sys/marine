@@ -6308,34 +6308,61 @@ function _sbHeaders(extra) {
 }
 
 // ── Fetch cloud data ──────────────────────────────────────────
+// ── Retry yardımcısı: 503/504 hatalarında exponential backoff ──
+async function _withRetry(fn, maxRetries) {
+  maxRetries = maxRetries || 3;
+  var delay = 2000; // 2s → 4s → 8s
+  for (var attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch(e) {
+      var msg = e.message || '';
+      var isRetryable = msg.indexOf('503') !== -1 || msg.indexOf('504') !== -1
+                     || msg.indexOf('PGRST002') !== -1 || msg.indexOf('schema cache') !== -1
+                     || msg.indexOf('Failed to fetch') !== -1;
+      if (!isRetryable || attempt === maxRetries) throw e;
+      _setStatus('🔄', 'Supabase uyandırılıyor... (' + (attempt+1) + '/' + maxRetries + ')');
+      await new Promise(function(r){ setTimeout(r, delay); });
+      delay *= 2;
+    }
+  }
+}
+
 async function _fetchCloud(rowId) {
-  var url = SUPABASE_URL + '/rest/v1/dashboard_data?id=eq.' + encodeURIComponent(rowId) + '&select=payload';
-  var res = await fetch(url, { headers: _sbHeaders() });
-  if (!res.ok) throw new Error('Supabase fetch failed: ' + res.status);
-  var rows = await res.json();
-  if (!rows || rows.length === 0) return null;
-  var record = rows[0].payload;
-  if (!record || record.init === true) return null;
-  return record;
+  return _withRetry(async function() {
+    var url = SUPABASE_URL + '/rest/v1/dashboard_data?id=eq.' + encodeURIComponent(rowId) + '&select=payload';
+    var res = await fetch(url, { headers: _sbHeaders() });
+    if (!res.ok) {
+      var errTxt = await res.text().catch(function(){ return ''; });
+      throw new Error('Supabase fetch failed: ' + res.status + ' ' + errTxt.substring(0,100));
+    }
+    var rows = await res.json();
+    if (!rows || rows.length === 0) return null;
+    var record = rows[0].payload;
+    if (!record || record.init === true) return null;
+    return record;
+  });
 }
 
 // ── Write (upsert) data to Supabase ──────────────────────────
 async function _writeCloud(rowId, data) {
-  var url = SUPABASE_URL + '/rest/v1/dashboard_data';
-  var res = await fetch(url, {
-    method: 'POST',
-    headers: _sbHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
-    body: JSON.stringify({
-      id:         rowId,
-      payload:    data,
-      updated_at: new Date().toISOString(),
-      updated_by: _currentUser || 'unknown'
-    })
+  return _withRetry(async function() {
+    var url = SUPABASE_URL + '/rest/v1/dashboard_data';
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: _sbHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+      body: JSON.stringify({
+        id:         rowId,
+        payload:    data,
+        updated_at: new Date().toISOString(),
+        updated_by: _currentUser || 'unknown'
+      })
+    });
+    if (!res.ok) {
+      var err = await res.text().catch(function(){ return ''; });
+      throw new Error('Supabase write failed: ' + res.status + ' ' + err.substring(0, 200));
+    }
   });
-  if (!res.ok) {
-    var err = await res.text();
-    throw new Error('Supabase write failed: ' + res.status + ' ' + err.substring(0, 200));
-  }
 }
 
 // ── Save local state to cloud ─────────────────────────────────
@@ -6661,7 +6688,10 @@ async function _doCloudSave() {
     var msg = e.message||'';
     if (msg.indexOf('401')!==-1||msg.indexOf('403')!==-1) _setStatus('⚠️','Auth error');
     else if (msg.indexOf('429')!==-1) _setStatus('⚠️','Rate limit');
-    else { _setStatus('⚠️','Error'); showToast('Cloud save failed — data stored locally','error'); }
+    else if (msg.indexOf('503')!==-1||msg.indexOf('504')!==-1||msg.indexOf('PGRST002')!==-1) {
+      _setStatus('⚠️','Supabase geçici hata — yerel kaydedildi');
+      showToast('Supabase şu an meşgul (503/504). Veriler yerel olarak saklandı, sonra tekrar deneyin.','error');
+    } else { _setStatus('⚠️','Error'); showToast('Cloud save failed — data stored locally','error'); }
   } finally {
     _isSaving = false;
     if (_pendingSave) { _pendingSave = false; _doCloudSave(); }
@@ -6688,7 +6718,14 @@ window.manualSync = async function() {
       _setStatus('☁️', 'Written to cloud: ' + _nowStr());
     }
   } catch(e) {
-    _setStatus('⚠️', 'Error!');
+    var emsg = (e.message||'');
+    if (emsg.indexOf('503')!==-1||emsg.indexOf('504')!==-1||emsg.indexOf('PGRST002')!==-1) {
+      _setStatus('⚠️', 'Supabase geçici hata');
+      showToast('Supabase şu an yanıt vermiyor (503/504). Birkaç dakika bekleyip tekrar deneyin.', 'error');
+    } else {
+      _setStatus('⚠️', 'Sync hatası');
+      showToast('Sync başarısız: ' + emsg.substring(0,80), 'error');
+    }
     console.warn('manualSync failed:', e);
   }
 };
