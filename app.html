@@ -6322,7 +6322,7 @@ async function _withRetry(fn, maxRetries, silent) {
                      || msg.indexOf('502') !== -1
                      || msg.indexOf('PGRST002') !== -1 || msg.indexOf('schema cache') !== -1
                      || msg.indexOf('Failed to fetch') !== -1 || msg.indexOf('upstream') !== -1
-                     || (e instanceof TypeError); // CORS / network error
+                     || (e instanceof TypeError)  // CORS / network error
       // CORS / project paused detection
       var isCors = (e instanceof TypeError && msg.indexOf('fetch') !== -1 && msg.indexOf('Failed') !== -1);
       if (isCors && attempt === 0) {
@@ -6348,22 +6348,16 @@ async function _wakeUpSupabase() {
 async function _fetchCloud(rowId) {
   return _withRetry(async function() {
     var url = SUPABASE_URL + '/rest/v1/dashboard_data?id=eq.' + encodeURIComponent(rowId) + '&select=payload';
-    var fCtrl = new AbortController();
-    var fTid  = setTimeout(function(){ fCtrl.abort(); }, 8000);
-    try {
-      var res = await fetch(url, { headers: _sbHeaders(), signal: fCtrl.signal });
-      if (!res.ok) {
-        var errTxt = await res.text().catch(function(){ return ''; });
-        throw new Error('Supabase fetch failed: ' + res.status + ' ' + errTxt.substring(0,100));
-      }
-      var rows = await res.json();
-      if (!rows || rows.length === 0) return null;
-      var record = rows[0].payload;
-      if (!record || record.init === true) return null;
-      return record;
-    } finally {
-      clearTimeout(fTid);
+    var res = await fetch(url, { headers: _sbHeaders() });
+    if (!res.ok) {
+      var errTxt = await res.text().catch(function(){ return ''; });
+      throw new Error('Supabase fetch failed: ' + res.status + ' ' + errTxt.substring(0,100));
     }
+    var rows = await res.json();
+    if (!rows || rows.length === 0) return null;
+    var record = rows[0].payload;
+    if (!record || record.init === true) return null;
+    return record;
   });
 }
 
@@ -6371,26 +6365,19 @@ async function _fetchCloud(rowId) {
 async function _writeCloud(rowId, data) {
   return _withRetry(async function() {
     var url = SUPABASE_URL + '/rest/v1/dashboard_data';
-    var wCtrl = new AbortController();
-    var wTid  = setTimeout(function(){ wCtrl.abort(); }, 10000);
-    try {
-      var res = await fetch(url, {
-        method: 'POST',
-        headers: _sbHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
-        body: JSON.stringify({
-          id:         rowId,
-          payload:    data,
-          updated_at: new Date().toISOString(),
-          updated_by: _currentUser || 'unknown'
-        }),
-        signal: wCtrl.signal
-      });
-      if (!res.ok) {
-        var err = await res.text().catch(function(){ return ''; });
-        throw new Error('Supabase write failed: ' + res.status + ' ' + err.substring(0, 200));
-      }
-    } finally {
-      clearTimeout(wTid);
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: _sbHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+      body: JSON.stringify({
+        id:         rowId,
+        payload:    data,
+        updated_at: new Date().toISOString(),
+        updated_by: _currentUser || 'unknown'
+      })
+    });
+    if (!res.ok) {
+      var err = await res.text().catch(function(){ return ''; });
+      throw new Error('Supabase write failed: ' + res.status + ' ' + err.substring(0, 200));
     }
   });
 }
@@ -9093,12 +9080,14 @@ window.vesselPhotoChanged = function(inp) {
     imgEl.onload = function() {
       // Compress: max 480px wide, JPEG 72% — keeps base64 small (~15-25 KB per vessel)
       var canvas = document.createElement('canvas');
-      var maxW = 480, maxH = 280;
+      var maxW = 320, maxH = 200;
       var ratio = Math.min(maxW / imgEl.width, maxH / imgEl.height, 1);
       canvas.width  = Math.round(imgEl.width  * ratio);
       canvas.height = Math.round(imgEl.height * ratio);
       canvas.getContext('2d').drawImage(imgEl, 0, 0, canvas.width, canvas.height);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.60);
+      var sizeKB = Math.round(dataUrl.length * 0.75 / 1024);
+      console.log('[Photo] Compressed to', sizeKB, 'KB (' + canvas.width + 'x' + canvas.height + ')');
 
       // Store locally with timestamp for LWW merge
       var record = JSON.stringify({ url: dataUrl, ts: new Date().toISOString() });
@@ -9107,9 +9096,10 @@ window.vesselPhotoChanged = function(inp) {
 
       // Push to cloud immediately so teammates see it
       cloudSave('vessel', canonicalize(activeVessel.name)).then(function() {
-        showToast('Vessel photo saved & synced! Others will see it shortly.', 'success');
-      }).catch(function() {
-        showToast('Photo saved locally. Will sync on next cloud save.', 'info');
+        showToast('Fotoğraf kaydedildi (' + sizeKB + ' KB). Diğerleri yakında görecek.', 'success');
+      }).catch(function(err) {
+        showToast('Fotoğraf locale kaydedildi. Sync hatası: ' + (err&&err.message||'bilinmiyor'), 'error');
+        console.error('[Photo sync error]', err);
       });
     };
     imgEl.src = e.target.result;
