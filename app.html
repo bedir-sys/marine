@@ -1361,7 +1361,7 @@ body {
 
 .nl-row {
   display: grid;
-  grid-template-columns: 26px 1fr 72px 52px 22px;
+  grid-template-columns: 26px 1fr 22px 72px 52px 22px;
   align-items: center;
   border-bottom: 1px solid var(--border);
   min-height: 0;
@@ -1441,6 +1441,19 @@ body {
 body.dark .nl-add-inline { background: #3b82f6; }
 
 /* Dark mode */
+.nl-bold-btn {
+  background: none; border: none;
+  color: #94a3b8; cursor: pointer;
+  font-size: 11px; font-weight: 800;
+  font-family: Georgia, serif;
+  line-height: 1; padding: 0 2px;
+  border-radius: 3px;
+  transition: color .12s, background .12s;
+  align-self: center;
+}
+.nl-bold-btn:hover { color: #2563eb; background: rgba(37,99,235,.08); }
+body.dark .nl-bold-btn { color: #555; }
+body.dark .nl-bold-btn:hover { color: #93b4f0; background: rgba(37,99,235,.12); }
 body.dark .nl-ta { color: #f0f0f0; }
 body.dark .nl-ta:focus { background: rgba(37,99,235,.07); }
 body.dark .nl-prio { background: #2a2a2a; border-color: #444; color: #aaa; }
@@ -5257,6 +5270,7 @@ function buildNoteItem(cat, idx, item, placeholder, isBlank) {
   const p         = item.priority || '';
   const prioColor = p === 'critical' ? '#dc2626' : p === 'watch' ? '#d97706' : '#c4c9d4';
   const rowBg     = p === 'critical' ? 'rgba(220,38,38,.04)' : p === 'watch' ? 'rgba(245,158,11,.04)' : '';
+  // Textarea'ya yüklerken hem HTML tag'leri hem de **bold** marker'larını koru — raw göster
   const cleanText = (item.text || '').replace(/<[^>]*>/g, '');
   const rowNum    = idx + 1;  // blank satırda da bir sonraki numara göster
 
@@ -5283,18 +5297,24 @@ function buildNoteItem(cat, idx, item, placeholder, isBlank) {
       + ' style="display:none;">+</button>'
     : '';
 
+  var boldBtn = isBlank ? '' :
+    '<button type="button" class="nl-bold-btn" title="Bold (Ctrl+B)"'
+    + ' onclick="nlBoldSelection(\''+taId+'\')"'  
+    + '>𝐁</button>';
+
   return '<div class="nl-row' + (isBlank ? ' nl-row-blank' : '') + '" id="' + rowId + '"' + (rowBg ? ' style="background:' + rowBg + ';"' : '') + '>'
     + '<div class="nl-num" style="color:' + (isBlank ? '#d1d5db' : prioColor) + ';">' + rowNum + '</div>'
     + '<textarea class="nl-ta" id="' + taId + '"'
     + ' placeholder="' + escAttr(placeholder) + '"'
     + ' oninput="autoResizeTA(this);' + (isBlank ? 'nlShowAdd(\'' + cat + '\',this);' : '') + '"'
     + ' onfocus="autoResizeTA(this)"'
-    + (isBlank ? ' onkeydown="if(event.key===\'Tab\'){event.preventDefault();nlCommit(\'' + cat + '\');}"' : '')
+    + ' onkeydown="' + (isBlank ? 'if(event.key===\'Tab\'){event.preventDefault();nlCommit(\'' + cat + '\');}else ' : '') + 'if((event.ctrlKey||event.metaKey)&&event.key===\'b\'){event.preventDefault();nlBoldSelection(this.id);}"'
     + ' rows="1">'
     + escHtml(cleanText)
     + '</textarea>'
     + (isBlank ? addBtn : (
-        '<select class="nl-prio" id="' + selId + '"'
+        boldBtn
+      + '<select class="nl-prio" id="' + selId + '"'
       + ' onchange="noteRowPrioChange(this,\'' + cat + '\',' + idx + ')" title="Priority">'
       + opts + '</select>'
       + '<span class="nl-time">' + timeDisplay + '</span>'
@@ -5303,6 +5323,36 @@ function buildNoteItem(cat, idx, item, placeholder, isBlank) {
     + '</div>';
 }
 
+
+// ── Bold seçili metni **text** ile sar ──────────────────────────────
+function nlBoldSelection(taId) {
+  var ta = document.getElementById(taId);
+  if (!ta) return;
+  var start = ta.selectionStart;
+  var end   = ta.selectionEnd;
+  var val   = ta.value;
+
+  if (start === end) {
+    // Seçim yok: imleci **|** içine taşı
+    var insert = '****';
+    ta.value = val.slice(0, start) + insert + val.slice(end);
+    ta.selectionStart = ta.selectionEnd = start + 2;
+  } else {
+    var selected = val.slice(start, end);
+    // Zaten bold mu? (**text** → text)
+    if (val.slice(start - 2, start) === '**' && val.slice(end, end + 2) === '**') {
+      ta.value = val.slice(0, start - 2) + selected + val.slice(end + 2);
+      ta.selectionStart = start - 2;
+      ta.selectionEnd   = end - 2;
+    } else {
+      ta.value = val.slice(0, start) + '**' + selected + '**' + val.slice(end);
+      ta.selectionStart = start;
+      ta.selectionEnd   = end + 4;
+    }
+  }
+  autoResizeTA(ta);
+  ta.focus();
+}
 
 // "+" butonunu göster / gizle
 function nlShowAdd(cat, ta) {
@@ -5640,10 +5690,16 @@ function renderAlertPanel() {
           <span class="alert-cat-label">${catLabel}</span>
           <span class="alert-note-num">#${idx + 1}</span>
           <span class="prio-badge prio-badge-${item.priority}">${prioLabels[item.priority]}</span>
-          <span class="alert-note-text">${escHtml(item.text)}</span>
+          <span class="alert-note-text">${nlRenderBold(item.text)}</span>
           ${item.time ? `<span class="alert-note-time">${escHtml(item.time.split(',')[0])}</span>` : ''}
         </div>`).join('')}
     </div>`}`;
+}
+
+// ** marker'larını <strong> olarak render et (güvenli — escHtml sonrası)
+function nlRenderBold(text) {
+  if (!text) return '';
+  return escHtml(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 }
 
 function toggleAlertPanel() {
@@ -6437,15 +6493,63 @@ function _applyGlobalData(mod, data) {
 function _mergeVesselData(vn, cloud, local) {
   if (!cloud) return local;
   if (!local) return cloud;
-  // last-write-wins per-field (her alanda _ts varsa onu kullan)
   var merged = Object.assign({}, cloud);
+
+  // Timestamp string'ten ms cinsine çevir
+  function ts(t) { return t ? new Date(t).getTime() : 0; }
+
+  // Certs için per-field merge (objeyi tek blok karşılaştırma değil)
+  function _mergeCertObj(cc, lc) {
+    if (!cc) return lc;
+    if (!lc) return cc;
+    var cTs = cc._ts || {}, lTs = lc._ts || {};
+    var result = { _ts: {} };
+    // Tüm sertifika alanlarını tara
+    var allKeys = new Set(Object.keys(cc).concat(Object.keys(lc)));
+    allKeys.forEach(function(k) {
+      if (k === '_ts') return;
+      var lFieldTs = ts(lTs[k]);
+      var cFieldTs = ts(cTs[k]);
+      var useLocal;
+      if (lTs[k] && cTs[k]) {
+        useLocal = lFieldTs >= cFieldTs;
+      } else if (lTs[k]) {
+        useLocal = true;
+      } else if (cTs[k]) {
+        useLocal = false;
+      } else {
+        // Her ikisinde de timestamp yok: dolu olan kazanır
+        useLocal = !!(lc[k]) || true;
+      }
+      result[k]      = useLocal ? (lc[k] || '') : (cc[k] || '');
+      result._ts[k]  = useLocal ? (lTs[k] || '') : (cTs[k] || '');
+    });
+    return result;
+  }
+
   Object.keys(local).forEach(function(key) {
     var lv = local[key], cv = cloud[key];
-    if (!lv) return; // local null → cloud'u koru
+    if (lv === null || lv === undefined) return; // local null → cloud'u koru
+
     if (!cv) { merged[key] = lv; return; }
-    // _ts alanı olan objeler için timestamp karşılaştır
-    if (lv && typeof lv === 'object' && lv._ts && cv._ts) {
-      merged[key] = lv._ts > cv._ts ? lv : cv;
+
+    // Certs: per-field merge
+    if (key === 'certs') {
+      merged[key] = _mergeCertObj(cv, lv);
+      return;
+    }
+
+    // _ts alanı olan objeler: en son yazılan snapshot'ı bul
+    if (typeof lv === 'object' && lv._ts && cv._ts) {
+      // _ts bir obje (per-field) ise: en yeni field timestamp'ini bul
+      var lMaxTs = 0, cMaxTs = 0;
+      if (typeof lv._ts === 'object') {
+        Object.values(lv._ts).forEach(function(t){ var n=ts(t); if(n>lMaxTs)lMaxTs=n; });
+      } else { lMaxTs = ts(lv._ts); }
+      if (typeof cv._ts === 'object') {
+        Object.values(cv._ts).forEach(function(t){ var n=ts(t); if(n>cMaxTs)cMaxTs=n; });
+      } else { cMaxTs = ts(cv._ts); }
+      merged[key] = lMaxTs >= cMaxTs ? lv : cv;
     } else {
       merged[key] = lv; // local üstün (son yazan)
     }
@@ -6562,9 +6666,30 @@ async function _doCloudSave() {
   }
 }
 
-// ── Basit per-modül merge ─────────────────────────────────────────────
-// Cloud'daki veri daha yeniyse cloud kazansın, değilse local kazansın
-;
+// ── Manuel sync butonu ────────────────────────────────────────
+window.manualSync = async function() {
+  if (!_cloudReady) return;
+  _setStatus('🔄', 'Syncing...');
+  try {
+    var cloudData = await _fetchCloud();
+    if (cloudData) {
+      _safeApplySnapshot(cloudData);
+      var merged = _buildSnapshot();
+      await _writeCloud(merged);
+      _lastCloudStr = _deepSortStringify(merged);
+      _setStatus('☁️', 'Last updated: ' + _nowStr());
+      showToast('Synced', 'success');
+    } else {
+      var local = _buildSnapshot();
+      await _writeCloud(local);
+      _lastCloudStr = _deepSortStringify(local);
+      _setStatus('☁️', 'Written to cloud: ' + _nowStr());
+    }
+  } catch(e) {
+    _setStatus('⚠️', 'Error!');
+    console.warn('manualSync failed:', e);
+  }
+};
 
 // ── Login modal (name + password) ────────────────────────────
 var _DASHBOARD_PASSWORD = 'yasa1234';
@@ -14731,7 +14856,24 @@ function peRender() {
     return true;
   });
 
-  list.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+  // Tarihi karşılaştırma için YYYY-MM-DD'ye normalize et
+  // Desteklenen formatlar: YYYY-MM-DD, DD.MM.YYYY, DD/MM/YYYY, DD.MM.YY
+  function _peNormDate(d) {
+    if (!d) return '';
+    var s = String(d).trim();
+    // YYYY-MM-DD zaten doğru
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+    // DD.MM.YYYY veya DD/MM/YYYY
+    var m = s.match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{2,4})$/);
+    if (m) {
+      var day = m[1].padStart(2,'0');
+      var mon = m[2].padStart(2,'0');
+      var yr  = m[3].length === 2 ? '20' + m[3] : m[3];
+      return yr + '-' + mon + '-' + day;
+    }
+    return s; // bilinmeyen format — olduğu gibi bırak
+  }
+  list.sort(function(a,b){ return _peNormDate(b.date).localeCompare(_peNormDate(a.date)); });
 
   var total = 0;
   list.forEach(function(r){ total += (r.cost||0); });
