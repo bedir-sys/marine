@@ -6309,23 +6309,32 @@ function _sbHeaders(extra) {
 
 // ── Fetch cloud data ──────────────────────────────────────────
 // ── Retry yardımcısı: 503/504 hatalarında exponential backoff ──
-async function _withRetry(fn, maxRetries) {
-  maxRetries = maxRetries || 3;
-  var delay = 2000; // 2s → 4s → 8s
+async function _withRetry(fn, maxRetries, silent) {
+  maxRetries = maxRetries == null ? 3 : maxRetries;
+  var delay = 3000; // 3s → 6s → 12s
   for (var attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch(e) {
       var msg = e.message || '';
       var isRetryable = msg.indexOf('503') !== -1 || msg.indexOf('504') !== -1
+                     || msg.indexOf('502') !== -1
                      || msg.indexOf('PGRST002') !== -1 || msg.indexOf('schema cache') !== -1
-                     || msg.indexOf('Failed to fetch') !== -1;
+                     || msg.indexOf('Failed to fetch') !== -1 || msg.indexOf('upstream') !== -1;
       if (!isRetryable || attempt === maxRetries) throw e;
-      _setStatus('🔄', 'Supabase uyandırılıyor... (' + (attempt+1) + '/' + maxRetries + ')');
+      if (!silent) _setStatus('🔄', 'Supabase yeniden deneniyor... (' + (attempt+1) + '/' + maxRetries + ')');
       await new Promise(function(r){ setTimeout(r, delay); });
       delay *= 2;
     }
   }
+}
+
+// ── Supabase'i uyandır (cold start ping) ─────────────────────
+async function _wakeUpSupabase() {
+  try {
+    var url = SUPABASE_URL + '/rest/v1/dashboard_data?id=eq.__ping__&select=id';
+    await fetch(url, { headers: _sbHeaders() });
+  } catch(e) {}
 }
 
 async function _fetchCloud(rowId) {
@@ -6701,6 +6710,9 @@ async function _doCloudSave() {
 // ── Manuel sync butonu ────────────────────────────────────────
 window.manualSync = async function() {
   if (!_cloudReady) return;
+  _setStatus('🔄', 'Bağlanıyor...');
+  await _wakeUpSupabase();
+  await new Promise(function(r){ setTimeout(r, 500); });
   _setStatus('🔄', 'Syncing...');
   try {
     var cloudData = await _fetchCloud();
@@ -6926,30 +6938,46 @@ async function cloudInit() {
         _applyGlobalData('core', coreRow);
         _lastRowStr['yasa_global_core']  = _deepSortStringify(coreRow);
       }
-      // Tüm gemileri yükle (paralel)
-      var vesselPromises = VESSELS_ALL.map(function(v) {
-        var vn    = canonicalize(v);
-        var rowId = vesselRowId(vn);
-        return _fetchCloud(rowId).then(function(cd) {
-          if (cd) {
-            _applyVesselData(vn, cd);
-            _lastRowStr[rowId] = _deepSortStringify(cd);
-          } else {
-            // Cloud'da yok → local varsa yaz
-            var vdata = _buildVesselData(vn);
-            var hasContent = vdata && Object.values(vdata).some(function(val){
-              return val!=null&&(Array.isArray(val)?val.length>0:typeof val==='object'?Object.keys(val).length>0:!!val);
-            });
-            if (hasContent) {
-              return _writeCloud(rowId, vdata).then(function(){
-                _lastRowStr[rowId]  = _deepSortStringify(vdata);
-                _lastWriteTs[rowId] = Date.now();
-              }).catch(function(){});
+      // ── Önce Supabase'i uyandır (cold start) ─────────────────
+      _setStatus('🔄', 'Supabase bağlanıyor...');
+      await _wakeUpSupabase();
+      await new Promise(function(r){ setTimeout(r, 800); });
+
+      // ── Gemileri 6'lı gruplar halinde sırayla yükle ────────────
+      // Promise.all(38 vessel) yerine gruplu → thundering herd önlenir
+      var BATCH = 6;
+      var loaded = 0;
+      for (var bi = 0; bi < VESSELS_ALL.length; bi += BATCH) {
+        var batch = VESSELS_ALL.slice(bi, bi + BATCH);
+        _setStatus('🔄', 'Yükleniyor ' + Math.min(bi + BATCH, VESSELS_ALL.length) + '/' + VESSELS_ALL.length + '...');
+        var batchPromises = batch.map(function(vname) {
+          var vn    = canonicalize(vname);
+          var rowId = vesselRowId(vn);
+          return _fetchCloud(rowId).then(function(cd) {
+            loaded++;
+            if (cd) {
+              _applyVesselData(vn, cd);
+              _lastRowStr[rowId] = _deepSortStringify(cd);
+            } else {
+              var vdata = _buildVesselData(vn);
+              var hasContent = vdata && Object.values(vdata).some(function(val){
+                return val!=null&&(Array.isArray(val)?val.length>0:typeof val==='object'?Object.keys(val).length>0:!!val);
+              });
+              if (hasContent) {
+                return _writeCloud(rowId, vdata).then(function(){
+                  _lastRowStr[rowId]  = _deepSortStringify(vdata);
+                  _lastWriteTs[rowId] = Date.now();
+                }).catch(function(){});
+              }
             }
-          }
-        }).catch(function(e){ console.warn('[CloudInit] vessel', vn, e); });
-      });
-      await Promise.all(vesselPromises);
+          }).catch(function(e){ console.warn('[CloudInit] vessel', vn, e.message); });
+        });
+        await Promise.all(batchPromises);
+        // Gruplar arası kısa bekleme — Supabase'e nefes ver
+        if (bi + BATCH < VESSELS_ALL.length) {
+          await new Promise(function(r){ setTimeout(r, 300); });
+        }
+      }
 
       // Diğer global'leri yükle
       for (var gj=0; gj<GLOBAL_MODULES.length; gj++) {
