@@ -9067,7 +9067,7 @@ function exportVesselPDF() {
     return (s || '').replace(/ğ/g,'g').replace(/Ğ/g,'G').replace(/ş/g,'s').replace(/Ş/g,'S')
       .replace(/ı/g,'i').replace(/İ/g,'I').replace(/ö/g,'o').replace(/Ö/g,'O')
       .replace(/ç/g,'c').replace(/Ç/g,'C').replace(/ü/g,'u').replace(/Ü/g,'U')
-      .replace(/<[^>]*>/g,'');
+      .replace(/<[^>]*>/g,'').replace(/\*\*/g,'');
   };
 
   var jsPDF = window.jspdf.jsPDF;
@@ -9077,7 +9077,7 @@ function exportVesselPDF() {
   var colR   = PW - M*2 - colL - 6;
   var colLx  = M;
   var colRx  = M + colL + 6;
-  var BOTTOM = PH - 12;  // alt footer alanı başlangıcı
+  var BOTTOM = PH - 14;  // biraz daha fazla alan bırak
   var bodyTop = 26;
   var now    = new Date();
   var pageNum = 1;
@@ -9128,16 +9128,18 @@ function exportVesselPDF() {
   var halfCol = (colL - 4) / 2;
 
   // ── Yeni sayfa ekle ───────────────────────────────────────────
+  var _notesContinued = false;
   function addNewPage() {
     drawFooter();
     doc.addPage();
     pageNum++;
     drawHeader(false);
-    // Sayfa 2+'da dikey çizgi tekrar çiz
+    // Dikey çizgi
     doc.setDrawColor(220,228,245); doc.setLineWidth(0.3);
     doc.line(colRx - 3, bodyTop, colRx - 3, BOTTOM);
 
     // Kalan sertifikaları sol sütunda devam ettir
+    var leftEndY = bodyTop;
     if (remainingCerts.length > 0) {
       var certY = bodyTop;
       doc.setFillColor(37,99,235);
@@ -9172,9 +9174,19 @@ function exportVesselPDF() {
       } else {
         remainingCerts = [];
       }
+      leftEndY = certY + 4;
     }
 
-    return bodyTop;
+    // Sağ sütunda not devam başlığı
+    if (_notesContinued) {
+      doc.setFillColor(15,32,69);
+      doc.rect(colRx, bodyTop, colR, 7, 'F');
+      doc.setFontSize(8); doc.setFont('helvetica','bold');
+      doc.setTextColor(255,255,255);
+      doc.text('SUPERINTENDENT NOTES (CONT.)', colRx + 3, bodyTop + 5);
+    }
+
+    return bodyTop + (_notesContinued ? 9 : 0);
   }
 
   // ── Sayfa 1 başlık ───────────────────────────────────────────
@@ -9295,6 +9307,7 @@ function exportVesselPDF() {
   // Sağ sütun sınırına ulaşınca yeni sayfa açar (sol sütunda kalan sertifikalar da devam eder)
   function checkPageBreakR(neededHeight) {
     if (yR + neededHeight > BOTTOM) {
+      _notesContinued = true;
       yR = addNewPage();
     }
   }
@@ -9357,7 +9370,7 @@ function exportVesselPDF() {
       valid.forEach(function(it, idx) {
         var prio     = it.priority || '';
         var prioTag  = prio === 'critical' ? ' [CRITICAL]' : prio === 'watch' ? ' [WATCH]' : '';
-        var cleanText = tr((it.text||'').replace(/<[^>]*>/g,'').trim());
+        var cleanText = tr((it.text||'').replace(/<[^>]*>/g,'').replace(/\*\*/g,'').trim());
         var bullet   = (idx + 1) + '.  ' + cleanText + prioTag;
         var lines    = doc.splitTextToSize(bullet, curColR - 6);
         var lineH    = lines.length * 3.8 + 2;
@@ -9384,6 +9397,14 @@ function exportVesselPDF() {
       });
       yR += 3;
     });
+  }
+
+  // ── Kalan sertifikalar hâlâ varsa ek sayfa ─────────────────
+  while (remainingCerts.length > 0) {
+    _notesContinued = false; // sadece cert sayfası
+    addNewPage();
+    drawFooter(); // bu sayfanın footer'ı
+    // addNewPage içinde zaten footer çizilmiyor, manuel çiziyoruz
   }
 
   // ── Son sayfa footer ─────────────────────────────────────────
