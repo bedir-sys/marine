@@ -6697,6 +6697,15 @@ async function _doCloudSave() {
     }
 
     if (savedCount > 0) {
+      // ── CRITICAL FIX: Push _changedRowTs to Supabase so other clients detect changes ──
+      try {
+        var existingIdx = {};
+        try { existingIdx = (await _fetchCloud('yasa_changes_index')) || {}; } catch(ei) {}
+        var updatedIdx = Object.assign({}, existingIdx, _changedRowTs);
+        await _writeCloud('yasa_changes_index', updatedIdx);
+        _lastRowStr['yasa_changes_index'] = _deepSortStringify(updatedIdx);
+      } catch(idxErr) { console.warn('[CloudSync] changes_index update failed:', idxErr); }
+      // ─────────────────────────────────────────────────────────────────────────────────
       _updateStorageLabel(totalBytes);
       _setStatus('☁️', 'Saved ' + savedCount + ' row(s) — ' + _nowStr());
     } else {
@@ -6722,20 +6731,68 @@ window.manualSync = async function() {
   if (!_cloudReady) return;
   _setStatus('🔄', 'Syncing...');
   try {
-    var cloudData = await _fetchCloud();
-    if (cloudData) {
-      _safeApplySnapshot(cloudData);
-      var merged = _buildSnapshot();
-      await _writeCloud(merged);
-      _lastCloudStr = _deepSortStringify(merged);
-      _setStatus('☁️', 'Last updated: ' + _nowStr());
-      showToast('Synced', 'success');
-    } else {
-      var local = _buildSnapshot();
-      await _writeCloud(local);
-      _lastCloudStr = _deepSortStringify(local);
-      _setStatus('☁️', 'Written to cloud: ' + _nowStr());
+    var savedCount = 0;
+    var totalBytes = 0;
+
+    // Fetch + merge + write all vessels
+    for (var i = 0; i < VESSELS_ALL.length; i++) {
+      var vname  = VESSELS_ALL[i];
+      var vn     = canonicalize(vname);
+      var rowId  = vesselRowId(vn);
+      try {
+        var cd = await _fetchCloud(rowId);
+        var local = _buildVesselData(vn);
+        var toWrite = cd ? _mergeVesselData(vn, cd, local) : local;
+        _applyVesselData(vn, toWrite);
+        var finalStr = _deepSortStringify(toWrite);
+        if (finalStr !== _lastRowStr[rowId]) {
+          totalBytes += new Blob([finalStr]).size;
+          await _writeCloud(rowId, toWrite);
+          _lastRowStr[rowId]  = finalStr;
+          _lastWriteTs[rowId] = Date.now();
+          _changedRowTs[rowId] = new Date().toISOString();
+          savedCount++;
+        }
+      } catch(ve) { console.warn('[manualSync] vessel', vn, ve); }
     }
+
+    // Fetch + merge + write all globals
+    for (var j = 0; j < GLOBAL_MODULES.length; j++) {
+      var gmod   = GLOBAL_MODULES[j];
+      var gRowId = GLOBAL_ROW[gmod];
+      try {
+        var gcd    = await _fetchCloud(gRowId);
+        var glocal = _buildGlobalData(gmod);
+        var gWrite = gcd ? _mergeGlobalData(gmod, gcd, glocal) : glocal;
+        _applyGlobalData(gmod, gWrite);
+        var gFinal = _deepSortStringify(gWrite);
+        if (gFinal !== _lastRowStr[gRowId]) {
+          totalBytes += new Blob([gFinal]).size;
+          await _writeCloud(gRowId, gWrite);
+          _lastRowStr[gRowId]  = gFinal;
+          _lastWriteTs[gRowId] = Date.now();
+          _changedRowTs[gRowId] = new Date().toISOString();
+          savedCount++;
+        }
+      } catch(ge) { console.warn('[manualSync] global', gmod, ge); }
+    }
+
+    // Update changes index so teammates see the sync
+    if (savedCount > 0 || Object.keys(_changedRowTs).length > 0) {
+      try {
+        var existingIdx = {};
+        try { existingIdx = (await _fetchCloud('yasa_changes_index')) || {}; } catch(ei) {}
+        var updatedIdx = Object.assign({}, existingIdx, _changedRowTs);
+        await _writeCloud('yasa_changes_index', updatedIdx);
+        _lastRowStr['yasa_changes_index'] = _deepSortStringify(updatedIdx);
+      } catch(idxErr) { console.warn('[manualSync] changes_index update failed:', idxErr); }
+    }
+
+    try { renderStats(); renderVessels(); renderAlertPanel(); } catch(re) {}
+    if (activeVessel) { try { vesselPhotoApply(activeVessel.name); } catch(pe) {} }
+
+    _setStatus('☁️', 'Güncellendi — ' + _nowStr());
+    showToast('Sync tamamlandı (' + savedCount + ' satır güncellendi)', 'success');
   } catch(e) {
     var emsg = (e.message||'');
     if (emsg.indexOf('503')!==-1||emsg.indexOf('504')!==-1||emsg.indexOf('PGRST002')!==-1) {
@@ -7009,6 +7066,17 @@ async function cloudInit() {
     _cloudReady = true;
     _setStatus('☁️', (migrated ? 'Migrated — ' : 'Loaded — ') + _nowStr());
 
+    // ── Seed changes index with any rows we just wrote during init ──────────
+    if (Object.keys(_changedRowTs).length > 0) {
+      try {
+        var seedIdx = {};
+        try { seedIdx = (await _fetchCloud('yasa_changes_index')) || {}; } catch(si) {}
+        var seedMerged = Object.assign({}, seedIdx, _changedRowTs);
+        await _writeCloud('yasa_changes_index', seedMerged);
+        _lastRowStr['yasa_changes_index'] = _deepSortStringify(seedMerged);
+      } catch(seedErr) { console.warn('[CloudInit] seed changes_index failed:', seedErr); }
+    }
+
     // ── Akıllı polling: sadece 2KB index satırı izle ─────────────
     // Eski: 38 row × 150KB × her 90s = ~5.7MB/poll → günde GB'lar
     // Yeni: 1 satır × 2KB × her 3dk = ~10KB/poll → günde MB'lar
@@ -7052,6 +7120,10 @@ async function cloudInit() {
               var pvn = rowId.replace('yasa_v_', '');
               _applyVesselData(pvn, pcd);
               try { renderStats(); renderVessels(); renderAlertPanel(); } catch(e2) {}
+              // If the open modal is for this vessel, refresh its photo
+              if (activeVessel && canonicalize(activeVessel.name) === pvn) {
+                try { vesselPhotoApply(activeVessel.name); } catch(e3) {}
+              }
             } else {
               var pmod = Object.keys(GLOBAL_ROW).find(function(m){ return GLOBAL_ROW[m] === rowId; });
               if (pmod) {
@@ -7064,7 +7136,7 @@ async function cloudInit() {
         _setStatus('☁️', 'Güncellendi — ' + _nowStr());
 
       } catch(e) { /* polling hatası sessiz */ }
-    }, 1000); // 1 saniyede bir — sadece 2KB index sorgusu (Pro plan)
+    }, 10000); // 10 saniyede bir — sadece 2KB index sorgusu
 
   } catch(e) {
     console.warn('cloudInit failed:', e);
