@@ -1712,7 +1712,7 @@ body.dark .nc-bold-btn:hover, body.dark .nc-italic-btn:hover { background: rgba(
 @media (max-width: 900px) {
   .vessels-grid { grid-template-columns: repeat(3, 1fr); }
   .modal-body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-  .modal-col-details { border-right: none; border-bottom: 1px solid var(--border); max-height: 50vh; }
+  .modal-col-details { border-right: none; border-bottom: 1px solid var(--border); }
   .cert-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 600px) {
@@ -2082,6 +2082,7 @@ body.dark .nc-bold-btn:hover, body.dark .nc-italic-btn:hover { background: rgba(
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     min-height: 0;
+    max-height: none;
     display: block;
   }
 
@@ -3991,9 +3992,23 @@ function getCertAlerts(vessel) {
   const data = loadCerts(vessel);
   const alerts = [];
   CERT_FIELDS.forEach(f => {
-    const st = certStatus(data[f.key]);
-    if (st === 'warn' || st === 'overdue') {
-      alerts.push({ label: f.label, days: certDaysLeft(data[f.key]), status: st });
+    if (f.noExpiry) {
+      // gyroRenewal vb: son değiştirilme tarihinden 5 yıl geçmişse kırmızı alert
+      const val = data[f.key];
+      if (!val) return;
+      const ts = parseCertDate(val);
+      if (!ts) return;
+      const FIVE_YEARS_MS = 5 * 365.25 * 24 * 3600 * 1000;
+      const ageMs = Date.now() - ts;
+      if (ageMs > FIVE_YEARS_MS) {
+        const yearsAgo = (ageMs / (365.25 * 24 * 3600 * 1000)).toFixed(1);
+        alerts.push({ label: f.label, days: -Math.round(ageMs / 86400000), status: 'overdue', yearsAgo });
+      }
+    } else {
+      const st = certStatus(data[f.key]);
+      if (st === 'warn' || st === 'overdue') {
+        alerts.push({ label: f.label, days: certDaysLeft(data[f.key]), status: st });
+      }
     }
   });
   return alerts;
@@ -4716,8 +4731,11 @@ function buildCard(v) {
   const certStripHtml = certAlerts.length > 0
     ? `<div class="card-cert-warn">${certAlerts.map(a => {
         const cls = a.status === 'overdue' ? 'cert-chip-overdue' : 'cert-chip-warn';
-        const daysText = a.status === 'overdue' ? `OVRD` : `${a.days}d`;
-        return `<span class="cert-chip ${cls}" title="${escAttr(a.label)}: ${a.days < 0 ? 'OVERDUE' : a.days + ' days'}">${escHtml(a.label.split(' ')[0])} ${daysText}</span>`;
+        const daysText = a.yearsAgo ? `${a.yearsAgo}y ago` : (a.status === 'overdue' ? `OVRD` : `${a.days}d`);
+        const titleText = a.yearsAgo
+          ? `${a.label}: last replaced ${a.yearsAgo} years ago`
+          : (a.status === 'overdue' ? `${a.label}: OVERDUE` : `${a.label}: ${a.days} days left`);
+        return `<span class="cert-chip ${cls}" title="${escAttr(titleText)}">${escHtml(a.label.split(' ')[0])} ${daysText}</span>`;
       }).join('')}</div>`
     : '';
 
